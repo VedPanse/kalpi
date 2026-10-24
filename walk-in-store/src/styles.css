@@ -1,0 +1,65 @@
+:root {
+  --ground: #0E0F12;
+  --panel: rgba(18, 19, 24, .92);
+  --line: #2C3039;
+  --ink: #EEEDF2;
+  --ink2: #A6A8B4;
+  --ink3: #7E818E;
+  --accent: #B4AAFF;
+  --accent-ink: #0C0B12;
+  --display: "Syne", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--ground); color: var(--ink); font: 15px/1.5 var(--body); overflow: hidden; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+#view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#view:active { cursor: grabbing; }
+.cross { position: fixed; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: rgba(255, 255, 255, .75); box-shadow: 0 0 0 1px rgba(0, 0, 0, .4); z-index: 4; pointer-events: none; }
+
+/* top bar */
+.bar { position: fixed; left: 16px; right: 16px; top: 16px; z-index: 5; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; pointer-events: none; }
+.bar > * { pointer-events: auto; }
+.brand { font: 800 18px/1 var(--display); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; text-transform: capitalize; }
+#storeForm { display: flex; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; }
+#storeForm input { width: min(260px, 52vw); background: transparent; border: 0; color: var(--ink); font: inherit; padding: 6px 8px; outline: none; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { background: var(--panel); border: 1px solid var(--line); color: var(--ink2); border-radius: 999px; padding: 7px 11px; font: 500 13px/1 var(--body); cursor: pointer; }
+.chip:hover { color: var(--ink); }
+
+/* buttons */
+.btn { border: 0; border-radius: 9px; padding: 8px 13px; font: 600 14px/1 var(--body); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.btn.main { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: rgba(255, 255, 255, .06); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* status line */
+.status { position: fixed; left: 16px; bottom: 16px; z-index: 5; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font: 500 12.5px/1.4 var(--mono); color: var(--ink2); max-width: min(560px, calc(100% - 200px)); }
+.status b { color: var(--ink); }
+
+/* product panel */
+.panel { position: fixed; right: 16px; top: 76px; z-index: 6; width: min(330px, calc(100% - 32px)); max-height: calc(100% - 92px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 10px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.panel img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 10px; }
+.panel h3 { margin: 0; font: 700 18px/1.2 var(--display); }
+.panel .meta { font: 500 12px/1.3 var(--mono); color: var(--ink3); text-transform: uppercase; letter-spacing: .06em; }
+.panel .price { font: 500 16px var(--mono); }
+.panel .btns { display: grid; gap: 8px; }
+.x { position: absolute; right: 10px; top: 8px; background: none; border: 0; color: var(--ink2); font-size: 20px; cursor: pointer; }
+
+/* on-screen walk buttons */
+.keys { position: fixed; right: 16px; bottom: 16px; z-index: 5; display: grid; grid-template-columns: repeat(3, 44px); gap: 6px; }
+.keys button { height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px; cursor: pointer; touch-action: none; }
+.keys .sp { visibility: hidden; }
+
+.toast { position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%); z-index: 7; background: var(--ink); color: var(--ground); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13.5px; max-width: calc(100% - 32px); text-align: center; }
+
+/* "enter the store" overlay */
+.enter { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; padding: 16px; background: rgba(10, 10, 14, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.enter > div { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; max-width: 440px; display: grid; gap: 12px; text-align: center; }
+.enter h2 { margin: 0; font: 800 24px/1.1 var(--display); }
+.enter p { margin: 0; color: var(--ink2); }
+.enter .btn { padding: 13px 18px; font-size: 15px; }
