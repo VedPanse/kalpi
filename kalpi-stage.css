@@ -1,0 +1,127 @@
+/* ==== KALPI STAGE · the one theme for every Kalpi page (2026-10-17, round 4) ====
+   ONE SOURCE OF TRUTH. Every colour, type size and stage effect on kalpi.html, kalpi-vote.html (inlined by its build),
+   kalpi-3d.html, kalpi-tools.css (/ideas, /imagelab) and the chat comes from the tokens below. Change a value here, not in a page.
+   Approved design: team-notes/design-options/kalpi-look-options.html, A2 · Solo spotlight, type and spacing of option A.
+   Theme: near-black, a soft velvet-plum glow from the top light, a hint of petrol in the floor reflection.
+   Values: the page's "Universal pick" (near-black + plum, ring #B4AAFF, floor reflection #8494A6). Two derived steps:
+   --st-s2/--st-s3 (raised surfaces) and --st-text-3 lifted from #87829A to #8F8AA2 so it passes AA on every surface.
+   See team-notes/round4-theme/WHAT-CHANGED.md.
+   Rules: one main button per screen (.st-btn), everything else quiet (.st-ghost, .st-link, .st-more). No yellow.
+   No giant type. Pictures are never cropped (object-fit: contain). */
+
+@property --ring-c { syntax: "<color>"; inherits: true; initial-value: #B4AAFF; }
+
+:root {
+  color-scheme: dark;
+  /* ground: near-black, plum light from above, petrol in the floor */
+  --st-bg: #070609;          /* the stage (Universal pick: base) */
+  --st-top: #140E1D;         /* velvet plum, where the top light falls (Universal: top) */
+  --st-glow: #261C39;        /* the light's own glow (Universal: glow) */
+  --st-petrol: #0B2230;      /* floor tint, used at low alpha (Deep petrol top) */
+  --st-floor-ref: #8494A6;   /* the floor reflection colour of the 3D stage (Universal: floor reflection) */
+  --st-rim-l: #B3A3EE; --st-rim-r: #D4E2EC; --st-dust: #DCD8FF;   /* 3D stage lights (Universal) */
+  --st-petrol-glow: #38A7C9; /* used at low alpha only */
+  /* surfaces: quiet steps above the ground */
+  --st-s1: #121016; --st-s2: #1A1721; --st-s3: #231F2D;
+  --st-line: #262033;        /* hairlines (Universal: line) */
+  --st-ctl: #706889;         /* outlines of controls (3:1 on every surface) */
+  /* text (all pass WCAG AA on every surface above, see WHAT-CHANGED.md) */
+  --st-text: #F4F3F7; --st-text-2: #A29DAE; --st-text-3: #8F8AA2;
+  /* the one accent: the main button is a lilac pill with near-black ink */
+  --st-accent: #B4AAFF; --st-ink: #0B0B10; --st-accent-hover: #C9C1FF;   /* the lilac main button of the approved Keynote screenshot */
+  --st-ring: #B4AAFF;        /* the signature ring when nothing is selected */
+  --st-link: #C9B8FF;
+  --st-good: #6FDDAE; --st-warn: #F2A58E; --st-bad: #FF8F8F;   /* no yellow anywhere */
+  /* version colours: the ring takes the selected version's colour and blends to it */
+  --st-va: #F07FB0; --st-vb: #B58CF5; --st-vc: #7FB8F0;
+  /* the example product (the water bottle): one ring colour per colourway. Navy is lifted for the glow (#2C3A5C is the real navy) */
+  --ex-sage: #8FA595; --ex-terracotta: #BA6246; --ex-navy: #2C3A5C; --ex-navy-ring: #6E86C0; --ex-cream: #E8E0CE;
+  --ex-lipstick: #8E2A3E;
+  --ex-amethyst: #B4AAFF; --ex-ruby: #FF8FA6; --ex-sapphire: #8FB3FF;   /* the lipstick's versions (same as the ring colours in media/examples/materials.js) */   /* the second example: the red crystal-cap lipstick */
+  --ring-c: var(--st-ring);
+  /* type: option A. Inter Tight 600 for headings (never giant), Inter 400/500 for everything else */
+  --st-head: "Inter Tight", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --st-body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --st-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --st-h1: clamp(26px, 3vw, 40px);     /* the landing hero only */
+  --st-h2: clamp(22px, 2.2vw, 28px);   /* every other heading: capped at 28px */
+  --st-h3: 17px; --st-fs: 15px; --st-fs-s: 13.5px; --st-fs-xs: 12.5px;
+  /* spacing and shape: airy, rounded, pill controls */
+  --st-r: 14px; --st-r-l: 20px; --st-pill: 999px;
+  --st-ease: cubic-bezier(.2, .7, .1, 1);
+  /* the stage light, as layers any element can paint */
+  --st-light: radial-gradient(70% 55% at 50% -6%, color-mix(in srgb, var(--st-glow) 80%, transparent), transparent 70%),
+              radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--st-top) 70%, transparent), transparent 75%);
+  --st-floor: radial-gradient(60% 40% at 50% 100%, color-mix(in srgb, var(--st-petrol-glow) 9%, transparent), transparent 70%),
+              linear-gradient(to bottom, transparent 55%, color-mix(in srgb, var(--st-petrol) 55%, transparent));
+}
+
+/* ---- the one continuous stage: light from the top of the page, petrol at the very bottom ---- */
+html.st, html.st body { background-color: var(--st-bg); color: var(--st-text); }
+html.st body { font: 400 var(--st-fs)/1.55 var(--st-body); -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(1100px 620px at 50% -180px, color-mix(in srgb, var(--st-glow) 75%, transparent), transparent 72%),
+                    radial-gradient(1600px 900px at 50% -300px, color-mix(in srgb, var(--st-top) 80%, transparent), transparent 70%);
+  background-repeat: no-repeat; }
+
+/* ---- a stage: a dark block lit from above, a petrol hint in the floor ---- */
+.st-stage { position: relative; isolation: isolate; background: var(--st-light), var(--st-floor), var(--st-bg); border-radius: var(--st-r-l); overflow: hidden; }
+.st-stage::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; box-shadow: inset 0 0 120px 30px rgba(0, 0, 0, .55); border-radius: inherit; }
+
+/* ---- the signature ring: a floor ellipse in the selected version's colour; it blends when the colour changes ---- */
+.st-ringhost { transition: --ring-c .9s ease; }
+.st-ring { position: absolute; left: 50%; bottom: 8%; width: min(64%, 420px); aspect-ratio: 5 / 1; transform: translateX(-50%); pointer-events: none; border-radius: 50%; z-index: 0;
+  background: radial-gradient(closest-side, transparent 62%, color-mix(in srgb, var(--ring-c) 85%, white) 72%, color-mix(in srgb, var(--ring-c) 55%, transparent) 78%, transparent 100%);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--ring-c) 70%, transparent)); opacity: .9; }
+.st-ring::after { content: ""; position: absolute; inset: -60% -20%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--ring-c) 22%, transparent), transparent 80%); }
+@media (prefers-reduced-motion: no-preference) { .st-ring { animation: st-breathe 4s ease-in-out infinite alternate; } }
+@keyframes st-breathe { from { opacity: .78; } to { opacity: 1; } }
+
+/* ---- a picture on the stage: whole, never cropped ---- */
+.st-pic { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+/* ---- A / B / C pills ---- */
+.st-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.st-pill { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; font: 500 13px/1 var(--st-body); color: var(--st-text-2); background: color-mix(in srgb, var(--st-s1) 80%, transparent);
+  border: 0; box-shadow: inset 0 0 0 1px var(--st-line); border-radius: var(--st-pill); padding: 8px 13px 8px 9px; cursor: pointer; transition: color .25s, box-shadow .35s; }
+.st-pill i { width: 12px; height: 12px; border-radius: 50%; background: var(--v, var(--st-ring)); flex: none; }
+.st-pill b { color: var(--st-text); font-weight: 600; }
+.st-pill:hover { color: var(--st-text); }
+.st-pill[aria-pressed="true"] { color: var(--st-text); box-shadow: inset 0 0 0 1px var(--v, var(--st-ring)), 0 0 20px -4px var(--v, var(--st-ring)); }
+
+/* ---- buttons: ONE main button per screen ---- */
+.st-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 0; border-radius: var(--st-pill);
+  background: var(--st-accent); color: var(--st-ink); font: 600 14.5px/1 var(--st-body); text-decoration: none; cursor: pointer; transition: transform .2s, box-shadow .3s, background-color .2s; }
+.st-btn:hover { background: var(--st-accent-hover); box-shadow: 0 0 0 6px color-mix(in srgb, var(--st-accent) 10%, transparent), 0 8px 30px color-mix(in srgb, var(--ring-c) 40%, transparent); }
+.st-btn:active { transform: scale(.97); }
+/* disabled never looks broken: full shape, calm colour, the reason sits beside it */
+.st-btn:disabled, .st-btn[aria-disabled="true"] { background: var(--st-s3); color: var(--st-text-2); box-shadow: inset 0 0 0 1px var(--st-line); cursor: not-allowed; transform: none; }
+.st-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--st-pill);
+  background: rgba(255, 255, 255, .05); color: var(--st-text); box-shadow: inset 0 0 0 1px var(--st-line); font: 500 14px/1 var(--st-body); text-decoration: none; cursor: pointer; transition: background .2s, box-shadow .2s; }
+.st-ghost:hover { background: rgba(255, 255, 255, .09); box-shadow: inset 0 0 0 1px var(--st-ctl); }
+.st-link { color: var(--st-text); text-decoration: none; border-bottom: 1px solid var(--st-ctl); background: none; border-top: 0; border-left: 0; border-right: 0; padding: 0; font: inherit; cursor: pointer; }
+.st-link:hover { border-bottom-color: var(--st-text); }
+
+/* ---- More: a small quiet menu for secondary actions (a <details>, so it works without script) ---- */
+.st-more { position: relative; display: inline-block; }
+.st-more:not([open]) > .st-menu, html.st details:not([open]) > :not(summary) { display: none !important; }   /* a closed menu has no boxes at all (Chrome keeps hidden layout otherwise) */
+.st-more > summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: var(--st-pill); cursor: pointer;
+  color: var(--st-text-2); font: 500 13.5px/1 var(--st-body); box-shadow: inset 0 0 0 1px var(--st-line); background: rgba(255, 255, 255, .03); user-select: none; }
+.st-more > summary::-webkit-details-marker { display: none; }
+.st-more > summary::after { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.st-more[open] > summary { color: var(--st-text); }
+.st-more > summary:hover { color: var(--st-text); }
+.st-more > .st-menu { position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; min-width: 220px; max-width: min(340px, calc(100vw - 32px)); padding: 6px; border-radius: var(--st-r);
+  background: var(--st-s2); box-shadow: inset 0 0 0 1px var(--st-line), 0 24px 60px -20px rgba(0, 0, 0, .8); display: grid; gap: 2px; }
+.st-more.left > .st-menu { right: auto; left: 0; }
+.st-menu > a, .st-menu > button { display: block; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-radius: 10px; background: none; color: var(--st-text); font: 500 14px/1.3 var(--st-body); text-decoration: none; cursor: pointer; }
+.st-menu > a:hover, .st-menu > button:hover { background: rgba(255, 255, 255, .06); }
+.st-menu small { display: block; color: var(--st-text-3); font-size: 12.5px; margin-top: 2px; }
+.st-menu .st-menu-h { padding: 8px 12px 4px; color: var(--st-text-3); font: 500 12px/1.2 var(--st-body); }
+
+/* ---- type ---- */
+.st-h1 { font: 600 var(--st-h1)/1.12 var(--st-head); letter-spacing: -.02em; text-wrap: balance; }
+.st-h2 { font: 600 var(--st-h2)/1.2 var(--st-head); letter-spacing: -.015em; text-wrap: balance; }
+.st-eye { font: 500 13px/1.2 var(--st-body); color: var(--st-text-2); letter-spacing: .01em; }
+
+/* ---- focus ---- */
+html.st :focus-visible { outline: 2px solid var(--ring-c); outline-offset: 3px; }
