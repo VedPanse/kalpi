@@ -1,0 +1,7 @@
+node_modules/
+data/*
+!data/uploads/
+data/uploads/*
+!data/uploads/sample.glb
+.env
+.DS_Store

@@ -1,0 +1,34 @@
+import {test,before,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,rm,readFile} from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+let child,tmp;const base='http://127.0.0.1:3097',token='test-seller-secret';
+async function req(p,body,auth=true,method){let r=await fetch(base+'/api/'+p,{method:method||(body?'POST':'GET'),headers:{...(auth?{Authorization:'Bearer '+token}:{}),...(!(body instanceof FormData)?{'Content-Type':'application/json'}:{})},body:body instanceof FormData?body:body?JSON.stringify(body):undefined});return {status:r.status,data:await r.json()}}
+before(async()=>{tmp=await mkdtemp(path.join(os.tmpdir(),'kalpi-test-'));child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3097',SELLER_TOKEN:token,DB_PATH:path.join(tmp,'test.sqlite')},stdio:'pipe'});await new Promise((resolve,reject)=>{child.stdout.on('data',d=>{if(String(d).includes('Kalpi:'))resolve()});child.on('error',reject);child.on('exit',c=>reject(Error('Server exited '+c)))})});
+after(async()=>{child.kill();await rm(tmp,{recursive:true,force:true})});
+test('complete import → versions → immutable shelf → real response → seller results',async()=>{
+assert.equal((await req('seller/state',null,false)).status,401);assert.equal((await req('local-session',null,false)).status,403);
+let p=(await req('seller/projects',{name:'Test perfume'})).data;
+const f=new FormData();f.append('file',new Blob([await readFile('data/uploads/sample.glb')]),'bottle.glb');let a=(await req('seller/assets',f)).data;assert.equal(a.type,'model');
+assert.equal((await fetch(base+a.url)).status,401);
+let vs=[];for(let [name,color]of [['Olive','#87916b'],['Terra','#b07b59'],['Chalk','#e0d6bf']])vs.push((await req('seller/versions',{projectId:p.id,source:a.id,name,color,label:name})).data);
+let s=(await req('seller/shelves',{projectId:p.id,versionIds:vs.map(v=>v.id)})).data;assert.equal(s.versions.length,3);
+let pub=(await req('shelves/'+s.id,null,false)).data;assert.equal((await fetch(base+pub.versions[0].modelUrl)).status,200);assert.ok(!JSON.stringify(pub).includes('seller-secret'));
+const session='11111111-1111-4111-8111-111111111111';
+await req('shelves/'+s.id+'/views',{session},false);await req('shelves/'+s.id+'/views',{session},false);
+assert.equal((await req('shelves/'+s.id+'/responses',{session,choice:'wrong'},false)).status,400);
+assert.equal((await req('shelves/'+s.id+'/responses',{session,choice:vs[0].id,email:'dev@example.com',consent:false},false)).status,400);
+let response={session,choice:vs[1].id,comment:'Explicit test comment',email:'dev@example.com',consent:true};assert.equal((await req('shelves/'+s.id+'/responses',response,false)).status,200);await req('shelves/'+s.id+'/responses',response,false);
+let state=(await req('seller/state')).data;assert.equal(state.responses.length,1);assert.equal(state.views.length,1);assert.equal(state.responses[0].choice,vs[1].id);assert.equal(state.responses[0].waitlist,true);assert.ok(!JSON.stringify(state).includes('dev@example.com'));
+let edited=(await req('seller/versions',{...vs[1],name:'Changed',color:'#222222'})).data;assert.notEqual(edited.id,vs[1].id);let snapshot=(await req('shelves/'+s.id,null,false)).data;assert.equal(snapshot.versions[1].name,'Terra');assert.equal(snapshot.versions[1].color,'#b07b59');
+await req('seller/versions/'+vs[1].id,null,true,'DELETE');
+assert.equal((await req('seller/approve',{projectId:p.id,versionId:vs[1].id})).status,200);
+assert.equal((await req('seller/export/'+p.id)).data.project.approved.id,vs[1].id);
+await req('shelves/'+s.id+'/responses',{session,choice:'none',comment:'Updated response'},false);state=(await req('seller/state')).data;assert.equal(state.responses.length,1);assert.equal(state.responses[0].choice,'none');assert.equal(state.responses[0].waitlist,false);
+let p2=(await req('seller/projects',{name:'Other project'})).data;assert.equal((await req('seller/shelves',{projectId:p2.id,versionIds:[vs[0].id]})).status,400);
+await req('seller/shelves/'+s.id+'/unpublish',{});assert.equal((await req('shelves/'+s.id,null,false)).status,404);assert.equal((await fetch(base+pub.versions[0].modelUrl)).status,404);assert.equal((await req('shelves/'+s.id+'/responses',response,false)).status,400);
+});
+test('reject invalid models',async()=>{let f=new FormData();f.append('file',new Blob(['not a model']),'bad.glb');assert.equal((await req('seller/assets',f)).status,400)});
+test('database records survive reopen',async()=>{const {createStore}=await import('../store.js');let file=path.join(tmp,'persistence.sqlite');let s=createStore(file);s.put('project',{id:'durable',name:'Saved project'});s.db.close();s=createStore(file);assert.equal(s.get('durable').name,'Saved project');s.db.close()});
