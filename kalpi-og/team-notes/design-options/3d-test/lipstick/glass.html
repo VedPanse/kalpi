@@ -83,7 +83,7 @@ aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
-<script src="materials.js"></script>
+<script src="../../../../media/examples/materials.js"></script>
 <script>
 (() => {
 'use strict';
@@ -184,7 +184,7 @@ new ResizeObserver(resize).observe(canvas);
 const loader = new THREE.GLTFLoader(); if (window.MeshoptDecoder) loader.setMeshoptDecoder(MeshoptDecoder);
 async function load(name) {
   if (loaded[name]) return loaded[name];
-  const t0 = performance.now(), r = await fetch(KM.PRODUCTS[name].file, { cache: 'no-cache' });
+  const t0 = performance.now(), r = await fetch('../../../../media/examples/' + KM.PRODUCTS[name].file, { cache: 'no-cache' });
   if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + KM.PRODUCTS[name].file);
   const buf = await r.arrayBuffer();
   const gltf = await new Promise((res, rej) => loader.parse(buf, '', res, rej));

@@ -170,7 +170,7 @@ function fileFor(v) { return mode === 'rodin' ? 'models/rodin.glb' : 'models/3d-
 function build() {
   for (const v of VERSIONS) {
     const p = document.createElement('figure'); p.className = 'card photo'; p.style.margin = 0;
-    p.innerHTML = '<div class="cap"><span class="dot" style="background:' + v.hex + '"></span>' + v.name + '<small>2D · 864×1152</small></div><img alt="' + v.name + ' bottle, 2D colour version of the photo" src="photos/' + v.id + '.png">';
+    p.innerHTML = '<div class="cap"><span class="dot" style="background:' + v.hex + '"></span>' + v.name + '<small>2D · 864×1152</small></div><img alt="' + v.name + ' bottle, 2D colour version of the photo" src="../../../../media/example-bottle/' + v.id + '.png">';
     $('photos').appendChild(p);
     const s = document.createElement('div'); s.className = 'card'; s.dataset.version = v.id;
     s.innerHTML = '<div class="cap"><span class="dot" style="background:' + v.hex + '"></span>' + v.name + '<small class="kind">3D</small></div><div class="stage"><canvas aria-label="' + v.name + ' bottle in 3D"></canvas><span class="tag"></span><div class="msg">Loading…</div></div><div class="stats">…</div>';

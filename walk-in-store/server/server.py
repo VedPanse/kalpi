@@ -37,8 +37,13 @@ def clean_domain(raw):
     return host
 
 
+ASSETS = Path(__file__).resolve().parent.parent / "assets"  # committed catalogues + 3D models (e.g. assets/graza.co)
+
+
 def cache_dir(domain):
-    return CACHE / domain.removeprefix("www.")
+    """Saved catalogue + 3D models for a store: the committed assets/ folder first, then the local data/cache/."""
+    d = domain.removeprefix("www.")
+    return ASSETS / d if (ASSETS / d / "3d" / "catalog.json").exists() else CACHE / d
 
 
 def products(domain):

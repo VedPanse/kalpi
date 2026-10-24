@@ -41,7 +41,9 @@ export function buildModel(base: ModelBase, dir: string): THREE.Group {
     const pos = geo.attributes.position, uv = geo.attributes.uv;
     const W = base.widthMM * MM, H = base.heightMM * MM;
     for (let i = 0; i < pos.count; i++) {
-      uv.setXY(i, base.axisU! + pos.getX(i) / W, pos.getY(i) / H);
+      // the back (z < 0) gets the photo the other way round, so its text isn't mirrored
+      const x = pos.getZ(i) < 0 ? -pos.getX(i) : pos.getX(i);
+      uv.setXY(i, base.axisU! + x / W, pos.getY(i) / H);
     }
     uv.needsUpdate = true;
     geo.computeVertexNormals();
