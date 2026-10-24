@@ -1,0 +1,214 @@
+<title>Walk-in Store Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F4F1;--surface:#FFFFFF;--ink:#16171B;--ink2:#55586A;--line:#DEDBD4;--accent:#5B4BD6;--accent-soft:#ECE9FF;
+  --code-bg:#14151A;--code-ink:#E6E4EE;--c-key:#C9B8FF;--c-str:#9FE3B4;--c-com:#7F8496;--c-num:#FFC38A;--c-fn:#8FC8FF;
+  --display:"Syne",ui-sans-serif,system-ui,sans-serif;--body:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0E0F12;--surface:#17191F;--ink:#EEEDF2;--ink2:#A6A8B4;--line:#2C3039;--accent:#B4AAFF;--accent-soft:#25223A;--code-bg:#0A0B0E}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0E0F12;--surface:#17191F;--ink:#EEEDF2;--ink2:#A6A8B4;--line:#2C3039;--accent:#B4AAFF;--accent-soft:#25223A;--code-bg:#0A0B0E}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding-inline:16px;padding-block:32px 64px;margin:0}
+.wrap{max-width:900px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+h1{font:800 clamp(30px,5vw,48px)/1.02 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.lede{margin-top:14px;color:var(--ink2);max-width:62ch;font-size:17px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.stack{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.pill{font:500 13px/1 var(--mono);padding:7px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.flow{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;overflow-x:auto}
+.flow svg{display:block;min-width:640px;width:100%;height:auto}
+.step{display:grid;grid-template-columns:44px 1fr;gap:4px 16px;margin-top:44px}
+.num{grid-row:span 3;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--ink);color:var(--bg);font:700 16px/1 var(--mono)}
+.step h2{font:700 22px/1.2 var(--display);text-wrap:balance}
+.step p{color:var(--ink2);max-width:66ch}
+.file{font:500 12.5px/1 var(--mono);color:var(--accent);margin-top:12px}
+pre{grid-column:2;margin:8px 0 0;background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:14px 16px;overflow-x:auto;font:13px/1.65 var(--mono);tab-size:2}
+.k{color:var(--c-key)}.s{color:var(--c-str)}.c{color:var(--c-com);font-style:italic}.n{color:var(--c-num)}.f{color:var(--c-fn)}
+.note{grid-column:2;margin-top:10px;font-size:14px;color:var(--ink2);border-left:3px solid var(--accent);padding-left:12px}
+.tree{grid-column:2}
+.lesson{margin-top:48px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:10px}
+.lesson h2{font:700 20px/1.2 var(--display)}
+.lesson ul{margin:0;padding-left:20px;color:var(--ink2)}
+.lesson li{margin:4px 0}
+code.i{font:500 .92em var(--mono);background:var(--accent-soft);color:var(--ink);padding:1px 5px;border-radius:5px}
+@media (max-width:560px){.step{grid-template-columns:1fr}.num{grid-row:auto}pre,.note,.tree{grid-column:1}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Cal Hacks 13 · Friday night</div>
+  <h1>How the walk-in store was built</h1>
+  <p class="lede">Type any Shopify store's address and walk through a 3D shop filled with its real products, photos and prices. These are the steps, in order, with the actual code from <code class="i">~/calhacks-store</code>.</p>
+  <div class="stack"><span class="pill">TypeScript</span><span class="pill">three.js</span><span class="pill">Vite</span><span class="pill">Python 3</span><span class="pill">HTML + CSS</span></div>
+
+  <div class="flow" aria-label="How data flows from Shopify to the 3D store">
+    <svg viewBox="0 0 860 150" role="img">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="DM Sans, sans-serif" font-size="14" fill="currentColor" style="color:var(--ink)">
+        <rect x="10" y="40" width="150" height="70" rx="12" fill="var(--accent-soft)" stroke="var(--line)"/><text x="85" y="70" text-anchor="middle" font-weight="600">Shopify store</text><text x="85" y="92" text-anchor="middle" font-size="12" fill="var(--ink2)">/products.json</text>
+        <rect x="235" y="40" width="160" height="70" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="315" y="70" text-anchor="middle" font-weight="600">Python helper</text><text x="315" y="92" text-anchor="middle" font-size="12" fill="var(--ink2)">server/server.py</text>
+        <rect x="470" y="40" width="160" height="70" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="550" y="70" text-anchor="middle" font-weight="600">Store builder</text><text x="550" y="92" text-anchor="middle" font-size="12" fill="var(--ink2)">src/store.ts</text>
+        <rect x="705" y="40" width="145" height="70" rx="12" fill="var(--ink)" stroke="var(--ink)"/><text x="777" y="70" text-anchor="middle" font-weight="600" fill="var(--bg)">You, walking</text><text x="777" y="92" text-anchor="middle" font-size="12" fill="var(--bg)">walker.ts + panel.ts</text>
+        <line x1="162" y1="75" x2="230" y2="75" stroke="currentColor" stroke-width="2" marker-end="url(#ar)"/><text x="196" y="64" text-anchor="middle" font-size="11" fill="var(--ink2)">products</text>
+        <line x1="397" y1="75" x2="465" y2="75" stroke="currentColor" stroke-width="2" marker-end="url(#ar)"/><text x="431" y="64" text-anchor="middle" font-size="11" fill="var(--ink2)">JSON + photos</text>
+        <line x1="632" y1="75" x2="700" y2="75" stroke="currentColor" stroke-width="2" marker-end="url(#ar)"/><text x="666" y="64" text-anchor="middle" font-size="11" fill="var(--ink2)">3D scene</text>
+        <path d="M777 112 C 777 140, 315 140, 315 114" fill="none" stroke="var(--ink2)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#ar)"/><text x="546" y="146" text-anchor="middle" font-size="11" fill="var(--ink2)">"Add to cart" opens the seller's real Shopify cart</text>
+      </g>
+    </svg>
+  </div>
+
+  <section class="step"><div class="num">1</div><h2>Find the products without asking anyone</h2>
+    <p>Almost every Shopify store publishes its catalogue at <code class="i">/products.json</code>, with names, prices, photos and variant IDs. No login or API key. I tested real stores first to make sure it works.</p>
+<pre><span class="k">curl</span> <span class="s">"https://homesick.com/products.json?limit=250"</span>
+<span class="c"># homesick.com 247 products · kyliecosmetics.com 250 · allbirds.com 250 · gymshark.com: hidden</span></pre>
+  </section>
+
+  <section class="step"><div class="num">2</div><h2>A small Python helper to fetch it</h2>
+    <p>A web page isn't allowed to read another site's data or use its photos as 3D textures (the browser's CORS rule). So a tiny server fetches the catalogue and passes the photos through. It uses only Python's standard library.</p>
+    <div class="file">server/server.py</div>
+<pre><span class="k">def</span> <span class="f">products</span>(domain):
+    body, _ = fetch(<span class="s">f"https://{domain}/products.json?limit=250&amp;page={page}"</span>)
+    <span class="k">for</span> p <span class="k">in</span> json.loads(body)[<span class="s">"products"</span>]:
+        v = p[<span class="s">"variants"</span>][<span class="n">0</span>]
+        out.append({
+            <span class="s">"title"</span>: p[<span class="s">"title"</span>], <span class="s">"type"</span>: p[<span class="s">"product_type"</span>],
+            <span class="s">"price"</span>: v[<span class="s">"price"</span>], <span class="s">"variant_id"</span>: v[<span class="s">"id"</span>],
+            <span class="s">"image"</span>: p[<span class="s">"images"</span>][<span class="n">0</span>][<span class="s">"src"</span>],
+        })
+
+<span class="c"># /img?u=…  passes a Shopify photo through, resized to 360 px</span>
+<span class="k">if not</span> host.endswith((<span class="s">"cdn.shopify.com"</span>,)):
+    <span class="k">return</span> self.send_bytes(<span class="n">400</span>, <span class="s">b"image host not allowed"</span>, <span class="s">"text/plain"</span>)</pre>
+    <p class="note">Only Shopify's image server is allowed through, so the helper can't be used to fetch random websites.</p>
+  </section>
+
+  <section class="step"><div class="num">3</div><h2>Set up the project: TypeScript, three.js, Vite</h2>
+    <p>Vite runs the site while you work and forwards <code class="i">/api</code> and <code class="i">/img</code> to the Python helper, so the page and the helper act like one app.</p>
+    <div class="file">vite.config.ts</div>
+<pre><span class="k">const</span> API = <span class="s">'http://127.0.0.1:8790'</span>;
+
+<span class="k">export default</span> <span class="f">defineConfig</span>({
+  server: {
+    port: <span class="n">5173</span>,
+    proxy: { <span class="s">'/api'</span>: API, <span class="s">'/img'</span>: API },
+  },
+});</pre>
+    <div class="file">The files</div>
+<pre class="tree">index.html          <span class="c">page layout</span>
+src/main.ts         <span class="c">wires everything together</span>
+src/store.ts        <span class="c">builds the 3D store from the products</span>
+src/walker.ts       <span class="c">walking, looking, collisions</span>
+src/panel.ts        <span class="c">product card and messages</span>
+src/textures.ts     <span class="c">signs, price tags, floor drawn in code</span>
+src/api.ts          <span class="c">talks to the helper</span>
+src/types.ts        <span class="c">shared types</span>
+src/styles.css      <span class="c">page styles (CSS)</span>
+server/server.py    <span class="c">Shopify helper</span></pre>
+  </section>
+
+  <section class="step"><div class="num">4</div><h2>Describe a product once, in TypeScript</h2>
+    <p>Every file agrees on what a product looks like. If a field is misspelled anywhere, TypeScript complains before the page even runs.</p>
+    <div class="file">src/types.ts · src/api.ts</div>
+<pre><span class="k">export interface</span> <span class="f">Product</span> {
+  title: <span class="k">string</span>; type: <span class="k">string</span>; handle: <span class="k">string</span>;
+  price: <span class="k">string</span> | <span class="k">null</span>; variant_id: <span class="k">number</span>; image: <span class="k">string</span>;
+}
+
+<span class="k">export async function</span> <span class="f">fetchStore</span>(store: <span class="k">string</span>): Promise&lt;StoreData&gt; {
+  <span class="k">const</span> res = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">'/api/products?store='</span> + <span class="f">encodeURIComponent</span>(store));
+  <span class="k">const</span> data = <span class="k">await</span> res.<span class="f">json</span>();
+  <span class="k">if</span> (!res.ok) <span class="k">throw new</span> <span class="f">Error</span>(data.error ?? <span class="s">'Could not read that store.'</span>);
+  <span class="k">return</span> data;
+}</pre>
+  </section>
+
+  <section class="step"><div class="num">5</div><h2>Draw signs and price tags in code</h2>
+    <p>No image files needed. A 2D canvas draws the price tag, and three.js wraps it onto a small plane on the shelf edge. The aisle signs, checkout sign and floor tiles work the same way.</p>
+    <div class="file">src/textures.ts</div>
+<pre><span class="k">export function</span> <span class="f">priceTexture</span>(text: <span class="k">string</span>) {
+  <span class="k">return</span> <span class="f">canvasTexture</span>(<span class="n">256</span>, <span class="n">96</span>, (g, w, h) =&gt; {
+    g.fillStyle = <span class="s">'#FFFFFF'</span>;  g.<span class="f">fillRect</span>(<span class="n">0</span>, <span class="n">0</span>, w, h);
+    g.fillStyle = <span class="s">'#E4002B'</span>;  g.<span class="f">fillRect</span>(<span class="n">0</span>, <span class="n">0</span>, w, <span class="n">14</span>);       <span class="c">// red strip on top</span>
+    g.fillStyle = <span class="s">'#111'</span>;
+    g.font = <span class="s">'700 46px "IBM Plex Mono", monospace'</span>;
+    g.<span class="f">fillText</span>(text, w / <span class="n">2</span>, h * <span class="n">0.6</span>);                 <span class="c">// "$34.95"</span>
+  });
+}</pre>
+  </section>
+
+  <section class="step"><div class="num">6</div><h2>Build the store: as many aisles as the products need</h2>
+    <p>One two-sided shelving unit holds 80 products (10 per shelf × 4 shelves × 2 sides). The code counts the products, makes that many units, sorts products by type so each aisle has a theme, and puts every product on a shelf two deep with a price tag in front.</p>
+    <div class="file">src/store.ts</div>
+<pre><span class="k">const</span> LEVELS = [<span class="n">0.2</span>, <span class="n">0.62</span>, <span class="n">1.04</span>, <span class="n">1.46</span>];   <span class="c">// shelf heights in metres</span>
+<span class="k">const</span> PER_SIDE = Math.<span class="f">floor</span>(UNIT_LENGTH / SLOT);  <span class="c">// 10</span>
+<span class="k">const</span> PER_UNIT = PER_SIDE * LEVELS.length * <span class="n">2</span>;   <span class="c">// 80</span>
+
+products.<span class="f">sort</span>((a, b) =&gt; a.type.<span class="f">localeCompare</span>(b.type));   <span class="c">// themed aisles</span>
+<span class="k">const</span> units = Math.<span class="f">ceil</span>(products.length / PER_UNIT);
+
+<span class="k">for</span> (<span class="k">const</span> depth <span class="k">of</span> [<span class="n">0</span>, <span class="n">1</span>]) {   <span class="c">// two facings deep, like a stocked shelf</span>
+  <span class="k">const</span> box = <span class="k">new</span> THREE.<span class="f">Mesh</span>(productGeo, [edge, edge, edge, edge, photo, edge]);
+  box.position.<span class="f">set</span>(side * (UNIT_DEPTH - <span class="n">0.09</span> - depth * <span class="n">0.16</span>), LEVELS[li] + <span class="n">0.15</span>, z);
+  box.rotation.y = side * Math.PI / <span class="n">2</span>;          <span class="c">// face the aisle</span>
+  box.userData.product = p;                     <span class="c">// remembered for clicking</span>
+  unit.<span class="f">add</span>(box);
+}</pre>
+    <p class="note">The same file adds the end-of-aisle display, the hanging aisle signs (named after the most common product type), ceiling lights, the checkout counter, the entrance mat and two plants. All of it is built from boxes, cylinders, spheres and planes.</p>
+  </section>
+
+  <section class="step"><div class="num">7</div><h2>Walk around without going through shelves</h2>
+    <p>The camera is your eyes, 1.6 m off the floor. Each frame, the keys decide where you'd move, and the move only happens if that spot isn't inside a shelf or outside the walls.</p>
+    <div class="file">src/walker.ts</div>
+<pre><span class="k">private</span> <span class="f">free</span>(x: <span class="k">number</span>, z: <span class="k">number</span>): <span class="k">boolean</span> {
+  <span class="k">if</span> (x &lt; b.x0 || x &gt; b.x1 || z &lt; b.z0 || z &gt; b.z1) <span class="k">return false</span>;  <span class="c">// walls</span>
+  <span class="k">return</span> !<span class="k">this</span>.blocks.<span class="f">some</span>((o) =&gt; x &gt; o.x0 &amp;&amp; x &lt; o.x1 &amp;&amp; z &gt; o.z0 &amp;&amp; z &lt; o.z1);  <span class="c">// shelves</span>
+}
+
+<span class="k">const</span> forward = (k.<span class="f">has</span>(<span class="s">'w'</span>) || k.<span class="f">has</span>(<span class="s">'arrowup'</span>) ? <span class="n">1</span> : <span class="n">0</span>) - (k.<span class="f">has</span>(<span class="s">'s'</span>) || k.<span class="f">has</span>(<span class="s">'arrowdown'</span>) ? <span class="n">1</span> : <span class="n">0</span>);
+<span class="k">let</span> dx = -Math.<span class="f">sin</span>(<span class="k">this</span>.yaw) * forward * speed;
+<span class="k">let</span> dz = -Math.<span class="f">cos</span>(<span class="k">this</span>.yaw) * forward * speed;
+<span class="k">if</span> (<span class="k">this</span>.<span class="f">free</span>(x + dx, z)) <span class="k">this</span>.position.x += dx;   <span class="c">// slide along shelves</span>
+<span class="k">if</span> (<span class="k">this</span>.<span class="f">free</span>(x, z + dz)) <span class="k">this</span>.position.z += dz;</pre>
+    <p class="note">Checking x and z separately lets you slide along a shelf instead of getting stuck on it. Mouse look uses the browser's pointer lock, the same as a video game.</p>
+  </section>
+
+  <section class="step"><div class="num">8</div><h2>Click a product, or the floor</h2>
+    <p>A raycaster shoots an invisible line from the camera through the mouse. If it hits a product, the product card opens. If it hits the floor, you walk there.</p>
+    <div class="file">src/main.ts</div>
+<pre>ray.<span class="f">setFromCamera</span>(ndc, camera);
+<span class="k">const</span> hit = ray.<span class="f">intersectObjects</span>(world.pickables, <span class="k">false</span>)[<span class="n">0</span>];
+<span class="k">if</span> (hit &amp;&amp; hit.distance &lt; <span class="n">7</span>) {
+  <span class="f">openPanel</span>(loadedStore, hit.object.userData.product);   <span class="c">// product card</span>
+  <span class="k">return</span>;
+}
+<span class="k">const</span> f = ray.<span class="f">intersectObject</span>(floor)[<span class="n">0</span>];
+<span class="k">if</span> (f) walker.<span class="f">walkTo</span>(f.point.x, f.point.z);              <span class="c">// click to walk</span></pre>
+  </section>
+
+  <section class="step"><div class="num">9</div><h2>Real checkout links to the seller's store</h2>
+    <p>Shopify supports "cart permalinks": a link with a variant ID drops that item straight into the seller's real cart. The product card uses it, so buying happens on their actual store.</p>
+    <div class="file">src/api.ts</div>
+<pre><span class="k">export function</span> <span class="f">cartUrl</span>(store: <span class="k">string</span>, variantId: <span class="k">number</span>) {
+  <span class="k">return</span> <span class="s">`https://${store}/cart/${variantId}:1`</span>;
+}</pre>
+  </section>
+
+  <section class="step"><div class="num">10</div><h2>Check it and run it</h2>
+    <p>TypeScript's strict checks pass with no errors. Two terminals run the app.</p>
+<pre><span class="k">npm</span> install
+<span class="k">npm</span> run api     <span class="c"># the Shopify helper on :8790</span>
+<span class="k">npm</span> run dev     <span class="c"># the site on http://127.0.0.1:5173</span>
+<span class="k">npx</span> tsc --noEmit  <span class="c"># type check: no errors</span></pre>
+  </section>
+
+  <div class="lesson">
+    <h2>What we tried first, and why we changed course</h2>
+    <ul>
+      <li><b>Filming a room (Ved's Reframe).</b> It worked, but 8 seconds of low-quality video gave a mesh full of holes, which looked too rough for a store.</li>
+      <li><b>AI image-to-3D for every product.</b> Clean models, but about $0.30 each and a minute per product, and the fal balance was nearly used up.</li>
+      <li><b>What we kept:</b> real product photos on real-looking shelves, the way InGallery does it. Instant, free, and every Shopify seller gets their own store. True 3D models can be added later for a few hero products.</li>
+    </ul>
+  </div>
+</div>

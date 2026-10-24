@@ -1,0 +1,77 @@
+<title>Torus Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#0E0F12;--panel:#17191F;--line:#2C3039;--ink:#EEEDF2;--ink2:#A6A8B4;--accent:#B4AAFF}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "DM Sans",system-ui,sans-serif;padding-inline:16px;padding-block:20px 32px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:16px}
+h1{margin:0 0 4px;font:800 28px/1.1 Syne,sans-serif}
+header{grid-column:1/-1}
+header p{margin:0;color:var(--ink2)}
+.view{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#000;aspect-ratio:4/3;max-width:100%}
+canvas{display:block;width:100%;height:100%}
+.ctl{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px;align-content:start}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:999px;padding:8px;font:600 13.5px "DM Sans",sans-serif;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+label{display:grid;gap:4px;font-size:13px;color:var(--ink2)}
+label span{display:flex;justify-content:space-between}
+label b{color:var(--ink);font:500 13px "IBM Plex Mono",monospace}
+input[type=range]{width:100%;accent-color:var(--accent)}
+pre{margin:0;background:#0A0B0D;border:1px solid var(--line);border-radius:10px;padding:12px;font:12.5px/1.6 "IBM Plex Mono",monospace;color:#CFCBFF;overflow-x:auto;white-space:pre}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:6px 10px;font:500 13px "DM Sans",sans-serif;cursor:pointer}
+.row button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:800px){.wrap{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header><h1>Torus playground</h1><p>Move the sliders and watch three.js rebuild the shape. The code underneath updates with your numbers. Drag the shape to spin it.</p></header>
+  <div class="view"><canvas id="c" aria-label="Spinning 3D torus"></canvas></div>
+  <div class="ctl">
+    <div class="tabs" role="group" aria-label="Shape"><button type="button" data-shape="torus" aria-pressed="true">Torus</button><button type="button" data-shape="knot" aria-pressed="false">Torus knot</button></div>
+    <div id="sliders"></div>
+    <div><div style="font-size:13px;color:var(--ink2);margin-bottom:6px">Material</div>
+      <div class="row" id="mats"><button type="button" data-m="normal" aria-pressed="true">Normal</button><button type="button" data-m="lilac" aria-pressed="false">Lilac</button><button type="button" data-m="wire" aria-pressed="false">Wireframe</button></div></div>
+    <pre id="code"></pre>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const SHAPES={
+  torus:{ctor:'TorusGeometry',p:[['radius',10,2,14,.5],['tube',3,.5,6,.1],['radialSegments',16,3,48,1],['tubularSegments',100,3,200,1],['arc',6.28,.2,6.28,.01]]},
+  knot:{ctor:'TorusKnotGeometry',p:[['radius',10,2,14,.5],['tube',3,.5,6,.1],['tubularSegments',100,8,300,1],['radialSegments',16,3,32,1],['p',2,1,9,1],['q',3,1,9,1]]}
+};
+let shape='torus',mat='normal';const vals={torus:{},knot:{}};
+for(const k in SHAPES)SHAPES[k].p.forEach(a=>vals[k][a[0]]=a[1]);
+const cv=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color('#0E0F12');
+const camera=new THREE.PerspectiveCamera(50,4/3,.1,200);camera.position.set(0,0,42);
+scene.add(new THREE.HemisphereLight('#ffffff','#2a2440',.6));const dl=new THREE.DirectionalLight('#ffffff',.9);dl.position.set(10,20,15);scene.add(dl);
+const mesh=new THREE.Mesh(new THREE.BufferGeometry(),new THREE.MeshNormalMaterial());scene.add(mesh);
+function material(){if(mat==='lilac')return new THREE.MeshStandardMaterial({color:'#B4AAFF',roughness:.35,metalness:.2});if(mat==='wire')return new THREE.MeshBasicMaterial({color:'#B4AAFF',wireframe:true});return new THREE.MeshNormalMaterial();}
+function rebuild(){const S=SHAPES[shape],v=vals[shape];const args=S.p.map(a=>v[a[0]]);
+  mesh.geometry.dispose();mesh.geometry=new THREE[S.ctor](...args);
+  mesh.material.dispose();mesh.material=material();
+  const mName={normal:'MeshNormalMaterial()',lilac:"MeshStandardMaterial({ color: '#B4AAFF' })",wire:"MeshBasicMaterial({ color: '#B4AAFF', wireframe: true })"}[mat];
+  document.getElementById('code').textContent=`const shape = new THREE.Mesh(\n  new THREE.${S.ctor}(${args.join(', ')}),\n  new THREE.${mName}\n);\nscene.add(shape);\n\n// ${S.p.map(a=>a[0]).join(', ')}`;}
+function sliders(){document.getElementById('sliders').innerHTML=SHAPES[shape].p.map(([n,d,mn,mx,st])=>`<label for="s-${n}"><span>${n}<b id="v-${n}">${vals[shape][n]}</b></span><input type="range" id="s-${n}" data-n="${n}" min="${mn}" max="${mx}" step="${st}" value="${vals[shape][n]}"></label>`).join('');}
+document.getElementById('sliders').addEventListener('input',e=>{const n=e.target.dataset.n;if(!n)return;vals[shape][n]=+e.target.value;document.getElementById('v-'+n).textContent=e.target.value;rebuild();});
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-shape]');if(!b)return;shape=b.dataset.shape;document.querySelectorAll('[data-shape]').forEach(x=>x.setAttribute('aria-pressed',x===b));sliders();rebuild();});
+document.getElementById('mats').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;mat=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));rebuild();});
+let drag=null,vx=0,vy=0;
+cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{if(!drag)return;vy=(e.clientX-drag[0])*.01;vx=(e.clientY-drag[1])*.01;mesh.rotation.y+=vy;mesh.rotation.x+=vx;drag=[e.clientX,e.clientY];});
+addEventListener('pointerup',()=>drag=null);
+function resize(){const r=cv.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(cv);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function loop(){if(!drag&&!reduce){mesh.rotation.x+=.004;mesh.rotation.y+=.007;}renderer.render(scene,camera);requestAnimationFrame(loop);})();
+sliders();rebuild();
+})();
+</script>

@@ -1,0 +1,113 @@
+<title>Shape Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F3F2EF;--panel:#FFFFFF;--ink:#16171B;--ink2:#5A5D6E;--line:#DCD9D2;--accent:#5B4BD6;--chip:#EEECFA;--code:#14151A;--codeInk:#D9D6FF;--stageTop:#7A7A7E;--stageBot:#FFFFFF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0E0F12;--panel:#17191F;--ink:#EEEDF2;--ink2:#A6A8B4;--line:#2C3039;--accent:#B4AAFF;--chip:#24223A;--code:#0A0B0E;--stageTop:#2B2D35;--stageBot:#0E0F12}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0E0F12;--panel:#17191F;--ink:#EEEDF2;--ink2:#A6A8B4;--line:#2C3039;--accent:#B4AAFF;--chip:#24223A;--code:#0A0B0E;--stageTop:#2B2D35;--stageBot:#0E0F12}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 "DM Sans",system-ui,sans-serif;margin:0;padding-inline:16px;padding-block:24px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:16px}
+h1{margin:0;font:800 clamp(26px,4vw,40px)/1.05 Syne,sans-serif;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--ink2);max-width:70ch}
+.main{display:grid;grid-template-columns:1fr 330px;gap:16px}
+.stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(var(--stageTop),var(--stageBot) 70%);aspect-ratio:16/11;max-width:100%}
+canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+canvas:active{cursor:grabbing}
+.hint{position:absolute;left:12px;bottom:12px;font:500 12px "IBM Plex Mono",monospace;color:#fff;background:rgba(0,0,0,.4);padding:6px 9px;border-radius:8px;pointer-events:none}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:14px;align-content:start}
+.lbl{font:600 12px/1 "DM Sans",sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.opt{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:9px 10px;font:500 13.5px "DM Sans",sans-serif;cursor:pointer;text-align:left}
+.opt small{display:block;color:var(--ink2);font-size:11.5px}
+.opt[aria-pressed="true"]{background:var(--chip);border-color:var(--accent)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.tog{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 11px;font:500 13px "DM Sans",sans-serif;cursor:pointer}
+.tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+pre{margin:0;background:var(--code);color:var(--codeInk);border-radius:12px;padding:12px;font:12px/1.6 "IBM Plex Mono",monospace;white-space:pre-wrap;word-break:break-word}
+.use{font-size:13.5px;color:var(--ink2)}
+.use b{color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:860px){.main{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header><h1>Shape studio</h1><p>Shapes three.js can make from code, in the style of the torus knot video. Drag to orbit, scroll to zoom: that is OrbitControls. Pick a shape, a finish and whether it spins; the code updates to match.</p></header>
+  <div class="main">
+    <div class="stage"><canvas id="c" aria-label="3D shape you can orbit around"></canvas><div class="hint">Drag to orbit · scroll to zoom · right-drag to pan</div></div>
+    <div class="side">
+      <div class="lbl">Shape</div>
+      <div class="grid" id="shapes"></div>
+      <div class="lbl">Finish</div>
+      <div class="row" id="mats"></div>
+      <div class="row"><button class="tog" id="spin" type="button" aria-pressed="true">Spinning</button><button class="tog" id="axes" type="button" aria-pressed="false">Axes helper</button></div>
+      <p class="use" id="use"></p>
+      <pre id="code"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/ParametricGeometry.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/ParametricGeometries.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+/* each shape: how to build it, the code to show, and an idea for using it */
+const vase=()=>{const p=[];for(let i=0;i<=24;i++){const t=i/24;p.push(new THREE.Vector2(.35+.45*Math.sin(t*Math.PI*1.1)+.08*Math.sin(t*12),t*2.2-1.1));}return new THREE.LatheGeometry(p,96);};
+const heart=()=>{const s=new THREE.Shape();s.moveTo(0,.5);s.bezierCurveTo(0,.8,-.5,1.1,-.9,.7);s.bezierCurveTo(-1.3,.2,-.6,-.4,0,-.9);s.bezierCurveTo(.6,-.4,1.3,.2,.9,.7);s.bezierCurveTo(.5,1.1,0,.8,0,.5);const g=new THREE.ExtrudeGeometry(s,{depth:.35,bevelEnabled:true,bevelThickness:.12,bevelSize:.1,bevelSegments:8,curveSegments:48});g.center();return g;};
+const spring=()=>{class Helix extends THREE.Curve{getPoint(t,o=new THREE.Vector3()){const a=t*Math.PI*2*6;return o.set(Math.cos(a)*.8,t*2.4-1.2,Math.sin(a)*.8);}}return new THREE.TubeGeometry(new Helix(),600,.09,24,false);};
+const mobius=()=>{const g=new THREE.ParametricGeometry(THREE.ParametricGeometries.mobius3d,160,24);g.scale(.7,.7,.7);return g;};
+const klein=()=>{const g=new THREE.ParametricGeometry(THREE.ParametricGeometries.klein,120,60);g.computeBoundingBox();g.center();g.scale(.085,.085,.085);return g;};
+const SHAPES=[
+ {id:'knot',name:'Torus knot',sub:'p 2, q 3',make:()=>new THREE.TorusKnotGeometry(1,.3,256,40,2,3),code:'new THREE.TorusKnotGeometry(1, 0.3, 256, 40, 2, 3)',use:'A <b>hero object on the Stage template</b>, or a logo mark for the store entrance.'},
+ {id:'knot37',name:'Wild knot',sub:'p 3, q 7',make:()=>new THREE.TorusKnotGeometry(1,.18,400,24,3,7),code:'new THREE.TorusKnotGeometry(1, 0.18, 400, 24, 3, 7)',use:'A <b>loading animation</b> while the store builds from Shopify.'},
+ {id:'torus',name:'Torus',sub:'the doughnut',make:()=>new THREE.TorusGeometry(1,.4,48,160),code:'new THREE.TorusGeometry(1, 0.4, 48, 160)',use:'The <b>glowing ring</b> under a product on a plinth, or a mug handle.'},
+ {id:'gem',name:'Gem',sub:'icosahedron, low-poly',make:()=>new THREE.IcosahedronGeometry(1.2,0),code:'new THREE.IcosahedronGeometry(1.2, 0)',use:'A <b>points or reward token</b> shoppers collect for visiting a store.'},
+ {id:'blob',name:'Smooth blob',sub:'icosahedron, detail 5',make:()=>{const g=new THREE.IcosahedronGeometry(1.2,5);const p=g.attributes.position,v=new THREE.Vector3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);const n=1+.12*Math.sin(v.x*4)*Math.sin(v.y*5)*Math.sin(v.z*3);v.multiplyScalar(n);p.setXYZ(i,v.x,v.y,v.z);}g.computeVertexNormals();return g;},code:'new THREE.IcosahedronGeometry(1.2, 5)\n// then push each point in or out with sin() for a lumpy shape',use:'An <b>ambient object</b> floating in the Kalpi stage or landing page.'},
+ {id:'vase',name:'Vase',sub:'lathe: a spun curve',make:vase,code:'new THREE.LatheGeometry(points, 96)\n// points = a curve that is spun around the centre',use:'<b>Bottles, vases, candles, cups</b>: any round product drawn from its outline.'},
+ {id:'heart',name:'Heart',sub:'extruded 2D shape',make:heart,code:'new THREE.ExtrudeGeometry(heartShape, { depth: 0.35, bevelEnabled: true })',use:'Turn a <b>seller’s logo</b> (a 2D outline) into a 3D sign for their store.'},
+ {id:'spring',name:'Spring',sub:'tube along a helix',make:spring,code:'new THREE.TubeGeometry(helixCurve, 600, 0.09, 24)',use:'<b>Neon tube signs</b> or a ribbon path that guides shoppers through the aisles.'},
+ {id:'mobius',name:'Möbius strip',sub:'parametric surface',make:mobius,code:'new THREE.ParametricGeometry(ParametricGeometries.mobius3d, 160, 24)',use:'A <b>sculpture</b> for the Gallery template entrance.'},
+ {id:'klein',name:'Klein bottle',sub:'parametric surface',make:klein,code:'new THREE.ParametricGeometry(ParametricGeometries.klein, 120, 60)',use:'Pure eye candy: a <b>"wow" object</b> for the hackathon intro screen.'}
+];
+const MATS=[
+ {id:'normal',name:'Rainbow',make:()=>new THREE.MeshNormalMaterial(),code:'new THREE.MeshNormalMaterial()'},
+ {id:'pearl',name:'Pearl',make:()=>new THREE.MeshPhysicalMaterial({color:'#E9E4FF',roughness:.25,metalness:.1,clearcoat:1,clearcoatRoughness:.08,sheen:new THREE.Color('#B4AAFF')}),code:"new THREE.MeshPhysicalMaterial({ color: '#E9E4FF', clearcoat: 1 })"},
+ {id:'glass',name:'Glass',make:()=>new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.05,metalness:0,transmission:.95,transparent:true,opacity:.6,clearcoat:1}),code:"new THREE.MeshPhysicalMaterial({ transmission: 0.95, roughness: 0.05 })"},
+ {id:'chrome',name:'Chrome',make:()=>new THREE.MeshStandardMaterial({color:'#DADDE2',roughness:.08,metalness:1}),code:"new THREE.MeshStandardMaterial({ metalness: 1, roughness: 0.08 })"},
+ {id:'toon',name:'Cartoon',make:()=>{const g=new Uint8Array([60,140,255]);const t=new THREE.DataTexture(g,3,1,THREE.LuminanceFormat);t.minFilter=t.magFilter=THREE.NearestFilter;t.needsUpdate=true;return new THREE.MeshToonMaterial({color:'#B4AAFF',gradientMap:t});},code:"new THREE.MeshToonMaterial({ color: '#B4AAFF', gradientMap })"},
+ {id:'wire',name:'Wireframe',make:()=>new THREE.MeshBasicMaterial({color:'#5B4BD6',wireframe:true}),code:"new THREE.MeshBasicMaterial({ wireframe: true })"}
+];
+let shape=SHAPES[0],mat=MATS[0],spin=true;
+$('#shapes').innerHTML=SHAPES.map(s=>`<button class="opt" type="button" data-s="${s.id}" aria-pressed="${s===shape}">${s.name}<small>${s.sub}</small></button>`).join('');
+$('#mats').innerHTML=MATS.map(m=>`<button class="tog" type="button" data-m="${m.id}" aria-pressed="${m===mat}">${m.name}</button>`).join('');
+
+const cv=$('#c');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;
+const scene=new THREE.Scene();
+const pm=new THREE.PMREMGenerator(renderer);
+/* a soft studio for chrome, pearl and glass to reflect */
+(function(){const s=new THREE.Scene();s.background=new THREE.Color('#2a2a30');const add=(w,h,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);s.add(m);};add(6,6,'#ffffff',0,8,2);add(2,8,'#e8e4ff',-7,1,2);add(2,8,'#fff1e0',7,1,-1);add(10,3,'#B4AAFF',0,-1,-8);scene.environment=pm.fromScene(s,.04).texture;})();
+scene.add(new THREE.HemisphereLight('#ffffff','#666670',.7));const dl=new THREE.DirectionalLight('#ffffff',1.1);dl.position.set(3,5,4);scene.add(dl);
+const camera=new THREE.PerspectiveCamera(45,16/11,.1,100);camera.position.set(3.2,1.4,4.2);
+const controls=new THREE.OrbitControls(camera,cv);controls.enableDamping=true;controls.minDistance=2;controls.maxDistance=12;
+const axes=new THREE.AxesHelper(2);axes.visible=false;scene.add(axes);
+const mesh=new THREE.Mesh(shape.make(),mat.make());scene.add(mesh);
+function update(){
+  $('#use').innerHTML='<b>Idea:</b> '+shape.use.replace(/^<b>|<\/b>/g,m=>m);
+  $('#code').textContent=`const shape = new THREE.Mesh(\n  ${shape.code.split('\n').join('\n  ')},\n  ${mat.code}\n);\nscene.add(shape);\n\n// let people orbit around it\nconst controls = new OrbitControls(camera, renderer.domElement);`;
+}
+$('#shapes').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;shape=SHAPES.find(s=>s.id===b.dataset.s);mesh.geometry.dispose();mesh.geometry=shape.make();document.querySelectorAll('[data-s]').forEach(x=>x.setAttribute('aria-pressed',x===b));update();});
+$('#mats').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;mat=MATS.find(m=>m.id===b.dataset.m);mesh.material.dispose();mesh.material=mat.make();document.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x===b));update();});
+$('#spin').addEventListener('click',e=>{spin=!spin;e.target.setAttribute('aria-pressed',spin);e.target.textContent=spin?'Spinning':'Still';});
+$('#axes').addEventListener('click',e=>{axes.visible=!axes.visible;e.target.setAttribute('aria-pressed',axes.visible);});
+function resize(){const r=cv.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(cv);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clock=new THREE.Clock();
+(function loop(){const d=clock.getDelta();if(spin&&!reduce){mesh.rotation.x+=d*.4;mesh.rotation.y+=d*.6;}controls.update();renderer.render(scene,camera);requestAnimationFrame(loop);})();
+update();
+})();
+</script>

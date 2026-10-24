@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalpi at Cal Hacks</title>
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1b26;--muted:#5f5b6e;--line:#e3e0ea;--accent:#5b4bd6;--good:#1f7a4d;--warn:#a5531a;--chip:#efecfb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#13121a;--card:#1c1a26;--ink:#ecebf3;--muted:#a7a3b8;--line:#2e2b3b;--accent:#a99cff;--good:#5fd39a;--warn:#f0a067;--chip:#272338}}
+:root[data-theme="dark"]{--bg:#13121a;--card:#1c1a26;--ink:#ecebf3;--muted:#a7a3b8;--line:#2e2b3b;--accent:#a99cff;--good:#5fd39a;--warn:#f0a067;--chip:#272338}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.15;margin:.2em 0 .3em}
+h2{font-size:22px;margin:40px 0 10px}
+h3{font-size:17px;margin:20px 0 6px}
+.kicker{color:var(--muted);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+.verdict{border-left:5px solid var(--accent)}
+.big{font-size:19px}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.score{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.score b{font-size:22px;color:var(--accent)}
+.score small{display:block;color:var(--muted);font-size:13.5px;margin-top:4px}
+.bar{height:6px;background:var(--chip);border-radius:3px;margin:6px 0 2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:600px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.chip{display:inline-block;background:var(--chip);border-radius:999px;padding:2px 10px;font-size:13px;margin:2px 4px 2px 0}
+.good{color:var(--good)}.warn{color:var(--warn)}
+ol,ul{padding-left:22px}
+li{margin:4px 0}
+.muted{color:var(--muted)}
+blockquote{margin:10px 0;padding:8px 14px;border-left:3px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<div class="kicker">Cal Hacks 13 · 23–25 Oct 2026 · Palace of Fine Arts, SF · prepared 17 Oct</div>
+<h1>Is Kalpi strong enough for Cal Hacks, or should you pivot?</h1>
+
+<div class="card verdict">
+<p class="big"><b>Don't pivot away from Kalpi. Change the demo.</b></p>
+<p>As a hackathon idea Kalpi is good, about <b>7/10 once it is reshaped</b>. None of the roughly 40 projects I could read from the channel touches product decisions or demand testing, and Cal Hacks 13 has prizes that fit it: <b>Visa "Reimagining Shopping" ($5k)</b>, <b>Creao "Best One-Person Company" and "AI-First Disruptor"</b> and <b>Figma "Best Design"</b>.</p>
+<p>The risk is the current pitch. "AI product pictures, then a vote" sounds like an image-generation wrapper, the kind of entry judges see most. Build it fresh at the event around one moment the judges take part in: <b>the AI predicts which version the room will choose, the judges vote on their phones, and the screen shows whether the AI was right.</b></p>
+<p class="muted">Main alternative: Ion + simple hardware with Ved. It is a strong format, but Ion's existing code can't be brought in, so it would have to be rebuilt. Decide with Ved this weekend.</p>
+</div>
+
+<h2>Kalpi's scores</h2>
+<p class="muted">Scored as an idea she builds from scratch in 36 hours. Arrows show the change once it becomes the "Ask the room" version.</p>
+<div class="scores">
+<div class="score">Novelty vs the field <b>7</b><div class="bar"><i style="width:70%"></i></div><small>Nobody in the field does it. Outside the hackathon, Dough and PickFu exist.</small></div>
+<div class="score">Wow in 3 minutes <b>5 → 8</b><div class="bar"><i style="width:80%"></i></div><small>The judges' own vote and their own object make the moment.</small></div>
+<div class="score">Technical depth <b>5 → 7</b><div class="bar"><i style="width:70%"></i></div><small>Truth check (paste-back, pixels that moved) plus the AI's prediction scored against the real vote.</small></div>
+<div class="score">Track / prize fit <b>8</b><div class="bar"><i style="width:80%"></i></div><small>Visa Shopping, Creao, Figma, Most Creative, Planet-First (waste).</small></div>
+<div class="score">Buildable in 36 h, within rules <b>8</b><div class="bar"><i style="width:80%"></i></div><small>All new code; she already knows which APIs work and where they break.</small></div>
+<div class="score">Real-impact story <b>4 → 6</b><div class="bar"><i style="width:60%"></i></div><small>"Fewer unwanted products" needs one sourced waste figure.</small></div>
+</div>
+
+<h2>The best version: "Ask the room"</h2>
+<div class="card">
+<ol>
+<li>A judge hands over something from their bag. The team photographs it, paints the cap and types "make it ceramic". Three real-looking versions appear in about 30 seconds, each with a "nothing else changed" score.</li>
+<li>Before voting, the AI says which one the room will pick and how sure it is. The judges scan a QR code and vote, and the results stream in live.</li>
+<li>The screen shows whether the AI was right, the break-even for the winner, and the request for a quote it would send to the maker.</li>
+</ol>
+<h3>Who builds what (3–4 people, all code written at the event)</h3>
+<div class="tw"><table>
+<tr><th>Person</th><th>Builds</th><th>Done when</th></tr>
+<tr><td>1 Image</td><td>Photo → paint one part → edit → paste the original back → truth score</td><td>3 checked versions in &lt; 40 s</td></tr>
+<tr><td>2 Prediction</td><td>Ranks A/B/C with reasons; stores the guess; scores it against the vote</td><td>Guess shown before voting; hit rate updates</td></tr>
+<tr><td>3 Live vote</td><td>QR phone ballot, no log-in, real-time tally</td><td>20 phones at once</td></tr>
+<tr><td>4 Decision + pitch</td><td>Break-even, request for a quote, Devpost, video (Ioanna pitches)</td><td>Readable in 10 s</td></tr>
+</table></div>
+<p class="muted">Hours 0–4 skeleton · 4–16 each piece alone · 16–24 join them up · 24–30 test with strangers at the venue · 30–36 video and Devpost. Cut first: 3D, the maker side, accounts.</p>
+<p><span class="chip">Visa Reimagining Shopping</span><span class="chip">Creao One-Person Company</span><span class="chip">Figma Best Design</span><span class="chip">Convex (live vote)</span><span class="chip">image API, e.g. fal.ai</span></p>
+<p><b>If Ved joins:</b> a light box with an ESP32 turntable and an LED ring takes 8 photos of the judge's object as it turns. That is simple hardware with no robot, and it gives real angles and size that software can't get.</p>
+</div>
+
+<h2>The field</h2>
+<div class="tw"><table>
+<tr><th>Project</th><th>What</th><th>Polish</th><th>Tech</th><th>Won</th></tr>
+<tr><td><b>Night Owl</b></td><td>NYC "silent blocks" rat prediction + $30 Pi night-vision sensors</td><td>5</td><td>LightGBM, DuckDB/H3, YOLO on Pi, Grok, three.js</td><td>DivHacks 2026, no badge yet</td></tr>
+<tr><td>Loci</td><td>Android AR memory palace for dementia</td><td>4</td><td>ARCore, LiteRT, on-device Gemma</td><td>no badge</td></tr>
+<tr><td>The House Is You</td><td>Pygame casino that grades decisions</td><td>3</td><td>Python, Pygame</td><td>no badge</td></tr>
+<tr><td>Escape-room booth</td><td>5-stage live escape room</td><td>5</td><td>ESP32 ×4, Node WebSocket</td><td>400 tickets sold</td></tr>
+<tr><td>JAMES</td><td>Camera + voice maintenance helper with a safety check</td><td>4</td><td>local VLM, gesture, agents</td><td>none</td></tr>
+<tr><td>NeuroContext / AutiKit</td><td>Social-cue help for autistic users</td><td>4 / 3</td><td>Next.js, Claude</td><td>6th of 125 (AutiKit)</td></tr>
+<tr><td>Jugaad</td><td>Voice + multi-agent student aid</td><td>3–4</td><td>Claude, Deepgram, Fetch.ai, Redis, Browserbase</td><td>sponsor stack, 1 commit</td></tr>
+<tr><td>Onboardly</td><td>(few details)</td><td>4</td><td>agents</td><td>Cal Hacks 12: Best Use of Conversion</td></tr>
+<tr><td>Sift</td><td>Agent that sources and compares suppliers</td><td>3–4</td><td>agents</td><td>built at START Hack</td></tr>
+<tr><td>Synaptix · ContractPilot · NARA · Synovia</td><td>Drug repurposing · contract risk · AI pen-tester · surgical outcomes</td><td>4</td><td>Gemini / Claude, agents</td><td>Vultr · Flowglad · Featherless · Best Healthcare</td></tr>
+</table></div>
+<h3>Patterns</h3>
+<ul>
+<li><b>AI agents are the baseline.</b> About 70% of projects use them. Winners stand out with a sharp real-world frame and one hard number.</li>
+<li><b>Most wins are sponsor prizes.</b> Repeat winners pick their stack to match the prize list.</li>
+<li><b>Hardware is a minority but strong at the top:</b> about 15% of Cal Hacks 12 winners, but 4 of its 7 top slots.</li>
+<li><b>Health and accessibility take most grand prizes.</b> Shopping ideas win sponsor prizes (Visa, Bright Data, Fetch.ai).</li>
+<li><b>Generative "idea → real thing" can win:</b> Paper Cuts (doodle → game, fal.ai) took a 2026 grand prize; ChipChat; Artki.tech 3D rooms. <span class="warn">A plain voting app (Versus) did not.</span></li>
+<li><b>Empty lane:</b> no one in this field does consumer-product decisions or demand testing.</li>
+</ul>
+
+<h2>Pivot options</h2>
+<div class="card">
+<h3>Ion + simple hardware (with Ved)</h3>
+<p>A judge moves a wire on a breadboard that measures every row. Ion names the mistake out loud, LEDs show where the wire should go, and a current sensor cuts power before a short. This is the best fit to the winning format, <span class="warn">but Ion's code can't be reused (MLH rule 9), so it must be rebuilt at the event.</span></p>
+<h3>Kids game maker</h3>
+<p>A judge says "a bunny that skates and collects stars", a 3D game appears with a "see the real code" panel, and the judge changes one line. It's fun, but Paper Cuts won with a close format in June, so the judges have seen it. Ranked third.</p>
+</div>
+
+<h2>The rules on pre-built work</h2>
+<div class="card">
+<blockquote>"You cannot work on a project you started before the hackathon. Ideation before the hackathon is allowed, but all implementation must occur during the hackathon." (calhacks.io FAQ)</blockquote>
+<p><span class="good"><b>Can bring:</b></span> the idea, the flow, her notes and lessons, public APIs, open-source libraries.<br>
+<span class="warn"><b>Must build there:</b></span> all code, prompts, pages and pictures, in a fresh public repo with steady commits. AI coding tools are allowed but must be disclosed. Add one honest line on Devpost: "We explored this idea before the event; all code here was written at Cal Hacks 13."</p>
+</div>
+
+<h2>Not verified</h2>
+<ul class="muted">
+<li>No named tracks are listed for Cal Hacks 13, and no Anthropic prize yet. Prize amounts are as listed on 17 Oct.</li>
+<li>Team size: Devpost says 2–4, but the FAQ says solo is fine. Ask the organisers.</li>
+<li>No winner badge on Night Owl, Loci or The House Is You. Portfolio-claimed wins were not checked.</li>
+<li>Five named products (SetForge, Servi AI, Grove, BilimTube, TypeAnywhere) were not found. Demo videos were not watched.</li>
+<li>The waste figure for the impact story still needs a source. Whether Ion is a public product is unknown.</li>
+</ul>
+<p class="muted">Full notes: CALHACKS-FIELD-VS-KALPI.md in this folder.</p>
+</main>
+</body>
+</html>
