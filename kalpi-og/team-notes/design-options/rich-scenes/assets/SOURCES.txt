@@ -1,0 +1,10 @@
+All files here are CC0 (public domain) from Poly Haven, https://polyhaven.com/license, downloaded from dl.polyhaven.org on 18 Oct 2026.
+Some 2k JPEGs were re-encoded (quality 82) to stay under ~3 MB.
+  kiara_interior_1k.hdr            https://polyhaven.com/a/kiara_interior
+  museum_of_ethnography_1k.hdr     https://polyhaven.com/a/museum_of_ethnography
+  qwantani_dusk_2_puresky_1k.hdr   https://polyhaven.com/a/qwantani_dusk_2_puresky
+  aerial_sand_*                    https://polyhaven.com/a/aerial_sand
+  rock_boulder_dry_*               https://polyhaven.com/a/rock_boulder_dry
+  smooth_concrete_floor_*          https://polyhaven.com/a/smooth_concrete_floor
+  plastered_wall_02_diff_1k.jpg    https://polyhaven.com/a/plastered_wall_02
+Generated here (no third-party source): marble_veined_2k.jpg, marble_veined_rough_1k.jpg (procedural, numpy).

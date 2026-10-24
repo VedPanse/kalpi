@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalpi demo video · review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400..700&family=JetBrains+Mono:wght@500..700&family=Syne:wght@500..800&display=swap">
+<style>
+/* Review sheet only, not part of the product. Tokens copied from kalpi.html. */
+:root {
+  --display: Syne, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: Commissioner, "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --bg: #0e0c20; --panel: #18152f; --panel-2: #221e40; --line: #35305c;
+  --text: #f4f3ff; --text-2: #bcb9dc; --text-3: #8f8bb5;
+  --peri: #b3b4f5; --orange: #ff7a1a; --ink-deep: #14112b;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+.w { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+.eyebrow { font: 600 11.5px/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); margin: 0 0 10px; }
+h1.sheet { font: 700 clamp(28px, 4vw, 44px)/1.05 var(--display); letter-spacing: -.035em; margin: 0 0 8px; }
+h2.sheet { font: 700 clamp(22px, 3vw, 30px)/1.1 var(--display); letter-spacing: -.03em; margin: 0 0 6px; }
+.note { color: var(--text-2); margin: 0 0 22px; max-width: 70ch; }
+header.top { padding: 40px 0 18px; }
+.big { border-radius: 18px; overflow: hidden; background: #000; box-shadow: inset 0 0 0 1px var(--line); }
+.big video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: contain; background: #000; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+.facts li { font: 600 12px/1 var(--mono); letter-spacing: .06em; color: var(--text-2); padding: 8px 10px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); }
+section.mock-wrap { padding: 56px 0 72px; }
+.devices { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.dev { min-width: 0; }
+.dev .lbl { font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); margin: 0 0 8px; }
+.dev.desk { flex: 1 1 100%; }
+.dev.phone { flex: 0 0 390px; max-width: 100%; }
+.frame { border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line), 0 30px 70px -40px #000; }
+
+/* ---- the hero mock: as it would sit at the top of kalpi.html ---- */
+.hero { container-type: inline-size; background: radial-gradient(120% 80% at 80% 0%, #221e40 0%, var(--bg) 60%); padding: 28px 28px 34px; }
+.hero-in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; align-items: center; }
+.k-eyebrow { font: 600 11.5px/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+.k-hero { font: 700 clamp(30px, 4.2cqi, 54px)/1 var(--display); letter-spacing: -.04em; margin: 12px 0 14px; }
+.k-hi { color: var(--peri); }
+.k-lede { color: var(--text-2); margin: 0 0 20px; max-width: 46ch; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.k-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 12px; font: 600 15px/1 var(--body); text-decoration: none; background: var(--peri); color: var(--ink-deep); }
+.k-btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--line); }
+.k-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+.hero-vid { margin: 0; }
+.hero-vid .watch { display: inline-flex; align-items: center; gap: 8px; font: 600 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--peri); margin: 0 0 10px; }
+.hero-vid .watch::before { content: ""; width: 0; height: 0; border-left: 8px solid var(--peri); border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.hero-vid video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: contain; background: #0b0a1a; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line), 0 24px 60px -30px #000; }
+/* phone: video first, same file, scaled */
+@container (max-width: 640px) {
+  .hero { padding: 18px 16px 26px; }
+  .hero-in { grid-template-columns: 1fr; gap: 18px; }
+  .hero-vid { order: -1; }
+  .k-hero { font-size: 34px; }
+}
+@media (max-width: 640px) { header.top { padding-top: 24px; } .dev.phone { flex-basis: 100%; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="w">
+  <p class="eyebrow">Review sheet · not part of the product · 2026-10-17</p>
+  <h1 class="sheet">Kalpi demo film, with patita</h1>
+  <p class="note">42 seconds, looping. Her real patita pictures from this computer; one step is staged (see the list below). If she approves, it goes at the top of the landing page in kalpi.html, as in the mock further down.</p>
+  <div class="big">
+    <video controls autoplay muted loop playsinline preload="auto" poster="kalpi-demo-poster.jpg">
+      <source src="kalpi-demo.webm" type="video/webm">
+      <source src="kalpi-demo.mp4" type="video/mp4">
+    </video>
+  </div>
+  <ul class="facts">
+    <li>42 s · 1440×900 · 30 fps</li>
+    <li>MP4 H.264 · 7.1 MB</li>
+    <li>WebM VP9 · 6.8 MB</li>
+    <li>Staged: "Make 2 versions" answered with existing pictures</li>
+    <li>Votes: sample, labelled</li>
+    <li>0 paid requests</li>
+  </ul>
+</div></header>
+
+<section class="mock-wrap"><div class="w">
+  <p class="eyebrow">Mock · top of the landing page</p>
+  <h2 class="sheet">How it would sit as the hero</h2>
+  <p class="note">Same video, same file on phones, scaled down and never cropped. The headline and buttons are today's copy from kalpi.html.</p>
+  <div class="devices">
+    <div class="dev desk"><p class="lbl">Desktop</p><div class="frame">
+      <div class="hero"><div class="hero-in">
+        <div>
+          <span class="k-eyebrow">Before you message a single factory</span>
+          <h3 class="k-hero">Inventory is an expensive way to ask a <span class="k-hi">question.</span></h3>
+          <p class="k-lede">Design your product, show it to real people, and see who joins the waitlist before you buy a single unit.</p>
+          <div class="cta"><a class="k-btn" href="#"><span class="k-dot"></span>Start designing</a><a class="k-btn ghost" href="#">See how it works</a></div>
+        </div>
+        <figure class="hero-vid"><span class="watch">Watch how it works</span>
+          <video autoplay muted loop playsinline preload="metadata" poster="kalpi-demo-poster.jpg" aria-label="Kalpi demo: a lipstick photo, paint the cap, describe the change, compare versions, sample votes, then a quote request for the maker."><source src="kalpi-demo.webm" type="video/webm"><source src="kalpi-demo.mp4" type="video/mp4"></video>
+        </figure>
+      </div></div>
+    </div></div>
+    <div class="dev phone"><p class="lbl">Phone · 390 wide</p><div class="frame" style="max-width:390px">
+      <div class="hero"><div class="hero-in">
+        <div>
+          <span class="k-eyebrow">Before you message a single factory</span>
+          <h3 class="k-hero">Inventory is an expensive way to ask a <span class="k-hi">question.</span></h3>
+          <p class="k-lede">Design your product, show it to real people, and see who joins the waitlist before you buy a single unit.</p>
+          <div class="cta"><a class="k-btn" href="#"><span class="k-dot"></span>Start designing</a><a class="k-btn ghost" href="#">See how it works</a></div>
+        </div>
+        <figure class="hero-vid"><span class="watch">Watch how it works</span>
+          <video autoplay muted loop playsinline preload="metadata" poster="kalpi-demo-poster.jpg" aria-label="Kalpi demo video"><source src="kalpi-demo.webm" type="video/webm"><source src="kalpi-demo.mp4" type="video/mp4"></video>
+        </figure>
+      </div></div>
+    </div></div>
+  </div>
+</div></section>
+</body>
+</html>

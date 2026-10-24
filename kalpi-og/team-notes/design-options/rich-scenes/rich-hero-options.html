@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Hero Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@300;400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0a0c; --ink:#F2EEE8; --ink2:rgba(242,238,232,.62); --ink3:rgba(242,238,232,.38); --line:rgba(242,238,232,.16);
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace; --sans:'Inter Tight',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#0b0a0c; } }
+:root[data-theme="dark"]{ --bg:#0b0a0c; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.intro{padding:56px 24px 40px;max-width:1100px;margin:0 auto}
+.intro .k{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.intro h1{font:300 clamp(28px,4vw,44px)/1.1 var(--sans);letter-spacing:-.02em;margin:14px 0 14px}
+.intro p{font:400 15px/1.55 var(--sans);color:var(--ink2);max-width:720px}
+.intro nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.intro nav a{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:9px 14px;color:var(--ink2)}
+.intro nav a:hover{color:var(--ink);border-color:var(--ink3)}
+
+section.hero{position:relative;height:100vh;min-height:560px;overflow:hidden;background:#000;border-top:1px solid #000}
+section.hero canvas.gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ov{position:absolute;inset:0;pointer-events:none;color:#F4F1EC;text-shadow:0 1px 18px rgba(0,0,0,.18)}
+.ov *{pointer-events:auto}
+.bar{position:absolute;left:28px;right:28px;top:24px;display:flex;justify-content:space-between;align-items:center;font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.bar .tag{display:flex;gap:14px;align-items:center}
+.bar .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
+.bar .opt{opacity:.75}
+.copy{position:absolute;left:28px;bottom:34px;max-width:560px}
+.copy .eyebrow{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.72;margin-bottom:14px}
+.copy h2{font:300 clamp(26px,3.2vw,40px)/1.08 var(--sans);letter-spacing:-.022em;margin-bottom:20px;text-wrap:balance}
+.ask{display:flex;align-items:center;gap:6px;width:min(440px,calc(100vw - 56px));padding:5px 5px 5px 18px;border-radius:99px;background:rgba(18,16,16,.28);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.22)}
+.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:inherit;font:400 14px/1 var(--sans);padding:10px 0}
+.ask input::placeholder{color:rgba(244,241,236,.6)}
+.ask button{font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;border:0;border-radius:99px;padding:12px 16px;background:#F4F1EC;color:#141212;cursor:pointer}
+.meta{position:absolute;right:28px;bottom:34px;text-align:right;font:400 10px/1.75 var(--mono);letter-spacing:.12em;text-transform:uppercase;opacity:.55;max-width:300px}
+.fps{position:absolute;right:28px;top:48px;font:400 10px/1 var(--mono);letter-spacing:.1em;opacity:.45}
+.loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:500 10.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:rgba(244,241,236,.5);transition:opacity .6s}
+.ready .loading{opacity:0}
+.light .ov{color:#1d1a17;text-shadow:none}
+.light .ask{background:rgba(255,255,255,.3);border-color:rgba(30,25,20,.18)}
+.light .ask input::placeholder{color:rgba(29,26,23,.55)}
+.light .ask button{background:#1d1a17;color:#F4F1EC}
+
+/* R4 orbit */
+.menu{position:absolute;left:28px;top:50%;transform:translateY(-50%);font:500 10.5px/2.2 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.menu .q{opacity:.5;margin-bottom:8px}
+.menu a{display:block;text-decoration:none;opacity:.6}
+.menu a.on,.menu a:hover{opacity:1}
+.menu a.on::before{content:'';display:inline-block;width:14px;height:1px;background:currentColor;vertical-align:middle;margin-right:10px}
+.pillnav{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;gap:2px;padding:4px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.pillnav a{font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding:9px 14px;border-radius:99px;opacity:.7}
+.pillnav a.on{background:rgba(255,255,255,.92);color:#121014;opacity:1}
+.cardlabel{position:absolute;left:50%;top:calc(50% + 31vh);transform:translateX(-50%);font:500 10.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;opacity:.9;transition:opacity .35s}
+.arrows{position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
+.arrows button{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.04);color:inherit;font:400 14px/1 var(--mono);cursor:pointer}
+
+/* R5 choose */
+#r5 .ov{color:#EFE6D6}
+.r5type{position:absolute;left:0;right:0;top:9vh;text-align:center;pointer-events:none}
+.r5type .small{font:400 clamp(22px,3vw,40px)/1 var(--serif);letter-spacing:.01em;opacity:.92}
+.r5type .big{font:400 clamp(90px,17vw,290px)/.86 var(--serif);letter-spacing:-.03em;margin-top:.5vh;color:#EFE6D6;text-shadow:0 0 60px var(--glow,rgba(201,104,71,.35))}
+.pills{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);display:flex;gap:8px}
+.pills button{font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;border-radius:99px;border:1px solid rgba(239,230,214,.25);background:rgba(239,230,214,.03);color:#EFE6D6;cursor:pointer;transition:all .35s}
+.pills button.on{border-color:var(--glowc,#C96847);box-shadow:0 0 0 1px var(--glowc,#C96847) inset,0 0 24px var(--glowc,#C96847);background:color-mix(in srgb,var(--glowc,#C96847) 22%,transparent)}
+.r5left{position:absolute;left:28px;bottom:36px;max-width:330px}
+.r5left .vn{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--glowc,#C96847);margin-bottom:12px}
+.r5left h3{font:400 34px/1 var(--serif);margin-bottom:12px}
+.r5left p{font:400 14px/1.5 var(--sans);opacity:.75}
+.r5left .ask{margin-top:18px;width:min(330px,calc(100vw - 56px))}
+.r5right{position:absolute;right:28px;bottom:36px;display:flex;flex-direction:column;gap:16px;width:250px}
+.r5right div{display:flex;gap:12px;align-items:center;font:400 13px/1.35 var(--sans);opacity:.85}
+.r5right svg{flex:none}
+#sketch{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.note{font-family:'Caveat',cursive;font-weight:600}
+
+
+/* R5 alien variants: no glow, plain readable type */
+.r5x{--vc:#B8694A}
+.r5x .pills{position:absolute;left:50%;top:34.5%;bottom:auto;height:auto;transform:translateX(-50%);display:flex;gap:8px}
+.r5x .pills button{font:400 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;border-radius:99px;border:1px solid currentColor;background:transparent;color:inherit;opacity:.55;cursor:pointer;transition:all .3s;box-shadow:none;white-space:nowrap}
+.r5x .pills button.on{box-shadow:none;opacity:1;border-color:var(--vc);background:color-mix(in srgb,var(--vc) 16%,transparent)}
+.r5x .r5left .vn{color:var(--vc);font-weight:400}
+.r5x .r5left h3{font:300 32px/1.05 var(--sans);letter-spacing:-.01em}
+.r5x.spec .ov{color:#26282B;text-shadow:none}
+.r5x.spec .ask{background:rgba(255,255,255,.35);border-color:rgba(38,40,43,.22)}
+.r5x.spec .ask input::placeholder{color:rgba(38,40,43,.5)}
+.r5x.spec .ask button{background:#26282B;color:#EDECE8}
+.r5x.spec .bar,.r5x.spec .r5left .vn,.r5x.spec .pills button{font-family:'IBM Plex Mono',monospace}
+.r5x.dune .ov{color:#F7EAD6}
+.r5x.dune .r5left h3{font:700 22px/1.2 'Syncopate',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.r5x.deep .ov{color:#DCEBE6}
+.r5x.deep .bar,.r5x.deep .pills button{font-family:'IBM Plex Mono',monospace}
+@media (max-width:720px){ .r5x .pills{top:auto;bottom:190px} }
+.r5x.dune .r5left .vn{color:#4A2E20}
+.r5x.dune .ov{text-shadow:0 1px 12px rgba(60,30,15,.25)}
+
+/* film mode */
+body.film{overflow:hidden;background:#000}
+body.film .intro, body.film .ov, body.film footer{display:none!important}
+body.film section.hero{position:fixed;left:0;top:0;width:1920px;height:1080px;min-height:0}
+body.film section.hero:not(.filmed){display:none}
+footer{padding:40px 24px 60px;max-width:1100px;margin:0 auto;font:400 12px/1.7 var(--mono);color:var(--ink3)}
+footer b{color:var(--ink2);font-weight:500}
+@media (max-width:720px){
+  .bar{left:16px;right:16px;top:16px}
+  .copy{left:16px;right:16px;bottom:22px}
+  .ask{width:calc(100vw - 32px)}
+  .meta,.fps,.arrows{display:none}
+  .menu{display:none}
+  .pillnav{top:44px}
+  .r5left{left:16px;right:16px;bottom:20px;max-width:none}
+  .r5right{display:none}
+  .pills{bottom:190px;top:auto}
+  .pills button{white-space:nowrap;padding:9px 11px}
+}
+</style>
+</head>
+<body>
+<div class="intro">
+  <div class="k">Kalpi · hero options · 18 Oct 2026</div>
+  <h1>Rich heroes: seven ways to put the product somewhere real.</h1>
+  <p>Each option is a live three.js scene with real HDRI light (Poly Haven, CC0), soft PCSS shadows, raymarched haze and light beams, depth of field, bloom and film grain. Pick one by its label. Scenes only render while on screen. Film mode for any scene: <code>?film=1&amp;scene=r3</code> (1920×1080, no text, <code>renderFrame(t)</code>).</p>
+  <nav><a href="#r4">R4 · Product orbit</a><a href="#r5b">R5b · Dune</a><a href="#r5a">R5a · Specimen</a><a href="#r5c">R5c · Deep</a><a href="#r1">R1 · Morning marble</a><a href="#r2">R2 · Stone gallery</a><a href="#r3">R3 · Dune at dusk</a></nav>
+</div>
+
+<section class="hero" id="r4" data-scene="r4">
+  <div class="loading">Loading R4</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R4 · Product orbit</div></div>
+    <div class="pillnav"><a class="on" href="#r4">Versions</a><a href="#r4">Votes</a><a href="#r4">Samples</a></div>
+    <div class="menu"><div class="q">What are you looking for?</div><a class="on" href="#r4">Colours</a><a href="#r4">Materials</a><a href="#r4">Shapes</a><a href="#r4">Prices</a></div>
+    <div class="cardlabel" id="r4label">A · Terracotta · 41 votes · Sample</div>
+    <div class="arrows"><button data-dir="-1" aria-label="Previous">↑</button><button data-dir="1" aria-label="Next">↓</button></div>
+    <div class="copy"><div class="eyebrow">Drag, scroll or use the arrows</div><h2>Every version of your product, side by side. Your customers pick.</h2>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="fps"></div>
+  </div>
+</section>
+
+<section class="hero r5x dune" id="r5b" data-scene="r5b">
+  <div class="loading">Loading R5b</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R5b · Dune</div></div>
+    <div class="pills"><button data-v="A" class="on">A · Terracotta</button><button data-v="B">B · Navy</button><button data-v="C">C · Cream</button></div>
+    <div class="r5left"><div class="vn r5vn">Version A</div><h3 class="r5h">Terracotta</h3><p class="r5p">Same bottle, warm terracotta coat. 41 sample votes.</p>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="r5right">
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><circle cx="12" cy="12" r="2.2" fill="var(--vc)"/></svg>Colour change only, free</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12h8M12 8v8" stroke="var(--vc)" stroke-width="1.2"/></svg>Maker confirms the price</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12.5l2.8 2.8L16 9" fill="none" stroke="var(--vc)" stroke-width="1.2"/></svg>Deposits decide the winner</div>
+    </div>
+    <div class="fps"></div>
+  </div>
+</section>
+<section class="hero r5x spec" id="r5a" data-scene="r5a">
+  <div class="loading">Loading R5a</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R5a · Specimen</div></div>
+    <div class="pills"><button data-v="A" class="on">A · Terracotta</button><button data-v="B">B · Navy</button><button data-v="C">C · Cream</button></div>
+    <div class="r5left"><div class="vn r5vn">Version A</div><h3 class="r5h">Terracotta</h3><p class="r5p">Same bottle, warm terracotta coat. 41 sample votes.</p>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="r5right">
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><circle cx="12" cy="12" r="2.2" fill="var(--vc)"/></svg>Colour change only, free</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12h8M12 8v8" stroke="var(--vc)" stroke-width="1.2"/></svg>Maker confirms the price</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12.5l2.8 2.8L16 9" fill="none" stroke="var(--vc)" stroke-width="1.2"/></svg>Deposits decide the winner</div>
+    </div>
+    <div class="fps"></div>
+  </div>
+</section>
+<section class="hero r5x deep" id="r5c" data-scene="r5c">
+  <div class="loading">Loading R5c</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R5c · Deep</div></div>
+    <div class="pills"><button data-v="A" class="on">A · Terracotta</button><button data-v="B">B · Navy</button><button data-v="C">C · Cream</button></div>
+    <div class="r5left"><div class="vn r5vn">Version A</div><h3 class="r5h">Terracotta</h3><p class="r5p">Same bottle, warm terracotta coat. 41 sample votes.</p>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="r5right">
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><circle cx="12" cy="12" r="2.2" fill="var(--vc)"/></svg>Colour change only, free</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12h8M12 8v8" stroke="var(--vc)" stroke-width="1.2"/></svg>Maker confirms the price</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-dasharray="1.2 2.8" opacity=".7"/><path d="M8 12.5l2.8 2.8L16 9" fill="none" stroke="var(--vc)" stroke-width="1.2"/></svg>Deposits decide the winner</div>
+    </div>
+    <div class="fps"></div>
+  </div>
+</section>
+
+<section class="hero" id="r1" data-scene="r1">
+  <div class="loading">Loading R1</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R1 · Morning marble</div></div>
+    <div class="copy"><div class="eyebrow">Your idea, made real · 08:12 window light</div><h2>Know what sells before you make it.</h2>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="meta">HDRI kiara interior · CC0<br>PCSS window shadow · god rays · DOF</div>
+    <div class="fps"></div>
+  </div>
+</section>
+
+<section class="hero" id="r2" data-scene="r2">
+  <div class="loading">Loading R2</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R2 · Stone gallery</div></div>
+    <div class="copy"><div class="eyebrow">Shown before it exists</div><h2>See it on the plinth before it's made.</h2>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="meta">HDRI museum of ethnography · CC0<br>rock boulder dry · concrete · CC0</div>
+    <div class="fps"></div>
+  </div>
+</section>
+
+<section class="hero" id="r3" data-scene="r3">
+  <div class="loading">Loading R3</div>
+  <div class="ov">
+    <div class="bar"><div class="tag"><span class="dot"></span>Kalpi</div><div class="opt">R3 · Dune at dusk</div></div>
+    <div class="copy"><div class="eyebrow">Real demand · before the first unit</div><h2>Know what sells before you make it.</h2>
+      <div class="ask"><input placeholder="Describe your product…" aria-label="Describe your product"><button>Test it →</button></div></div>
+    <div class="meta">HDRI qwantani dusk 2 · CC0<br>aerial sand · CC0 · 24°N 19:42</div>
+    <div class="fps"></div>
+  </div>
+</section>
+
+<footer>
+  <b>Assets</b> (all CC0, Poly Haven, polyhaven.com): HDRIs kiara_interior, museum_of_ethnography, qwantani_dusk_2_puresky (1k .hdr); textures aerial_sand, rock_boulder_dry, smooth_concrete_floor, plastered_wall_02. The veined marble is generated (Poly Haven has no polished veined slab). Products: Kalpi's own GLBs.<br>
+  <b>Quality</b>: <code>?q=high|low</code>. Phones get lower DPR, no DOF, fewer raymarch steps.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="../3d-test/lipstick/materials.js"></script>
+<script src="engine.js"></script>
+<script src="scene-r1.js"></script>
+<script src="scene-r2.js"></script>
+<script src="scene-r3.js"></script>
+<script src="scene-r4.js"></script>
+<script src="scene-r5x.js"></script>
+<script>
+(function () {
+  const { Stage, U } = window.RICH;
+  const Q = new URLSearchParams(location.search);
+  const stages = [];
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener('pointermove', e => { pointer.tx = e.clientX / innerWidth * 2 - 1; pointer.ty = -(e.clientY / innerHeight * 2 - 1); });
+  const T0 = performance.now();
+
+  async function init(sec) {
+    if (sec._init) return sec._init;
+    return sec._init = (async () => {
+      const id = sec.dataset.scene;
+      if (!window.SCENES || !window.SCENES[id]) return null;
+      const c = document.createElement('canvas'); c.className = 'gl'; sec.prepend(c);
+      const stage = new Stage(c, (window.SCENE_OPTS || {})[id]);
+      stage.section = sec;
+      const w = U.FILM ? 1920 : sec.clientWidth, h = U.FILM ? 1080 : sec.clientHeight;
+      const update = await window.SCENES[id](stage, sec);
+      stage.setSize(w, h);
+      stage.update = update; stage.fpsEl = sec.querySelector('.fps'); stage.times = [];
+      update(0, { x: 0, y: 0 }); stage.render(0);
+      sec.classList.add('ready');
+      stages.push(stage); window.__stages = stages;
+      return stage;
+    })().catch(e => { console.error(id, e); sec.querySelector('.loading').textContent = 'Error: ' + e.message; });
+  }
+
+  if (U.FILM) {
+    document.body.classList.add('film');
+    const id = Q.get('scene') || 'r3';
+    const sec = document.getElementById(id); sec.classList.add('filmed');
+    init(sec).then(stage => {
+      window.renderFrame = t => { stage.update(t, { x: 0, y: 0 }); stage.render(t); return true; };
+      window.filmStage = stage; window.filmReady = true;
+      if (Q.get('manual') !== '1') { const loop = () => { const t = (performance.now() - T0) / 1000; window.renderFrame(t); requestAnimationFrame(loop); }; loop(); }
+    });
+    return;
+  }
+
+  const secs = [...document.querySelectorAll('section.hero')];
+  const vis = new Map();
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    vis.set(e.target, e.isIntersecting);
+    if (e.isIntersecting) init(e.target);
+  }), { rootMargin: '60% 0px' });
+  secs.forEach(s => io.observe(s));
+  const onResize = () => stages.forEach(s => s.setSize(s.section.clientWidth, s.section.clientHeight));
+  addEventListener('resize', onResize);
+  let last = performance.now();
+  function loop(now) {
+    requestAnimationFrame(loop);
+    const t = (now - T0) / 1000;
+    pointer.x += (pointer.tx - pointer.x) * .04; pointer.y += (pointer.ty - pointer.y) * .04;
+    let top = null, topV = 0;
+    stages.forEach(s => { const r = s.section.getBoundingClientRect(); const v = Math.min(innerHeight, r.bottom) - Math.max(0, r.top); if (v > topV) { topV = v; top = s; } });
+    stages.forEach(s => {
+      if (s !== top) return;
+      const t0 = performance.now();
+      s.update(t, pointer); s.render(t);
+      s.times.push(now); while (s.times.length && now - s.times[0] > 1000) s.times.shift();
+      if (s.fpsEl && s.frame % 15 === 0) s.fpsEl.textContent = s.times.length + ' FPS · ' + s.dpr.toFixed(2) + '× · ' + U.TIER;
+      // graceful degradation: drop DPR if frames get slow
+      // graceful: drop DPR when frames are slow; raise it (up to 2 on desktop) when there is headroom, never above a level that was too slow
+      if (s.frame > 120) {
+        const f = s.times.length; s.ceil = s.ceil || s.maxDpr;
+        s.slow = Math.max(0, (s.slow || 0) + (f < 48 ? 1 : -1)); s.fast = f >= 59 ? (s.fast || 0) + 1 : 0;
+        if (s.slow > 60 && s.dpr > .75) { s.ceil = s.dpr - .25; s.dpr = Math.max(.75, s.dpr - .25); s.slow = 0; s.fast = 0; s.setSize(s.section.clientWidth, s.section.clientHeight); }
+        else if (s.fast > 180 && s.dpr + .25 <= s.ceil) { s.dpr += .25; s.fast = 0; s.setSize(s.section.clientWidth, s.section.clientHeight); }
+      }
+    });
+    window.__fps = stages.map(s => [s.section.id, s.times.length, s.dpr]);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

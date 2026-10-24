@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en-US" class="st">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalpi · Ask first. Make second.</title>
+<!-- Landing, rebuilt 2026-10-17 (round 4): a scroll story of the approved stage scenes (team-notes/design-options/kalpi-look-options.html: Keynote, A5, A4, A2) on one dark stage. -->
+<meta name="description" content="Design a product, show it to real people, and see who joins the waitlist before you pay for inventory. The Studio is open now, for any product.">
+<!-- Mockup: the product is not live; the products are examples and the vote numbers are samples. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg transform='rotate(-6 24 24)'%3E%3Crect x='6' y='19' width='36' height='24' rx='8.5' fill='%23b3b4f5'/%3E%3Crect x='14.5' y='21.5' width='19' height='4.5' rx='2.25' fill='%2314112b'/%3E%3Ccircle cx='30' cy='13' r='5.5' fill='%23ff7a1a'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="kalpi-stage.css">
+<style>
+/* Kalpi landing (round 4, rebuilt 2026-10-17): a few full-width moments on one dark stage. The stage parts are option A's
+   (team-notes/design-options/kalpi-look-options.html), every colour comes from kalpi-stage.css. */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; overflow-x: hidden; }
+h1, h2, p { margin: 0; }
+img { max-width: 100%; }
+.w { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* nav: the logo and one quiet way into the Studio */
+.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--st-bg) 78%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.nav .w { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: inline-flex; align-items: center; gap: 9px; color: var(--st-text); text-decoration: none; font: 600 19px/1 var(--st-head); letter-spacing: -.03em; }
+.brand svg { width: 28px; height: 28px; overflow: visible; }
+.nav nav { display: flex; align-items: center; gap: 18px; }
+.nav nav a:not(.st-ghost) { color: var(--st-text-2); text-decoration: none; font: 500 14px/1 var(--st-body); }
+.nav nav a:not(.st-ghost):hover { color: var(--st-text); }
+@media (max-width: 520px) { .nav nav a:not(.st-ghost) { display: none; } }
+
+/* ---- option A stage parts ---- */
+.mo { position: relative; scroll-margin-top: 60px; }
+.a-stage { position: relative; height: clamp(440px, 60vw, 720px); overflow: hidden; }
+.mo-stage::after { content: ""; position: absolute; inset: auto 0 0 0; height: 18%; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--st-bg)); }
+.hero .a-stage { height: clamp(480px, calc(100vh - 60px - 210px), 820px); min-height: 440px; }
+.a-stage canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: pan-y; }
+.a-fallback { display: none; position: absolute; inset: 60px 0 40px; margin: auto; height: calc(100% - 100px); width: auto; max-width: 80%; object-fit: contain; border-radius: 6px; }
+.a-stage.nogl .a-fallback { display: block; } .a-stage.nogl canvas, .a-stage.nogl .a-hint, .a-stage.nogl .a-replay, .a-stage.nogl .a-lab, .a-stage.nogl .a-pct { display: none; }
+.a-cap { position: absolute; left: 0; right: 0; top: clamp(22px, 5vw, 56px); z-index: 2; text-align: center; font: 500 clamp(15px, 1.6vw, 18px)/1.3 var(--st-head); letter-spacing: -.005em; color: var(--st-text); pointer-events: none; padding: 0 16px; }
+.a-cap span { display: inline-block; transition: opacity .7s ease, transform .9s cubic-bezier(.2,.7,.1,1), filter .7s; }
+.a-cap span.out { opacity: 0; transform: translateY(8px); filter: blur(6px); }
+.a-lab { position: absolute; left: 0; top: 0; z-index: 2; transform: translate(-50%, 0); font: 500 12.5px/1 var(--st-body); color: var(--st-text-2); white-space: nowrap; opacity: 0; pointer-events: none; transition: color .3s; }
+.a-lab b { color: var(--st-text); font-weight: 600; margin-right: 5px; }
+.a-lab.on { color: var(--st-text); }
+.a-replay { position: absolute; right: clamp(12px, 3vw, 28px); bottom: 24px; z-index: 3; font: 500 12.5px/1 var(--st-body); color: var(--st-text-2); background: rgba(255,255,255,.06); border: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); border-radius: 999px; padding: 8px 12px; cursor: pointer; transition: color .2s, background .2s; }
+.a-replay:hover { color: var(--st-text); background: rgba(255,255,255,.1); }
+.a-hint { position: absolute; left: clamp(12px, 3vw, 28px); bottom: 30px; z-index: 3; font-size: 12px; color: var(--st-text-3); opacity: 0; transition: opacity 1s; }
+.a-hint.on { opacity: 1; }
+.a-note { position: absolute; right: clamp(12px, 3vw, 28px); bottom: 26px; z-index: 3; font: 500 12px/1 var(--st-body); color: var(--st-text-3); }
+.a-pct { position: absolute; left: 0; top: 0; z-index: 2; font: 600 13px/1 var(--st-body); color: var(--st-text); opacity: 0; pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* the one form: a heading, a pill input, one lilac button */
+.a-form { position: relative; z-index: 2; padding: 6px 16px 56px; display: grid; justify-items: center; text-align: center; }
+.a-h { font: 600 clamp(22px, 2.4vw, 28px)/1.2 var(--st-head); letter-spacing: -.02em; margin: 0 0 16px; color: var(--st-text); }
+.a-row { display: flex; gap: 8px; width: min(620px, 100%); padding: 6px; border-radius: 999px; background: var(--st-s1); box-shadow: inset 0 0 0 1px var(--st-line), 0 20px 50px -20px color-mix(in srgb, var(--st-ring) 30%, transparent); transition: box-shadow .3s; }
+.a-row:focus-within { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--st-ring) 55%, var(--st-line)), 0 0 0 4px color-mix(in srgb, var(--st-ring) 22%, transparent), 0 20px 50px -20px color-mix(in srgb, var(--st-ring) 45%, transparent); }
+.a-row input { flex: 1; min-width: 0; background: none; border: 0; color: var(--st-text); font: 400 16px/1 var(--st-body); padding: 0 14px; outline: none; }
+.a-row input::placeholder { color: var(--st-text-3); }
+.a-btn { flex: none; border: 0; border-radius: 999px; background: var(--st-accent); color: var(--st-ink); font: 600 14.5px/1 var(--st-body); padding: 13px 20px; cursor: pointer; transition: transform .2s, box-shadow .3s, background-color .2s; }
+.a-btn:hover { background: var(--st-accent-hover); box-shadow: 0 0 0 6px color-mix(in srgb, var(--st-accent) 12%, transparent), 0 8px 30px color-mix(in srgb, var(--st-ring) 45%, transparent); }
+.a-btn:active { transform: scale(.97); }
+.a-sub { margin: 14px 0 0; font-size: 13.5px; color: var(--st-text-2); min-height: 1.4em; }
+@media (max-width: 560px) { .a-note { right: auto; left: 16px; } .a-sub { padding-right: 56px; } .a-row { flex-direction: column; border-radius: 18px; } .a-row input { padding: 12px; } .a-btn { width: 100%; } .a-hint { display: none; } }
+
+/* A5: a tall track, the stage sticks while you scroll through the three beats */
+.a5-track { height: 300vh; position: relative; }
+.a5-sticky { position: sticky; top: 60px; height: min(calc(100vh - 60px), 760px); display: flex; flex-direction: column; }
+.a5-sticky .a-stage { flex: 1; height: auto; min-height: 0; }
+.a5-dots { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 9px; z-index: 3; }
+.a5-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--st-line); transition: background-color .4s, box-shadow .4s; }
+.a5-dots i.on { background: var(--ring-c); box-shadow: 0 0 8px var(--ring-c); }
+
+/* close: one line, one button */
+.close { display: grid; justify-items: center; gap: 22px; padding: clamp(64px, 10vw, 120px) 16px; text-align: center; }
+.close-line { font: 600 clamp(22px, 2.4vw, 28px)/1.25 var(--st-head); letter-spacing: -.02em; color: var(--st-text); text-wrap: balance; }
+
+/* the Studio, framed */
+.kx { padding: 8px 0 48px; scroll-margin-top: 60px; }
+.kx-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 12px; }
+.kx-tabs { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.kx-tab { position: relative; font: 500 13.5px/1 var(--st-body); color: var(--st-text-2); background: none; border: 0; padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: background .25s, color .25s; }
+.kx-tab b { font-weight: 500; }
+.kx-tab[aria-selected="true"] { background: rgba(255,255,255,.12); color: var(--st-text); }
+.kx-state { display: inline-flex; align-items: center; gap: 7px; font: 400 13px/1.3 var(--st-body); color: var(--st-text-2); }
+.kx-state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--st-text-3); }
+.kx-state.on::before { background: var(--st-good); box-shadow: 0 0 8px var(--st-good); } .kx-state.off::before { background: var(--st-bad); }
+#kx-open { margin-left: auto; font-size: 13.5px; }
+.kx-frame { position: relative; border-radius: var(--st-r-l); overflow: hidden; box-shadow: inset 0 0 0 1px var(--st-line); background: var(--st-bg); }
+.kx-frame iframe { display: block; width: 100%; height: calc(100vh - 140px); min-height: 480px; border: 0; background: var(--st-bg); }
+.kx-msg { padding: clamp(24px, 4vw, 48px); color: var(--st-text-2); font-size: 16px; line-height: 1.55; min-height: 280px; }
+.kx-msg b { color: var(--st-text); } .kx-msg code { font: 500 13.5px/1.5 var(--st-mono); background: var(--st-s2); padding: 3px 8px; border-radius: 8px; color: var(--st-text); word-break: break-all; }
+.kx-msg a { color: var(--st-link); }
+.kx-note { margin-top: 10px; font-size: 12.5px; color: var(--st-text-3); }
+
+/* quiet, far down */
+.quiet { padding: 40px 0; }
+.quiet + .quiet { padding-top: 8px; }
+.q-h { font: 600 17px/1.3 var(--st-head); color: var(--st-text); margin-bottom: 8px; }
+.q-p { color: var(--st-text-2); max-width: 66ch; }
+.faq { display: grid; max-width: 760px; }
+.faq details { border-top: 1px solid var(--st-line); }
+.faq details:last-child { border-bottom: 1px solid var(--st-line); }
+.faq summary { cursor: pointer; padding: 13px 0; color: var(--st-text); font: 500 15px/1.4 var(--st-body); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--st-text-3); }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { color: var(--st-text-2); padding: 0 0 14px; max-width: 64ch; }
+
+/* footer, on the floor */
+footer { padding: 36px 0 48px; background: var(--st-floor); }
+footer .w { display: grid; gap: 14px; border-top: 1px solid var(--st-line); padding-top: 28px; }
+footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+footer nav a { color: var(--st-text-2); text-decoration: none; font-size: 14px; }
+footer nav a:hover { color: var(--st-text); }
+footer p { color: var(--st-text-3); font-size: 13px; max-width: 70ch; }
+@media (min-width: 760px) { footer .w { grid-template-columns: auto 1fr; align-items: center; } footer p { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="k-mark" viewBox="0 0 48 48"><g transform="rotate(-6 24 24)"><rect style="fill:var(--mark-box,#B4AAFF)" x="6" y="19" width="36" height="24" rx="8.5"/><rect style="fill:var(--mark-slot,#0B0B10)" x="14.5" y="21.5" width="19" height="4.5" rx="2.25"/><circle style="fill:var(--mark-dot,#F4F3F7)" cx="30" cy="13" r="5.5"/></g></symbol>
+</svg>
+
+<header class="nav"><div class="w">
+  <a class="brand" href="#top" aria-label="Kalpi, home"><svg aria-hidden="true"><use href="#k-mark"/></svg><span>kalpi</span></a>
+  <nav aria-label="Page"><a href="#how">How it works</a><a class="st-ghost" href="#make">Open the Studio</a></nav>
+</div></header>
+
+<main>
+  <!-- 1 · HERO: three products float under the lights (Keynote stage, full bleed). One caption, one input, one button -->
+  <section class="mo hero" id="top">
+    <div class="a-stage mo-stage st-ringhost" id="sHero">
+      <canvas aria-label="Three products float under spotlights on a dark glossy floor: a red crystal lipstick in the centre, an art-deco perfume and a marble candle beside it."></canvas>
+      <img class="a-fallback" src="media/examples/lipstick-crystal-red.png" alt="The red crystal-cap lipstick, an example product" width="864" height="1152">
+      <div class="a-cap"><span>Ask first. Make second.</span></div>
+    </div>
+    <form class="a-form" id="hs-form" novalidate>
+      <h1 class="a-h">What do you want to make?</h1>
+      <div class="a-row"><input type="text" id="hs-idea" name="idea" maxlength="400" autocomplete="off" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?" aria-describedby="hs-hint"><button class="a-btn" type="submit">Start with this idea</button></div>
+      <p class="a-sub" id="hs-hint" aria-live="polite">or <a class="st-link" href="#make" id="hs-photo">start from a photo of a product you found</a></p>
+    </form>
+  </section>
+
+  <!-- 2 · KEYNOTE ROW: your photo, the scan ring rises, it becomes 3D, then three versions -->
+  <section class="mo" id="how" aria-label="How it works">
+    <div class="a-stage mo-stage st-ringhost" id="sKey">
+      <canvas aria-label="A photo of a red crystal lipstick becomes a 3D product, then three versions: Amethyst, Ruby and Sapphire"></canvas>
+      <img class="a-fallback" src="media/examples/lipstick-crystal-red.png" alt="The red crystal-cap lipstick" width="864" height="1152">
+      <div class="a-cap" aria-live="polite"><span>Your product.</span></div>
+      <div class="a-lab"><b>A</b>Amethyst</div><div class="a-lab"><b>B</b>Ruby</div><div class="a-lab"><b>C</b>Sapphire</div>
+      <span class="a-hint">Drag to turn · click a version</span>
+      <button class="a-replay" type="button">Replay</button>
+    </div>
+  </section>
+
+  <!-- 3 · THE PROOF (option A5): votes rise as light, then deposits, then the winner. Scroll to play -->
+  <section class="mo a5" id="proof" aria-label="People vote, then leave a deposit">
+    <div class="a5-track"><div class="a5-sticky">
+      <div class="a-stage mo-stage st-ringhost" id="sVote">
+        <canvas aria-label="Three lipstick versions. Votes rise as bars of light: A 31%, B 23%, C 46%. Then deposits. C, Sapphire, wins. Sample numbers."></canvas>
+        <img class="a-fallback" src="media/examples/lipstick-crystal-red.png" alt="The red crystal-cap lipstick" width="864" height="1152">
+        <div class="a-cap"><span>Three versions, side by side.</span></div>
+        <div class="a-lab"><b>A</b>Amethyst</div><div class="a-lab"><b>B</b>Ruby</div><div class="a-lab"><b>C</b>Sapphire</div>
+        <div class="a-pct">0%</div><div class="a-pct">0%</div><div class="a-pct">0%</div>
+        <div class="a5-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+        <span class="a-note">Sample numbers</span>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- 4 · A4 SPLIT: from your photo to a product you can turn -->
+  <section class="mo" id="split" aria-label="From your photo to a product you can turn">
+    <div class="a-stage mo-stage st-ringhost" id="sSplit">
+      <canvas aria-label="The lipstick photo in a lit frame; a ring of light sweeps across and the 3D lipstick builds beside it"></canvas>
+      <img class="a-fallback" src="media/examples/lipstick-crystal-red.png" alt="The red crystal-cap lipstick" width="864" height="1152">
+      <div class="a-cap"><span>From your photo to a product you can turn.</span></div>
+      <div class="a-lab"><b>Your photo</b></div><div class="a-lab"><b>In 3D</b></div>
+      <span class="a-hint on">Drag to turn the product</span>
+    </div>
+  </section>
+
+  <!-- 5 · MAKE IT AN AD: only the winner, turning slowly -->
+  <section class="mo" id="ad" aria-label="Make it an ad">
+    <div class="a-stage mo-stage st-ringhost" id="sAd">
+      <canvas aria-label="The winning version, Sapphire, turning slowly under one light"></canvas>
+      <img class="a-fallback" src="media/examples/lipstick-crystal-red.png" alt="The red crystal-cap lipstick" width="864" height="1152">
+      <div class="a-cap"><span>The winner becomes your ad.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 · CLOSE: one line, one button -->
+  <section class="close">
+    <p class="close-line">Find out who wants it before you make it.</p>
+    <button class="a-btn" type="button" id="closeGo">Open the Studio</button>
+  </section>
+
+  <!-- THE STUDIO, working, inside the page -->
+  <section class="kx" id="make" aria-label="Studio">
+    <div class="w">
+      <div class="kx-top">
+        <div class="kx-tabs" role="tablist" aria-label="Tools">
+          <button type="button" role="tab" class="kx-tab" data-tool="studio" aria-selected="true"><b>Studio</b><span class="vh">Any product: start from an idea or a photo, try a change, compare, ask people, decide</span></button>
+          <button type="button" role="tab" class="kx-tab" data-tool="gallery" aria-selected="false"><b>Gallery</b><span class="vh">Everything you have built, and every picture made on this computer</span></button>
+        </div>
+        <span id="kx-state" class="kx-state">Checking the helper…</span>
+        <a id="kx-open" class="st-link" href="#" target="_blank" rel="noopener">Open full page</a>
+      </div>
+      <div class="kx-frame" id="kx-frame"><div class="kx-msg" id="kx-msg">Loading…</div><iframe id="kx-if" title="Kalpi tool" loading="lazy" hidden></iframe></div>
+      <p class="kx-note"><span id="kx-name">Studio</span> · Pictures are concepts until a maker says yes. Nothing is published.</p>
+    </div>
+  </section>
+
+  <!-- quiet, far down -->
+  <section class="quiet" id="who"><div class="w">
+    <h2 class="q-h">Who it's for</h2>
+    <p class="q-p">People with an idea and no savings to gamble: students, parents at home, anyone after a side income. Not for anyone looking to get rich quick.</p>
+  </div></section>
+  <section class="quiet" id="answers"><div class="w">
+    <h2 class="q-h">Straight answers</h2>
+    <div class="faq">
+      <details><summary>Will this make me money?</summary><p>Nobody can promise that, and you should walk away from anyone who does. Here's what you get: a real answer about whether people want it, before you pay for inventory.</p></details>
+      <details><summary>Is it honest to advertise something that isn't made yet?</summary><p>Yes, when the page says so. Every page and every ad says coming soon. A deposit is refundable, and it is charged only if the maker's minimum order is reached.</p></details>
+      <details><summary>Does a vote mean a sale?</summary><p>No. That's why the winner is judged on deposits, not votes.</p></details>
+      <details><summary>People committed. Now what?</summary><p>You take your design and your numbers to a maker. Makers have a minimum order, so you will buy inventory. The difference is that now you know people are waiting for it.</p></details>
+      <details><summary>What does it cost?</summary><p>The price of a test isn't set yet. <!-- FOUNDER-CONFIRM -->You'll see the full cost before you start one, and we'll never call something free unless it is.</p></details>
+      <details><summary>Is it live?</summary><p>The Studio is, for any product. Asking your people, the waitlist and deposits are what we're building next.</p></details>
+    </div>
+  </div></section>
+</main>
+
+<footer><div class="w">
+  <a class="brand" href="#top" aria-label="Kalpi, home"><svg aria-hidden="true"><use href="#k-mark"/></svg><span>kalpi</span></a>
+  <nav aria-label="More"><a href="#who">Who it's for</a><a href="#answers">Straight answers</a><a href="kalpi-kids.html">Kalpi Kids</a></nav>
+  <p>An early-stage project by Ioanna Gkerdouki. Not yet available to the public. Nothing on this page is a promise of income. The products shown are examples; the vote numbers are samples.</p>
+</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script src="media/examples/materials.js"></script>
+<script src="kalpi-stage.js"></script>
+<script>
+/* Kalpi landing scenes (round 4, rebuilt 2026-10-17). Each one is the approved option's own code (Keynote, A5, A4, A2 in
+   team-notes/design-options/kalpi-look-options.html) running on the shared kit, kalpi-stage.js, with Kalpi's real example products.
+   A stage renders only while it is on screen. Without WebGL each stage shows the product photo instead. */
+(() => {
+'use strict';
+const K = window.KalpiStage; if (!K) return;
+const { reduce, clamp, ease, lerp, kStage, makePhoto, makeModel, makeParts, loadGLB, loadImg, setDim, dragSpin, tok, glOK } = K;
+const nogl = el => e => { if (e) console.warn('stage: showing the photo instead', e); el.classList.add('nogl'); };
+const ok = !!(window.THREE && THREE.GLTFLoader && glOK());
+
+/* the example products */
+const LIP = 'media/examples/lipstick-crystal-red.glb', PARTS = n => 'media/examples/' + n + '-parts.glb', LIP_PHOTO = 'media/examples/lipstick-crystal-red.png', BOTTLE = c => 'media/example-bottle/3d-' + c + '.glb';
+/* the lipstick's three versions: a free recolour of the crystal cap and the bullet only (hue ~350°, saturated). The rose-gold case is left alone */
+const LIPRC = { hue: .972, width: .075, sat: .34 };
+/* the real materials: glass cap, polished collar, brushed rose-gold case, satin bullet. Variants change only the cap */
+const VAR = ['A', 'B', 'C'];
+const LV = [{ L: 'A', name: 'Amethyst', ring: '--ex-amethyst', paint: null }, { L: 'B', name: 'Ruby', ring: '--ex-ruby', paint: [.99, 1.3, 2.1] }, { L: 'C', name: 'Sapphire', ring: '--ex-sapphire', paint: [.61, 1, 1.55] }];
+const lipModel = (S, M, h, i, opt) => { const p = makeModel(S, M, h, Object.assign({ gloss: true, recolour: LIPRC, idx: i }, opt)); if (i != null && LV[i].paint) p.paint(...LV[i].paint); return p; };
+let photoP = null; const lipPhoto = () => photoP || (photoP = loadImg(LIP_PHOTO));
+const stage = id => document.getElementById(id);
+function run(el, fn) { if (!el) return; if (!ok) return nogl(el)(); try { fn(el); } catch (e) { nogl(el)(e); } }
+/* a gentle float: each product hovers above the floor with its own phase */
+const bob = (t, ph) => .1 + .045 * Math.sin(t * .85 + ph);
+
+/* ================= 1 · HERO: three products float under the lights ================= */
+run(stage('sHero'), el => {
+  const S = kStage(el, { fov: 25, coneR: 1.25, pageMouse: true, motes: 360, dustSpread: 2.6 }), cam = S.cam;
+  let d = 6.5; S.onResize = () => { d = S.fitDist(cam.aspect < .8 ? 1.3 : 1.85, 1.22, .2); S.scene.fog.near = d + 1; S.scene.fog.far = d + 9; }; S.onResize();
+  /* two more spot cones and lights over the side products */
+  [-1, 1].forEach(sx => { const c = S.cone.clone(); c.position.x = sx * 1.32; c.position.z = -.1; c.scale.set(.78, 1, .78); S.scene.add(c);
+    const l = new THREE.SpotLight(0xf7f6f8, .9, 0, .42, .85, 1); l.position.set(sx * 1.4, 5.4, 2.2); l.target.position.set(sx * 1.32, .6, -.3); S.scene.add(l, l.target); });
+  /* the three fanciest examples: the crystal lipstick in front, the art-deco perfume and the marble candle beside it (glossy: glass, gold, stone) */
+  Promise.all([loadGLB(PARTS('lipstick')), loadGLB(PARTS('perfume')), loadGLB(PARTS('candle'))]).then(([ML, MP, MC]) => {
+    const items = [
+      { p: makeParts(S, ML, 'lipstick', 1.58), x: 0, z: .3, ph: 0, sp: .22 },
+      { p: makeParts(S, MP, 'perfume', 1.2), x: -1.4, z: -.35, ph: 2.1, sp: -.16 },
+      { p: makeParts(S, MC, 'candle', .95), x: 1.4, z: -.35, ph: 4.2, sp: .14 }];
+    const narrow = () => cam.aspect < .8;
+    items.forEach(it => { it.sh = S.shadow(.95, .62); it.glow = S.ring(1.2, .5, .32, 1); it.glow.position.set(it.x, .007, it.z); });
+    const big = S.ring(1.85, .72, .08, 1); big.position.set(0, .008, .3);
+    S.version(tok(LV[0].ring));
+    const spin = dragSpin(S.cv);
+    S.start((dt, t) => {
+      S.light(1); spin.step(dt);
+      items.forEach((it, i) => { const y = reduce ? .1 : bob(t, it.ph), x = narrow() ? it.x * .66 : it.x, z = narrow() && i ? -.75 : it.z; it.p.g.position.set(x, y, z); it.p.g.rotation.y = (reduce ? .3 : t * it.sp) + it.ph + (i === 0 ? spin.spin : 0);
+        it.sh.position.set(x, .006, z); it.glow.position.set(x, .007, z); it.sh.material.opacity = .55 - (y - .1) * 2; it.glow.material.uniforms.uA.value = (i ? .16 : .22) + .05 * Math.sin(t * 1.3 + it.ph); });
+      big.material.uniforms.uA.value = .62 + .12 * Math.sin(t * 1.6);
+      cam.position.set(S.mouse.sx * .5 + Math.sin(t * .17) * .05, 1.05 - S.mouse.sy * .22, d); cam.lookAt(0, .96, 0);
+    });
+  }).catch(nogl(el));
+});
+
+/* ================= 2 · KEYNOTE: your photo → scan → 3D → three versions ================= */
+run(stage('sKey'), el => {
+  const cap = el.querySelector('.a-cap span'), labs = [...el.querySelectorAll('.a-lab')], hint = el.querySelector('.a-hint'), replay = el.querySelector('.a-replay');
+  const S = kStage(el), cam = S.cam, cv = S.cv;
+  const scanRing = S.ring(1.5, .62, .1, 1);
+  let finalDist = 7; S.onResize = () => { finalDist = S.fitDist(1.68, 1.0); S.scene.fog.near = finalDist + .8; S.scene.fog.far = finalDist + 9; }; S.onResize();
+  Promise.all([loadGLB(LIP), lipPhoto(), loadGLB(PARTS('lipstick'))]).then(([M, img, MP]) => {
+    const V = LV.map((ver, i) => { const p = lipModel(S, M, 1.38, i); p.amount(0); p.sh = S.shadow(1.1, .7); p.fr = S.ring(1.35, .72, .09, 1); p.fr.position.y = .008; p.g.visible = i === 0;
+      p.real = makeParts(S, MP, 'lipstick', 1.38, { variant: VAR[i], idx: i }); p.real.g.visible = false; return p; });   /* the scan builds the plain model; once built, the real materials take over */
+    const photo = makePhoto(S, img, 1.5); photo.position.set(0, .77, .32);
+    const END = 10.6, caps = [[0, 'Your product.'], [3.1, 'Kalpi builds it in 3D.'], [7.2, 'Try a change. Three versions to compare.'], [9.8, 'Ask people which one they would buy.']];
+    let t = reduce ? END : 0, capI = -1, sel = 0, hover = -1, focus = -1, focusK = 0, drag = null, spinAll = 0, spinVel = 0;
+    const P = (a, b) => clamp((t - a) / (b - a), 0, 1);
+    const setCap = i => { if (i === capI) return; const first = capI < 0; capI = i; if (first) { cap.textContent = caps[i][1]; return; } cap.classList.add('out'); setTimeout(() => { cap.textContent = caps[i][1]; cap.classList.remove('out'); }, 380); };
+    replay.onclick = () => { focus = -1; spinAll = 0; spinVel = 0; t = 0; hint.classList.remove('on'); };
+    const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), curTgt = new THREE.Vector3(0, .7, 0);
+    S.start((dt, time, raw) => {
+      if (t < END) t = Math.min(END, t + Math.min(.1, raw));
+      S.light(ease(P(0, 1.6)));
+      const pin = ease(P(.3, 1.8)), turn = ease(P(.3, 2.8));
+      photo.userData.u.uA.value = pin; photo.rotation.y = -.42 * (1 - turn); photo.position.y = .77 + .1 * (1 - pin);
+      photo.userData.u.uSweep.value = lerp(-.4, 1.5, ease(P(1.7, 3.0)));
+      const sc = ease(P(3.1, 5.4)), SCAN = t < 3.1 ? -.2 : lerp(-.05, 1.62, sc), scanOn = Math.sin(Math.PI * clamp(sc * 1.04, 0, 1));
+      photo.userData.u.uScan.value = SCAN; photo.visible = sc < 1;
+      scanRing.position.y = Math.max(.01, SCAN); scanRing.material.uniforms.uA.value = scanOn; scanRing.scale.setScalar(1 + .05 * Math.sin(time * 6));
+      const tr = ease(P(5.0, 7.6)); S.sweep.intensity = 2.4 * Math.sin(Math.PI * tr); S.sweep.position.x = lerp(-2.6, 2.6, tr);
+      const sp = ease(P(7.2, 9.4)), slots = [[0, 0], [-1.18, -.42], [1.18, -.42]];
+      V.forEach((v, i) => {
+        v.g.visible = i === 0 || sp > 0;
+        const arc = Math.sin(Math.PI * sp) * .38, x = slots[i][0] * sp, z = slots[i][1] * sp - (i ? arc : 0) + (i === 0 ? .18 * sp : 0);
+        const target = (hover === i && t >= END ? 1 : 0) + (focus === i ? .5 : 0); v.lift += (target - v.lift) * Math.min(1, dt * 7);
+        v.g.position.set(x, .07 * v.lift, z);
+        v.g.rotation.y = -.25 + 2 * Math.PI * tr + (i === 1 ? .35 : i === 2 ? -.35 : 0) * sp + (t >= END ? Math.sin(time * .45 + i * 1.7) * .32 : 0) + spinAll;
+        const real = t >= 5.9; v.real.g.visible = real && v.g.visible; v.real.g.position.copy(v.g.position); v.real.g.rotation.y = v.g.rotation.y; v.inner.visible = !real;
+        v.u.uScan.value = t < 3.1 ? -1 : SCAN; v.amount(ease(clamp((sp - .25) / .75, 0, 1))); v.u.uGlow.value = 1 - P(5.2, 5.8); v.u.uLift.value = v.lift;
+        setDim(v, focus >= 0 && focus !== i ? .35 : 1, dt);
+        v.sh.position.set(x, .006, z); v.sh.material.opacity = (t < 3.1 ? 0 : .75 * clamp(sc * 1.5, 0, 1)) * (1 - .35 * v.lift) * (i === 0 || sp > .02 ? 1 : 0);
+        v.fr.position.set(x, .008, z); v.fr.material.uniforms.uA.value = Math.min(1, Math.max(v.lift, focus === i ? 1 : 0, i === sel ? .75 * ease(P(9.2, 10.4)) : 0)) * .9;
+      });
+      const cs = ease(P(6.8, 9.8)), fd = finalDist, startD = Math.max(5.8, fd * .8);
+      focusK += ((focus >= 0 ? 1 : 0) - focusK) * Math.min(1, dt * 3);
+      const dd = lerp(lerp(startD, fd, cs), Math.max(3.2, fd * .55), focusK);
+      camTgt.set(0, lerp(.74, .7, cs), 0);
+      if (focus >= 0) { camTgt.x = lerp(0, V[focus].g.position.x, focusK); camTgt.z = lerp(0, V[focus].g.position.z, focusK); }
+      camPos.set(camTgt.x + S.mouse.sx * .55 + Math.sin(time * .17) * .06, lerp(.95, 1.25, cs) - S.mouse.sy * .25, camTgt.z + dd);
+      cam.position.lerp(camPos, t < .05 ? 1 : Math.min(1, dt * 4)); curTgt.lerp(camTgt, Math.min(1, dt * 4)); cam.lookAt(curTgt);
+      let ci = 0; caps.forEach((c, i) => { if (t >= c[0]) ci = i; }); setCap(ci);
+      const lo = ease(P(8.9, 9.9));
+      labs.forEach((lab, i) => { const v = V[i]; S.place(lab, v.g.position.x, -.16, v.g.position.z, lo * (focus >= 0 && focus !== i ? .35 : 1)); lab.classList.toggle('on', hover === i || focus === i); });
+      S.version(t > 9.2 ? tok(LV[focus >= 0 ? focus : sel].ring) : null);
+      if (t >= END) hint.classList.add('on');
+      if (!drag) { spinAll += spinVel * dt; spinVel *= Math.pow(.04, dt); }
+    });
+    const objs = V.map(v => v.inner).concat(V.map(v => v.real.inner));
+    cv.addEventListener('pointermove', e => {
+      if (drag) { const dx = e.clientX - drag.x; drag.moved += Math.abs(dx); spinVel = dx * .35; spinAll += dx * .008; drag.x = e.clientX; return; }
+      if (t >= END && e.pointerType === 'mouse') { hover = S.pick(e, objs); cv.style.cursor = hover >= 0 ? 'pointer' : 'grab'; } });
+    cv.addEventListener('pointerleave', () => { hover = -1; });
+    cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, moved: 0 }; });
+    addEventListener('pointerup', e => { if (!drag) return; const moved = drag.moved; drag = null; if (moved < 6 && t >= END && e.target === cv) { const v = S.pick(e, objs); focus = v === focus ? -1 : v; if (v >= 0) sel = v; } });
+    addEventListener('keydown', e => { if (e.key === 'Escape') focus = -1; });
+  }).catch(nogl(el));
+});
+
+/* ================= 3 · A5: votes rise as light, then deposits, then the winner (scroll to play) ================= */
+run(stage('sVote'), el => {
+  const root = document.getElementById('proof'), track = root.querySelector('.a5-track'), sticky = root.querySelector('.a5-sticky');
+  const cap = el.querySelector('.a-cap span'), labs = [...el.querySelectorAll('.a-lab')], pcts = [...el.querySelectorAll('.a-pct')], dots = [...el.querySelectorAll('.a5-dots i')];
+  const S = kStage(el), cam = S.cam;
+  let fd = 7, nx = 1; S.onResize = () => { nx = cam.aspect < .8 ? .58 : 1; fd = S.fitDist(1.95 * nx + .35, 1.05) * (nx < 1 ? 1.1 : 1.2); S.scene.fog.near = fd + .8; S.scene.fog.far = fd + 9; }; S.onResize();
+  const steps = [[0, 'Three versions, side by side.'], [.2, 'People vote.'], [.45, 'Then they leave a deposit.'], [.72, 'C, Sapphire, wins. Now ask a maker for a price.']];
+  const votes = [31, 23, 46], deps = [9, 5, 21];
+  loadGLB(PARTS('lipstick')).then(M => {
+    const SL = [[-1.18, -.42], [0, .18], [1.18, -.42]], slots = SL.map(a => a.slice());
+    const V = [0, 1, 2].map(i => { const p = makeParts(S, M, 'lipstick', 1.38, { variant: VAR[i], idx: i }); p.sh = S.shadow(1.1, .7); return p; });
+    const winRing = S.ring(1.5, .72, .08, 1); winRing.position.y = .008;
+    const VS_UV = K.VS_UV, cols = LV.map(v => new THREE.Color(tok(v.ring)));
+    const barMat = c => new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, uniforms: { uC: { value: c }, uA: { value: 0 } }, vertexShader: VS_UV,
+      fragmentShader: 'uniform vec3 uC; uniform float uA; varying vec2 vUv; void main(){ float x = exp(-pow((vUv.x - .5) * 5., 2.)); gl_FragColor = vec4((uC * x * (.35 + .65 * vUv.y) + vec3(1.) * x * exp(-pow((vUv.y - .985) * 60., 2.)) * .6) * uA, 1.); }' });
+    const bars = [0, 1, 2].map(i => { const m = new THREE.Mesh(new THREE.PlaneGeometry(.16, 1), barMat(cols[i])); S.scene.add(m); return m; });
+    let p = 0, ps = 0;
+    const measure = () => { const r = track.getBoundingClientRect(), h = track.offsetHeight - sticky.offsetHeight; p = clamp((60 - r.top) / Math.max(1, h), 0, 1); };
+    addEventListener('scroll', measure, { passive: true }); addEventListener('resize', measure); measure();
+    const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(0, .74, 0), cur = new THREE.Vector3(0, .74, 0);
+    const R = (a, b) => ease(clamp((ps - a) / (b - a), 0, 1));
+    S.start((dt, time) => {
+      ps += (p - ps) * Math.min(1, dt * 5); if (reduce) ps = p; S.light(1); SL.forEach((a, i) => { slots[i][0] = a[0] * nx; });
+      let si = 0; steps.forEach((s, i) => { if (ps >= s[0]) si = i; }); if (cap.dataset.i !== String(si)) { cap.dataset.i = si; cap.textContent = steps[si][1]; dots.forEach((dd, i) => dd.classList.toggle('on', i <= si)); }
+      const vt = R(.2, .4), dp = R(.47, .66), win = R(.74, .92);
+      V.forEach((v, i) => {
+        v.g.position.set(slots[i][0], 0, slots[i][1]);
+        v.g.rotation.y = -.2 + Math.sin(time * .4 + i * 1.7) * .25 + (i === 0 ? .35 : i === 2 ? -.35 : 0);
+        v.sh.position.set(slots[i][0], .006, slots[i][1]);
+        const b = bars[i], hv = votes[i] / 46 * 1.55, hd = deps[i] / 21 * 1.55, h = Math.max(.001, lerp(hv, hd, dp) * vt);
+        b.scale.y = h; b.position.set(slots[i][0] + .4 * nx, h / 2 + .01, slots[i][1]); b.material.uniforms.uA.value = vt * (win > 0 && i !== 2 ? lerp(1, .35, win) : 1);
+        S.place(labs[i], slots[i][0], -.16, slots[i][1], win > 0 && i !== 2 ? lerp(1, .45, win) : 1);
+        S.place(pcts[i], slots[i][0] + .4 * nx, h + .16, slots[i][1], vt * (win > 0 && i !== 2 ? lerp(1, .5, win) : 1));
+        pcts[i].textContent = dp > .5 ? Math.round(deps[i] * dp) + ' deposits' : Math.round(votes[i] * vt) + '%';
+      });
+      S.version(win > 0 ? tok(LV[2].ring) : null);
+      winRing.position.set(slots[2][0], .008, slots[2][1]); winRing.material.uniforms.uA.value = win * (.85 + .1 * Math.sin(time * 2));
+      camTgt.set(lerp(0, 1.18 * nx, win * .35), .72, lerp(0, -.42, win * .35));
+      camPos.set(camTgt.x + S.mouse.sx * .45, 1.3 + .25 * vt * (1 - win) - S.mouse.sy * .2, camTgt.z + fd * lerp(1, .9, win));
+      cam.position.lerp(camPos, Math.min(1, dt * 4)); cur.lerp(camTgt, Math.min(1, dt * 4)); cam.lookAt(cur);
+    });
+  }).catch(nogl(el));
+});
+
+/* ================= 4 · A4 SPLIT: your photo in a lit frame, a ring of light sweeps across, the product builds beside it ================= */
+run(stage('sSplit'), el => {
+  const labs = [...el.querySelectorAll('.a-lab')];
+  const S = kStage(el, { coneR: 2.1 }), cam = S.cam;
+  let d = 8, xo = .95; S.onResize = () => { xo = S.cam.aspect < .9 ? .62 : .95; d = S.fitDist(xo + .62, 1.0); S.scene.fog.near = d + 1; S.scene.fog.far = d + 9; }; S.onResize();
+  Promise.all([loadGLB(LIP), lipPhoto(), loadGLB(PARTS('lipstick'))]).then(([M, img, MP]) => {
+    const photo = makePhoto(S, img, 1.4), p = lipModel(S, M, 1.3, null), sh = S.shadow(1.0, .65), real = makeParts(S, MP, 'lipstick', 1.3);
+    p.u.uDir.value.set(1, 0, 0); p.u.uGlow.value = 1;
+    const ring = S.ring(1.9, .74, .06, 0); ring.rotation.set(0, Math.PI / 2 - .5, 0);
+    const spin = dragSpin(S.cv), CYC = 8.5; let lt = 0; S.version(tok('--ex-lipstick'));
+    S.start((dt, time) => {
+      S.light(1); spin.step(dt);
+      const s = cam.aspect < .9 ? .72 : 1;
+      photo.scale.setScalar(s); photo.position.set(-xo, .72 * s, 0); p.g.scale.setScalar(s); p.g.position.set(xo, 0, 0); sh.position.set(xo, .006, 0); sh.scale.setScalar(s);
+      lt += dt; const tc = reduce ? 5 : lt % CYC, k = ease(clamp((tc - .5) / 3.2, 0, 1));
+      const x0 = -xo - .55 * s, x1 = xo + .5 * s, rx = lerp(x0, x1, k);
+      let scan = rx; if (tc > 7.4) scan = lerp(x1, xo - .4 * s, ease(clamp((tc - 7.4) / 1, 0, 1)));
+      p.u.uScan.value = tc < .5 ? -99 : scan;
+      ring.position.set(rx, .72 * s, 0); ring.scale.setScalar(s); ring.material.uniforms.uA.value = tc > .5 && tc < 3.8 ? Math.sin(Math.PI * k) : 0;
+      photo.userData.u.uSweep.value = lerp(-.3, 1.5, clamp((rx - (-xo - .5 * s)) / (1.0 * s), 0, 1));
+      sh.material.opacity = .7 * clamp((scan - xo + .3) / .5, 0, 1);
+      p.g.rotation.y = Math.sin(time * .4) * .45 + spin.spin; photo.rotation.y = .12 + S.mouse.sx * .05;
+      const built = tc > 3.9 && tc < 7.4; real.g.visible = built; p.inner.visible = !built; real.g.position.copy(p.g.position); real.g.scale.copy(p.g.scale); real.g.rotation.y = p.g.rotation.y;
+      cam.position.set(S.mouse.sx * .4, 1.05 - S.mouse.sy * .2, d); cam.lookAt(0, .7 * s, 0);
+      S.place(labs[0], -xo, -.12, 0, 1); S.place(labs[1], xo, -.12, 0, 1);
+    });
+  }).catch(nogl(el));
+});
+
+/* ================= 5 · MAKE IT AN AD: the winner alone, turning slowly (A2 solo spotlight) ================= */
+run(stage('sAd'), el => {
+  const S = kStage(el, { fov: 24, coneR: 1.2 }), cam = S.cam;
+  let d = 6; S.onResize = () => { d = S.fitDist(.8, 1.22, .3); }; S.onResize();
+  loadGLB(PARTS('lipstick')).then(M => {
+    const p = makeParts(S, M, 'lipstick', 1.62, { variant: 'C' }), sh = S.shadow(1.3, .85), floorRing = S.ring(1.7, .72, .08, 1); floorRing.position.y = .008;
+    const spin = dragSpin(S.cv); S.version(tok(LV[2].ring));
+    S.start((dt, time) => {
+      S.light(1); spin.step(dt);
+      p.g.position.y = reduce ? .04 : .04 + .025 * Math.sin(time * .8);
+      p.g.rotation.y = (reduce ? .4 : time * .32) + spin.spin;
+      floorRing.material.uniforms.uA.value = .55 + .12 * Math.sin(time * 1.6);
+      cam.position.set(S.mouse.sx * .35, 1.0 - S.mouse.sy * .18, d * (reduce ? 1 : 1 - .03 * Math.sin(time * .2))); cam.lookAt(0, .82, 0);
+    });
+  }).catch(nogl(el));
+});
+})();
+
+/* the hero's one button and the closing button hand over to the Studio below; an empty idea gets a hint, never a broken-looking button */
+(() => {
+  const f = document.getElementById('hs-form'), inp = document.getElementById('hs-idea'), hint = document.getElementById('hs-hint'); if (!f) return;
+  const sub = hint.innerHTML;
+  f.addEventListener('submit', e => { e.preventDefault(); const v = inp.value.trim();
+    if (!v) { hint.textContent = 'Type an idea first, or start from a photo.'; inp.focus(); return; }
+    hint.textContent = 'Opening the Studio with your idea…'; if (window.kalpiMake) window.kalpiMake(v); });
+  inp.addEventListener('input', () => { if (hint.textContent !== sub) hint.innerHTML = sub; });
+  const go = document.getElementById('closeGo'); if (go) go.onclick = () => { if (window.kalpiMake) window.kalpiMake(''); };
+  const ph = document.getElementById('hs-photo'); if (ph) ph.onclick = e => { e.preventDefault(); if (window.kalpiMake) window.kalpiMake(''); };
+})();
+</script>
+<!-- WORKBENCH script -->
+<script>
+(() => {
+  const B = 'http://127.0.0.1:8765', file = location.protocol === 'file:', base = file ? B : '';
+  /* 2026-10-17 (founder): ONE workspace, Studio = the product experiment for any product (kalpi-vote.html), and her Gallery = everything
+     she has built (the same page, its Gallery view). Older studios are archived. */
+  const TOOLS = { studio: ['Studio', '/kalpi-vote.html', true], gallery: ['Gallery', '/kalpi-vote.html', true, '?view=gallery'] };
+  const $ = id => document.getElementById(id), fr = $('kx-if'), msg = $('kx-msg'), st = $('kx-state');
+  let online = null, cur = 'studio', shown = false; try { const t = localStorage.getItem('kalpi.tab'); if (t === 'gallery') cur = t; } catch (e) {}   /* the tab she was on comes back after a reload */
+  const show = (k, query) => { cur = k; shown = true; try { localStorage.setItem('kalpi.tab', k); } catch (e) {} const t = TOOLS[k]; document.querySelectorAll('.kx-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tool === k));
+    $('kx-name').textContent = t[0]; $('kx-open').href = base + t[1] + (t[3] || ''); $('kx-frame').dataset.tool = k; const src = base + t[1] + (t[3] || '') + (query || '');
+    /* since 2026-10-17 the helper gives its key only to pages it serves itself, so this file cannot hold the Studio: say where to open it */
+    if (file) { fr.hidden = true; msg.hidden = false; msg.innerHTML = '<b>Open Kalpi from the helper on this computer</b> to use the Studio and your Gallery. This copy was opened as a file, and the helper only works with pages it serves.<br><br><code id="kx-addr">' + B + '/kalpi.html</code> <button type="button" class="k-btn small ghost" id="kx-copy">Copy the address</button> <a class="k-btn small ghost" href="' + B + '/kalpi.html#make">Open it</a><br><br>If it does not open, start the helper first: <code>cd ~/"Documents/html projects/7 Zengora" &amp;&amp; python3 kalpi-local/server.py</code>';
+      const cb = $('kx-copy'); if (cb) cb.onclick = () => { try { navigator.clipboard.writeText(B + '/kalpi.html').then(() => { cb.textContent = 'Copied'; }, () => { cb.textContent = 'Select the address above'; }); } catch (e) { cb.textContent = 'Select the address above'; } }; return; }
+    if (online === false) { fr.hidden = true; msg.hidden = false; msg.innerHTML = '<b>The helper on this computer is not running</b>, so the tools cannot open here yet.<br><br>Start it in a terminal: <code>cd ~/"Documents/html projects/7 Zengora" &amp;&amp; KALPI_IMAGELAB_LIVE=1 python3 kalpi-local/server.py</code><br><br>then reload this page, or open <a href="' + B + '/kalpi.html">' + B + '/kalpi.html</a>.'; return; }
+    msg.hidden = false; msg.textContent = 'Opening ' + t[0] + '…'; fr.hidden = true;
+    fetch(base + t[1], { method: 'GET', mode: file ? 'no-cors' : 'same-origin' }).then(r => { if (!file && !r.ok) throw 0; fr.onload = () => { msg.hidden = true; fr.hidden = false; }; fr.src = src; })
+      .catch(() => { fr.hidden = true; msg.hidden = false; msg.innerHTML = '<b>' + t[0] + ' is not ready yet.</b> It is being built; try again in a little while, or use “Open full page”.'; });
+    try { history.replaceState(null, '', '#make'); } catch (e) {}
+  };
+  document.querySelectorAll('.kx-tab').forEach(b => b.onclick = () => { show(b.dataset.tool); document.querySelector('.kx-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  /* the page in the frame may hand over to the other tab: Gallery → "Continue in Studio" on one product (open=<its id>), an idea (idea=<text>) */
+  /* the framed page may say how tall its content is (round 4): the frame then fits it, so no empty stage is left under a short screen */
+  addEventListener('message', ev => { const d = ev.data; if (ev.source === fr.contentWindow && d && d.kalpi === 'height' && +d.h > 0) fr.style.height = Math.max(480, Math.min(2400, Math.round(+d.h))) + 'px'; });
+  /* the hero's one button hands the typed idea to the Studio (round 4) */
+  window.kalpiMake = idea => { show('studio', idea ? '?idea=' + encodeURIComponent(String(idea).trim().slice(0, 400)) : ''); const tabs = document.querySelector('.kx-tabs'); if (tabs) tabs.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); };
+  addEventListener('message', ev => { const d = ev.data; if (ev.source !== fr.contentWindow || !d || !TOOLS[d.tool]) return;
+    /* the page moved between its Studio and Gallery views by itself: light the matching tab, nothing reloads */
+    if (d.kalpi === 'view') { cur = d.tool; try { localStorage.setItem('kalpi.tab', d.tool); } catch (e) {} document.querySelectorAll('.kx-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tool === d.tool)); $('kx-name').textContent = TOOLS[d.tool][0]; $('kx-frame').dataset.tool = d.tool; $('kx-open').href = base + TOOLS[d.tool][1] + (TOOLS[d.tool][3] || ''); return; }
+    if (d.kalpi !== 'open') return;
+    const pre = TOOLS[d.tool][3] ? '&' : '?', q = typeof d.idea === 'string' && d.idea.trim() ? pre + 'idea=' + encodeURIComponent(d.idea.trim().slice(0, 400)) : typeof d.open === 'string' && /^[a-z0-9]{4,40}$/.test(d.open) ? pre + 'open=' + d.open : ''; show(d.tool, q); document.querySelector('.kx-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  fetch(base + '/api/health').then(r => r.json()).then(j => { online = !!j.ok; }).catch(() => { online = false; }).then(() => {
+    st.textContent = online ? 'Helper running on this computer' : 'Helper not running'; st.className = 'kx-state ' + (online ? 'on' : 'off');
+    const go = () => { if (!shown) show(cur); }; const sec = document.getElementById('make');
+    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: '300px' }); io.observe(sec); } else go();
+  });
+})();
+</script>
+<!-- Kalpi chat overlay (mockup: answered by a local assistant) -->
+<script src="kalpi-assistant.js"></script>
+<script src="kalpi-chat.js"></script>
+</body>
+</html>
