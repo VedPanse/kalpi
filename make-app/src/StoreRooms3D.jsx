@@ -216,7 +216,8 @@ function dispose(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose();if(n.mater
     else if (o.isLight) o.intensity *= Math.PI;
   });
   const nameOf = (g) => (CATALOG.find((p) => p.id === g.userData.pid) || {}).name || "";
-  return { anim, pickables, nameOf };
+  const priceOf = (name) => (CATALOG.find((p) => p.name === name) || {}).price || "";
+  return { anim, pickables, nameOf, priceOf };
 }
 
 export default function StoreRooms3D() {
@@ -225,6 +226,8 @@ export default function StoreRooms3D() {
   const [room, setRoom] = useState("apothecary");
   const [ask, setAsk] = useState("");
   const [reply, setReply] = useState("Ask the shopkeeper for anything on the shelves.");
+  const [cart, setCart] = useState([]);
+  const [paid, setPaid] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -265,7 +268,9 @@ export default function StoreRooms3D() {
     const built = buildRoom(room, scene, c.camera, c.controls);
     c.anim = built.anim;
     if (c.keeper) c.keeper.dispose();
-    c.keeper = createShopAssistant({ scene, camera: c.camera, dom: c.renderer.domElement, pickables: built.pickables, nameOf: built.nameOf, home: ROOMS.find((r) => r.id === room).keeper });
+    setCart([]); setPaid(false);
+    c.keeper = createShopAssistant({ scene, camera: c.camera, dom: c.renderer.domElement, pickables: built.pickables, nameOf: built.nameOf, home: ROOMS.find((r) => r.id === room).keeper,
+      onDeliver: (name, obj) => setCart((list) => [...list, { name, price: built.priceOf(name), obj, key: Math.random() }]) });
     c.controls.update();
     c.scene = scene;
   }, [room]);
@@ -281,6 +286,31 @@ export default function StoreRooms3D() {
             {r.name}
           </button>
         ))}
+      </div>
+      <div style={{ position: "absolute", top: 12, right: 12, width: 250, padding: 12, borderRadius: 12, background: "rgba(11,11,16,.78)", color: "#fff", fontSize: 13 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 600, marginBottom: 6 }}>
+          <span>🛒 Cart</span><span>{cart.length} item{cart.length === 1 ? "" : "s"}</span>
+        </div>
+        {cart.length === 0 && <div style={{ opacity: 0.7 }}>Click a product, or ask the shopkeeper.</div>}
+        {cart.map((it) => (
+          <div key={it.key} style={{ display: "flex", gap: 6, alignItems: "center", padding: "3px 0" }}>
+            <span style={{ flex: 1 }}>{it.name}</span><span style={{ opacity: 0.8 }}>{it.price}</span>
+            <button aria-label={"Remove " + it.name} onClick={() => { ctx.current.keeper.removeFromCounter(it.obj); setCart((l) => l.filter((x) => x !== it)); }}
+              style={{ background: "none", border: 0, color: "#fff", cursor: "pointer", fontSize: 15 }}>×</button>
+          </div>
+        ))}
+        {cart.length > 0 && (() => {
+          const total = cart.reduce((a, it) => a + Number(String(it.price).replace(/[^0-9.]/g, "") || 0), 0);
+          return (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,.2)", marginTop: 6, paddingTop: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 600 }}><span>Total</span><span>${total.toFixed(2)}</span></div>
+              <button onClick={() => { setPaid(true); setReply(ctx.current.keeper.instruct("checkout")); }}
+                style={{ width: "100%", marginTop: 8, font: "inherit", padding: "8px 10px", borderRadius: 8, border: 0, background: "#b4aaff", color: "#0b0b10", cursor: "pointer" }}>
+                {paid ? "Thank you! (demo checkout)" : "Checkout"}
+              </button>
+            </div>
+          );
+        })()}
       </div>
       <form onSubmit={(e) => { e.preventDefault(); if (ctx.current?.keeper) setReply(ctx.current.keeper.instruct(ask)); setAsk(""); }}
         style={{ position: "absolute", left: 12, right: 12, bottom: 12, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>

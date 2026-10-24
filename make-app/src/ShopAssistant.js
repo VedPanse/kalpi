@@ -58,7 +58,7 @@ function buildShopkeeper(apron) {
  * pickables: the product groups you can click.  home: [x, z] where the shopkeeper stands.
  * nameOf(item): the product's name, so instructions like "bring me the candle" can find it.
  */
-export function createShopAssistant({ scene, camera, dom, pickables, home, apron = "#5d6f3a", nameOf = () => "" }) {
+export function createShopAssistant({ scene, camera, dom, pickables, home, apron = "#5d6f3a", nameOf = () => "", onDeliver = () => {} }) {
   const { g, arms, legs } = buildShopkeeper(apron);
   const homePos = new THREE.Vector3(home[0], 0, home[1]);
   g.position.copy(homePos);
@@ -72,6 +72,7 @@ export function createShopAssistant({ scene, camera, dom, pickables, home, apron
   say("Hi! Click anything you like", 4);
 
   let path = [], carried = null, then = null, walking = false;
+  const delivered = [];
   const goTo = (p, cb) => { path = [p.clone()]; then = cb; walking = true; };
 
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -109,7 +110,16 @@ export function createShopAssistant({ scene, camera, dom, pickables, home, apron
       carried.position.set(0, 0.95, 0.32); carried.rotation.set(0, 0, 0);
       carried.userData.spin = false;
       g.add(carried);
-      goTo(homePos, () => say("Here you go! Added to your basket", 4));
+      goTo(homePos, () => {
+        // put it down on the counter in front of the shopkeeper, next to the others
+        const done = carried; carried = null;
+        g.remove(done);
+        const spot = new THREE.Vector3(0.25 - delivered.length * 0.16, 0.95, 0.45).applyAxisAngle(new THREE.Vector3(0, 1, 0), g.rotation.y).add(g.position);
+        done.position.copy(spot); done.rotation.set(0, 0, 0);
+        scene.add(done); delivered.push(done);
+        onDeliver(done.userData.name, done);
+        say("Here you go! It's in your cart", 4);
+      });
     });
   }
 
@@ -133,8 +143,8 @@ export function createShopAssistant({ scene, camera, dom, pickables, home, apron
     if (/^(hi|hello|hey)\b/.test(t)) { say("Hello! What can I get you?"); return "Hello! What can I get you?"; }
     if (/(come back|come here|stop|go back)/.test(t)) { goTo(homePos, () => say("I'm here")); return "Coming back."; }
     if (/(checkout|check out|pay|basket|cart)/.test(t)) {
-      if (!carried) { say("Your basket is empty"); return "Your basket is empty. Ask me for something first."; }
-      say("Ready! Pay at the counter", 4); return "Ready to pay: " + (carried.userData.name || "your item") + ".";
+      if (!delivered.length) { say("Your cart is empty"); return "Your cart is empty. Ask me for something first."; }
+      say("Ready! Pay at the counter", 4); return "Ready to pay for " + delivered.length + " item" + (delivered.length > 1 ? "s" : "") + ".";
     }
     const item = findItem(t);
     if (!item) { say("Sorry, I couldn't find that"); return "Sorry, I couldn't find that here. Try a product name."; }
@@ -180,10 +190,16 @@ export function createShopAssistant({ scene, camera, dom, pickables, home, apron
     if (bubble && performance.now() > bubble.userData.until) { g.remove(bubble); bubble = null; }
   }
 
+  function removeFromCounter(obj) {
+    const i = delivered.indexOf(obj);
+    if (i >= 0) { delivered.splice(i, 1); scene.remove(obj); }
+  }
+
   function dispose() {
     dom.removeEventListener("pointerdown", onDown);
     dom.removeEventListener("pointerup", onUp);
     scene.remove(g);
+    delivered.forEach((d) => scene.remove(d));
   }
-  return { update, dispose, say, instruct };
+  return { update, dispose, say, instruct, removeFromCounter };
 }
