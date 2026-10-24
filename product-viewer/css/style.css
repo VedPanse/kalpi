@@ -1,0 +1,57 @@
+body {
+  margin: 0;
+  background: #0b0b10;
+  color: #f4f3f7;
+  font-family: Inter, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* The 3D canvas fills the whole window */
+#container3D {
+  position: fixed;
+  inset: 0;
+}
+
+#picker {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 32px);
+  max-width: 900px;
+}
+
+#picker button {
+  font: inherit;
+  font-size: 14px;
+  color: inherit;
+  background: #1b1a24;
+  border: 1px solid #2c2a38;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#picker button.on {
+  background: #b4aaff;
+  color: #0b0b10;
+  border-color: #b4aaff;
+}
+
+#hint,
+#status {
+  position: fixed;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  color: #a09eab;
+  margin: 0;
+}
+
+#hint { bottom: 16px; }
+#status { bottom: 40px; }
