@@ -44,3 +44,10 @@ server/server.py    Shopify helper (Python standard library only)
 ## Stack
 
 TypeScript, three.js, Vite; Python 3 standard library for the helper.
+
+## Any store in 3D, one command
+
+```sh
+.venv-3d/bin/python tools/add_store.py otherland.com --limit 120
+```
+Downloads the catalogue and photos, cuts each product out, decides its shape from the title (round things spun from their outline; bags, boxes, cards and prints as flat boxes), reads its size from the title ("8 oz", "250 ml") or a category default, and writes `assets/<store>/`. Then build that store: its shelves are 3D. Preview: `/tools/preview/?store=otherland.com`.

@@ -13,7 +13,7 @@ Open http://127.0.0.1:5173, click **graza.co**, then **Enter the store**. Graza'
 - 3D models + catalogue: `walk-in-store/assets/graza.co/` (`3d/catalog.json`, `3d/tex/*.png`, `products.json`). The helper uses these first, so it works offline.
 - Preview of all 21 models, spinning: http://127.0.0.1:5173/tools/preview/
 - Shop-assistant options: http://127.0.0.1:5173/tools/assistant-options/
-- Remake models for another store: see `walk-in-store/README.md` (`tools/make3d.py`, needs `pip install "rembg[cpu]" pillow numpy`).
+- Any other store in 3D: `.venv-3d/bin/python tools/add_store.py <store.com>` (needs `pip install "rembg[cpu]" pillow numpy`), then build that store. Example included: `assets/otherland.com/`.
 - Optional Tripo generation: `tools/tripo3d.py` reads a key from `TRIPO_API_KEY` or `~/.tripo_key` (paid credits; not needed for the demo).
 - The dancing-robot model is not committed (Poser EULA); the store loads it from Khronos' public copy.
 
