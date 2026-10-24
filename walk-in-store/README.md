@@ -44,15 +44,3 @@ server/server.py    Shopify helper (Python standard library only)
 ## Stack
 
 TypeScript, three.js, Vite; Python 3 standard library for the helper.
-
-## 3D products from product photos
-
-`tools/make3d.py` turns a store's product photos into simple 3D models, on a laptop, for free:
-
-1. Save the store's catalogue and photos to `data/cache/<store>/` (`products.json` + `img/<handle>.jpg`).
-2. `python3 -m venv .venv-3d && .venv-3d/bin/pip install "rembg[cpu]" pillow numpy`
-3. `.venv-3d/bin/python tools/make3d.py data/cache/<store>`
-
-It cuts each product out of its photo (rembg), measures its outline row by row, and saves a half-outline in millimetres plus the cut-out photo. In the store, `src/model3d.ts` spins round products into shape (three.js `LatheGeometry`) and wraps the photo back on; bags, cards and boxes become boxes with the photo on the front. Multi-packs ("6 Cans", "Trio") become several copies of the single products. When a store has models, its shelves show them instead of flat photos, and the helper falls back to the saved catalogue if the internet is down.
-
-`data/` is not committed: product photos belong to the store.

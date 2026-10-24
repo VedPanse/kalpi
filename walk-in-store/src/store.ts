@@ -25,6 +25,7 @@ export interface BuiltStore {
   count: number;
   aisles: number;
   in3d: number;                  // products shown as 3D models
+  spinners: THREE.Object3D[];    // 3D products that turn slowly
 }
 
 const loader = new THREE.TextureLoader();
@@ -220,7 +221,10 @@ export function buildStore(data: StoreData, models: ModelCatalog | null = null):
 
   buildFrontOfStore(scene, blocks, W, zFront);
 
-  return { scene, pickables, blocks, bounds, start: new THREE.Vector3(0, 1.6, zFront + 1.6), name, count: products.length, aisles: units, in3d };
+  const spinners: THREE.Object3D[] = [];
+  scene.traverse((o) => { if (o.userData.spin) spinners.push(o); });
+  spinners.forEach((o, i) => (o.rotation.y = i * 0.7)); // start at different angles
+  return { scene, pickables, blocks, bounds, start: new THREE.Vector3(0, 1.6, zFront + 1.6), name, count: products.length, aisles: units, in3d, spinners };
 }
 
 function buildShelving(unit: THREE.Group, m: Record<string, THREE.Material>): void {

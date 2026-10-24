@@ -107,7 +107,9 @@ $('#pTest').addEventListener('click', () => toast('Next step: Kalpi makes 2–3 
 const timer = new THREE.Timer();
 function frame(): void {
   timer.update();
-  walker.update(Math.min(0.05, timer.getDelta()));
+  const dt = Math.min(0.05, timer.getDelta());
+  walker.update(dt);
+  if (world) for (const o of world.spinners) o.rotation.y += dt * 0.6; // 3D products turn slowly
   if (world) renderer.render(world.scene, camera);
   requestAnimationFrame(frame);
 }

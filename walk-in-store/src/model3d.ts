@@ -78,6 +78,7 @@ export function buildListing(cat: ModelCatalog, handle: string, dir: string, max
   for (const b of items) {
     const m = buildModel(b, dir);
     m.position.x = (x + (b.widthMM * MM) / 2);
+    m.userData.spin = true; // turned slowly by the store's animate loop
     x += b.widthMM * MM + gap;
     g.add(m);
   }

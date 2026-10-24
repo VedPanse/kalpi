@@ -17,5 +17,7 @@ for (const id of ids) { const m = buildModel(cat.bases[id], dir); m.position.x =
 const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.01, 50); cam.position.set(x / 2, 0.35, 2.4);
 const c = new OrbitControls(cam, r.domElement); c.target.set(x / 2, 0.14, 0); c.update();
 window.__dbg = ids.map(id => { const b = cat.bases[id]; return id + " w" + b.widthMM + " pts" + b.profile?.length; }); console.log(JSON.stringify(window.__dbg));
-r.setAnimationLoop(() => { c.update(); r.render(scene, cam); });
+const spin = scene.children.filter((o) => o.userData.base);
+let last = performance.now();
+r.setAnimationLoop((t) => { const dt = (t - last) / 1000; last = t; spin.forEach((o) => (o.rotation.y += dt * 0.6)); c.update(); r.render(scene, cam); });
 </script>
