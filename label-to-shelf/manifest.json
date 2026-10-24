@@ -1,0 +1,12 @@
+{
+  "name": "Label to Shelf",
+  "id": "label-to-shelf-dev",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"]
+  }
+}

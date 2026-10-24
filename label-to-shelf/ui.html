@@ -1,0 +1,847 @@
+<meta charset="utf-8">
+<style>
+  :root { --bg:var(--figma-color-bg,#fff); --fg:var(--figma-color-text,#1e1e1e); --mut:var(--figma-color-text-secondary,#757575); --card:var(--figma-color-bg-secondary,#f5f5f5); --line:var(--figma-color-border,#e6e6e6); --acc:#b4aaff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.4 Inter, system-ui, sans-serif; }
+  header { padding:12px 14px 8px; }
+  h1 { font-size:15px; margin:0 0 2px; font-weight:600; }
+  .mut { color:var(--mut); }
+  .row { display:flex; gap:6px; padding:0 14px 10px; flex-wrap:wrap; }
+  button { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; }
+  button.on { background:var(--acc); color:#0b0b10; border-color:var(--acc); }
+  .act { display:flex; gap:6px; padding:0 14px 12px; }
+  .act button { border-radius:8px; }
+  #stage { position:relative; height:400px; margin:0 14px; }
+  #stage canvas { display:block; }
+  #empty { position:absolute; inset:auto 0 12px; text-align:center; color:var(--mut); pointer-events:none; }
+  #info { padding:10px 14px; color:var(--mut); }
+  #info b { color:var(--fg); font-weight:500; }
+
+  .tabs { display:flex; gap:4px; padding:0 14px 10px; }
+  .tabs button { border-radius:8px; }
+  #rooms button i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:1px; }
+  #storeStage { position:relative; height:420px; margin:0 14px; border-radius:12px; overflow:hidden; }
+  #storeCv { display:block; width:100%; height:100%; }
+  #roomtag { position:absolute; left:10px; top:10px; padding:5px 9px; border-radius:8px; background:rgba(11,11,16,.7); color:#fff; font-size:12px; }
+  #storeInfo { padding:10px 14px; color:var(--mut); }
+  #storeInfo b { color:var(--fg); font-weight:500; }
+</style>
+
+<header>
+  <h1>Label to Shelf</h1>
+  <div class="mut">Select up to 3 label frames, and optionally a vector outline for the shape. 1 px = 1 mm.</div>
+</header>
+
+<div class="tabs" id="modes">
+  <button data-mode="shelf" class="on">Shelf</button>
+  <button data-mode="store">Store</button>
+</div>
+
+<section id="shelfView">
+<div class="row" id="products">
+  <button data-p="bottle" class="on">Bottle 500 ml</button>
+  <button data-p="jar">Jar 250 ml</button>
+  <button data-p="candle">Candle 300 g</button>
+  <button data-p="custom" id="customBtn" hidden>My shape</button>
+  <button id="drawBtn" type="button">✎ Draw my own shape</button>
+</div>
+
+<div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
+<div id="info"></div>
+<div id="codeMsg" class="mut" style="padding:0 14px 8px" hidden></div>
+<div class="act"><button id="codeShelf" type="button" class="on">Copy as interactive 3D</button><button id="placeShelf" type="button">Place picture</button></div>
+</section>
+
+<section id="storeView" hidden>
+  <div class="row" id="rooms"></div>
+  <div id="storeStage"><canvas id="storeCv"></canvas><div id="roomtag"></div></div>
+  <div id="storeInfo"></div>
+  <div id="codeMsg2" class="mut" style="padding:0 14px 8px" hidden></div>
+  <div class="act"><button id="codeStore" type="button" class="on">Copy as interactive 3D</button><button id="placeStore" type="button">Place picture</button></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script>
+// ---------- Products, in real millimetres ----------
+// outline = half the side profile [radius, height]; three.js spins it into the product.
+// band = where the label goes [bottom, top] in mm.
+const PRODUCTS = {
+  bottle: {
+    name: "Bottle 500 ml", color: 0x9aae94, cap: 0xc9a56b,
+    outline: [[0,0],[34,0],[36,4],[36,150],[33,172],[20,190],[15,198],[15,212]],
+    capR: 17, capH: 26, band: [30, 120],
+  },
+  jar: {
+    name: "Jar 250 ml", color: 0xe9e4da, cap: 0x2b2a30,
+    outline: [[0,0],[38,0],[40,4],[40,78],[36,84],[36,92]],
+    capR: 39, capH: 16, band: [14, 64],
+  },
+  candle: {
+    name: "Candle 300 g", color: 0x3c3a42, cap: 0xf1ece2,
+    outline: [[0,0],[42,0],[43,3],[43,92],[41,95]],
+    capR: 0, capH: 0, band: [20, 74],
+  },
+};
+
+const MM = 0.01; // 1 mm = 0.01 three.js units
+let productKey = "bottle";
+let labels = []; // [{ name, width, height, image }]
+
+// ---------- Scene, camera, renderer ----------
+const stage = document.getElementById("stage");
+const scene = new THREE.Scene();
+scene.background = null; // transparent: the panel (or the Figma canvas) shows through
+
+const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
+camera.position.set(0, 1.5, 6.4);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.85;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+const ENV = 0.35; // how strongly materials reflect the studio
+
+// ---------- Lights ----------
+scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 0.35));
+const key = new THREE.DirectionalLight(0xffffff, 1.4);
+key.position.set(3, 5, 4); key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.left = key.shadow.camera.bottom = -3; key.shadow.camera.right = key.shadow.camera.top = 3;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xdcd6ff, 0.5); fill.position.set(-4, 2, 2); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xb4aaff, 1.2); rim.position.set(0, 3, -5); scene.add(rim);
+
+// Shelf
+const shelf = new THREE.Mesh(
+  new THREE.BoxGeometry(4, 0.06, 1.2),
+  new THREE.MeshStandardMaterial({ color: new THREE.Color(0x6b4a2f).convertSRGBToLinear(), roughness: 0.7, envMapIntensity: ENV })
+);
+shelf.position.y = -0.03; shelf.receiveShadow = true; scene.add(shelf);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 1.1, 0);
+controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+// ---------- Building one product with its label ----------
+const group = new THREE.Group();
+scene.add(group);
+
+function radiusAt(p, y) {
+  // body radius at height y (mm), read from the outline
+  const o = p.outline;
+  for (let i = 1; i < o.length; i++) {
+    if (y <= o[i][1]) {
+      const t = (y - o[i-1][1]) / ((o[i][1] - o[i-1][1]) || 1);
+      return o[i-1][0] + t * (o[i][0] - o[i-1][0]);
+    }
+  }
+  return o[o.length - 1][0];
+}
+
+let curSpec = null; // filled while building: parts + label, for the code-layer export
+const hex = (c) => '#' + new THREE.Color(c).getHexString();
+
+function buildProduct(p, label) {
+  const g = new THREE.Group();
+  if (curSpec) curSpec.parts.push({ rh: p.outline, color: hex(p.color) });
+  const body = new THREE.Mesh(
+    new THREE.LatheGeometry(p.outline.map(([r, y]) => new THREE.Vector2(r * MM, y * MM)), 96),
+    new THREE.MeshPhysicalMaterial({ color: new THREE.Color(p.color).convertSRGBToLinear(), roughness: 0.4, clearcoat: 0.5, clearcoatRoughness: 0.3, envMapIntensity: ENV })
+  );
+  body.castShadow = true; g.add(body);
+
+  const top = p.outline[p.outline.length - 1][1];
+  if (p.capH) {
+    const cap = new THREE.Mesh(
+      new THREE.CylinderGeometry(p.capR * MM, p.capR * MM, p.capH * MM, 64),
+      new THREE.MeshStandardMaterial({ color: new THREE.Color(p.cap).convertSRGBToLinear(), roughness: 0.45, metalness: 0.3, envMapIntensity: ENV })
+    );
+    cap.position.y = (top + p.capH / 2) * MM; cap.castShadow = true; g.add(cap);
+    if (curSpec) curSpec.parts.push({ rh: [[0, top], [p.capR, top], [p.capR, top + p.capH], [0, top + p.capH]], color: hex(p.cap) });
+  } else {
+    // candle: wax surface + wick
+    const wax = new THREE.Mesh(new THREE.CircleGeometry(40 * MM, 64), new THREE.MeshStandardMaterial({ color: p.cap, roughness: 0.9 }));
+    wax.rotation.x = -Math.PI / 2; wax.position.y = (top - 6) * MM; g.add(wax);
+    const wick = new THREE.Mesh(new THREE.CylinderGeometry(0.8 * MM, 0.8 * MM, 10 * MM), new THREE.MeshStandardMaterial({ color: 0x222222 }));
+    wick.position.y = (top - 1) * MM; g.add(wick);
+  }
+
+  return { group: g, facts: addLabel(g, p.band[0], p.band[1], radiusAt(p, (p.band[0] + p.band[1]) / 2) + 0.4, label) };
+}
+
+// The label: a slice of cylinder just outside the body, at real size.
+function addLabel(g, b0, b1, r, label) {
+  const bandH = b1 - b0;
+  if (curSpec) curSpec.label = { b0, b1, r, image: label.image };
+  const widthMM = bandH * (label.width / label.height);   // label keeps its proportions
+  const circumference = 2 * Math.PI * r;
+  const angle = Math.min(2 * Math.PI, widthMM / r);
+  if (curSpec) curSpec.label.angle = angle;
+  const tex = new THREE.Texture(label.image);
+  tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8; tex.needsUpdate = true;
+  const sleeve = new THREE.Mesh(
+    // centred on the front (+z): three.js starts theta at +z
+    new THREE.CylinderGeometry(r * MM, r * MM, bandH * MM, 128, 1, true, -angle / 2, angle),
+    new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.5, clearcoat: 0.2, envMapIntensity: ENV, side: THREE.DoubleSide })
+  );
+  sleeve.position.y = (b0 + bandH / 2) * MM;
+  g.add(sleeve);
+
+  const visibleFront = Math.min(widthMM, Math.PI * r);       // half the product faces you
+  return {
+    printed: `${Math.round(widthMM)} × ${Math.round(bandH)} mm`,
+    wrap: Math.round(angle * 180 / Math.PI),
+    hidden: Math.max(0, Math.round((1 - visibleFront / widthMM) * 100)),
+    tooWide: widthMM > circumference,
+  };
+}
+
+// ---------- Your own shape, drawn in Figma ----------
+// Each vector (or each separate piece after Figma's Cut tool) becomes one part.
+// Left edge of everything = the centre line, bottom = the base, 1 px = 1 mm.
+let shapes = [];
+
+function parsePath(d) {
+  const t = d.match(/[MLCQZHV]|-?\d*\.?\d+(?:e-?\d+)?/gi) || [];
+  const subs = []; let cur = null, x = 0, y = 0, i = 0;
+  const num = () => parseFloat(t[i++]);
+  while (i < t.length) {
+    const c = t[i++].toUpperCase();
+    if (c === "M") { x = num(); y = num(); cur = [[x, y]]; subs.push(cur); }
+    else if (c === "L") { x = num(); y = num(); cur.push([x, y]); }
+    else if (c === "H") { x = num(); cur.push([x, y]); }
+    else if (c === "V") { y = num(); cur.push([x, y]); }
+    else if (c === "C" || c === "Q") {
+      const p = c === "C" ? [num(), num(), num(), num(), num(), num()] : [num(), num(), num(), num()];
+      const x0 = x, y0 = y; x = p[p.length - 2]; y = p[p.length - 1];
+      for (let k = 1; k <= 12; k++) {
+        const s = k / 12, u = 1 - s;
+        cur.push(c === "C"
+          ? [u*u*u*x0 + 3*u*u*s*p[0] + 3*u*s*s*p[2] + s*s*s*x, u*u*u*y0 + 3*u*u*s*p[1] + 3*u*s*s*p[3] + s*s*s*y]
+          : [u*u*x0 + 2*u*s*p[0] + s*s*x, u*u*y0 + 2*u*s*p[1] + s*s*y]);
+      }
+    } else if (c === "Z") { if (cur && cur.length) cur.push(cur[0].slice()); }
+  }
+  return subs.filter((s) => s.length > 1);
+}
+
+function shapeParts() {
+  const parts = [];
+  shapes.forEach((sh) => sh.paths.forEach((d) => parsePath(d).forEach((pts) =>
+    parts.push({ pts: pts.map(([px, py]) => [px + sh.x, py + sh.y]), color: sh.color }))));
+  if (!parts.length) return null;
+  const all = parts.flatMap((p) => p.pts);
+  const axis = Math.min(...all.map((q) => q[0])), base = Math.max(...all.map((q) => q[1]));
+  parts.forEach((p) => {
+    p.rh = p.pts.map(([px, py]) => [Math.max(0, px - axis), base - py]); // [radius, height] in mm
+    const hs = p.rh.map((q) => q[1]);
+    p.h0 = Math.min(...hs); p.h1 = Math.max(...hs);
+  });
+  return { parts, top: Math.max(...parts.map((p) => p.h1)) };
+}
+
+function buildCustom(label) {
+  const sp = shapeParts();
+  const g = new THREE.Group();
+  sp.parts.forEach((part) => {
+    const srgb = part.color ? new THREE.Color(part.color[0], part.color[1], part.color[2]) : new THREE.Color(0x9aae94);
+    if (curSpec) curSpec.parts.push({ rh: part.rh, color: '#' + srgb.getHexString() });
+    const col = srgb.clone().convertSRGBToLinear();
+    const m = new THREE.Mesh(
+      new THREE.LatheGeometry(part.rh.map(([r, h]) => new THREE.Vector2(r * MM, h * MM)), 96),
+      new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.4, clearcoat: 0.5, envMapIntensity: ENV, side: THREE.DoubleSide })
+    );
+    m.castShadow = true; g.add(m);
+  });
+  // label on the tallest part, from 15 % to 55 % of its height
+  const main = sp.parts.reduce((a, b) => (b.h1 - b.h0 > a.h1 - a.h0 ? b : a));
+  const H = main.h1 - main.h0, b0 = main.h0 + 0.15 * H, b1 = main.h0 + 0.55 * H;
+  const inBand = main.rh.filter(([, h]) => h >= b0 && h <= b1).map(([r]) => r);
+  const r = (inBand.length ? Math.max(...inBand) : Math.max(...main.rh.map((q) => q[0]))) + 0.4;
+  return { group: g, facts: addLabel(g, b0, b1, r, label), top: sp.top };
+}
+
+// A letter tag above each version
+function tag(letter) {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const x = c.getContext("2d");
+  x.fillStyle = "#b4aaff"; x.beginPath(); x.arc(64, 64, 56, 0, Math.PI * 2); x.fill();
+  x.fillStyle = "#0b0b10"; x.font = "bold 72px Inter, system-ui, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText(letter, 64, 68);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c) }));
+  s.scale.set(0.22, 0.22, 1);
+  return s;
+}
+
+let SPEC = [];
+function rebuild() {
+  group.clear();
+  const custom = productKey === "custom" && shapes.length && shapeParts();
+  const p = PRODUCTS[productKey] || PRODUCTS.bottle;
+  const list = labels.length ? labels : [sampleLabel()];
+  const gap = 1.05;
+  const lines = [];
+  SPEC = [];
+  list.forEach((label, i) => {
+    curSpec = { x: (i - (list.length - 1) / 2) * gap, parts: [], label: null };
+    const { group: g, facts } = custom ? buildCustom(label) : buildProduct(p, label);
+    SPEC.push(curSpec); curSpec = null;
+    g.position.x = (i - (list.length - 1) / 2) * gap;
+    group.add(g);
+    if (list.length > 1) {
+      const t = tag("ABC"[i]);
+      const topMM = custom ? custom.top : p.outline[p.outline.length - 1][1] + p.capH;
+      t.position.set(g.position.x, (topMM + 22) * MM, 0);
+      group.add(t);
+    }
+    const prefix = list.length > 1 ? `<b>${"ABC"[i]}</b> · ` : "";
+    lines.push(
+      `${prefix}<b>${escapeHtml(label.name)}</b>: printed ${facts.printed}, wraps ${facts.wrap}°` +
+      (facts.hidden ? `, ${facts.hidden}% is round the back` : "") +
+      (facts.tooWide ? " · <b>too wide: it overlaps itself</b>" : "")
+    );
+  });
+  document.getElementById("info").innerHTML = lines.join("<br>");
+  document.getElementById("empty").hidden = labels.length > 0;
+}
+
+// ---------- A sample label until a frame is selected ----------
+function sampleLabel() {
+  const c = document.createElement("canvas"); c.width = 640; c.height = 500;
+  const x = c.getContext("2d");
+  x.fillStyle = "#f4efe6"; x.fillRect(0, 0, 640, 500);
+  x.fillStyle = "#2c2a26"; x.textAlign = "center";
+  x.font = "600 76px Georgia, serif"; x.fillText("HOLLOW", 320, 200); x.fillText("OAK", 320, 280);
+  x.font = "34px Inter, system-ui, sans-serif"; x.font = "30px Inter, system-ui, sans-serif"; x.fillText("SAGE & CEDAR · HANDMADE", 320, 350);
+  x.strokeStyle = "#2c2a26"; x.lineWidth = 6; x.strokeRect(30, 30, 580, 440);
+  return { name: "Sample label", width: 640, height: 500, image: c };
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch])); }
+
+// ---------- Messages from Figma (code.js) ----------
+window.onmessage = async (event) => {
+  const msg = event.data.pluginMessage;
+  if (!msg || (msg.type !== "labels" && msg.type !== "selection")) return;
+  shapes = msg.shapes || [];
+  const btn = document.getElementById("customBtn");
+  btn.hidden = !shapes.length;
+  if (shapes.length) selectProduct("custom");
+  else if (productKey === "custom") selectProduct("bottle");
+  labels = await Promise.all(msg.labels.map(async (l) => {
+    const blob = new Blob([l.bytes], { type: "image/png" });
+    const image = await createImageBitmap(blob, { imageOrientation: "flipY" });
+    return { name: l.name, width: l.width, height: l.height, image };
+  }));
+  rebuild();
+  Store.setLabels(labels);
+};
+
+// ---------- Product buttons ----------
+function selectProduct(key) {
+  productKey = key;
+  document.querySelectorAll("#products [data-p]").forEach((x) => x.classList.toggle("on", x.dataset.p === key));
+}
+document.querySelectorAll("#products [data-p]").forEach((b) => b.onclick = () => { selectProduct(b.dataset.p); rebuild(); });
+document.getElementById("drawBtn").onclick = () => parent.postMessage({ pluginMessage: { type: "starter" } }, "*");
+
+// ---------- Place the 3D view on the Figma canvas as an image ----------
+function placeOnCanvas(canvas, name) {
+  canvas.toBlob(async (blob) => {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    parent.postMessage({ pluginMessage: { type: "place", bytes, width: canvas.width, height: canvas.height, name } }, "*");
+  }, "image/png");
+}
+document.getElementById("placeShelf").onclick = () => placeOnCanvas(renderer.domElement, "3D shelf · Label to Shelf");
+// ---------- Copy the live 3D as a Figma code layer ----------
+// Figma code layers (the { } tool) run React + npm packages such as three on the canvas.
+// We pack the current scene into a GLB, inline it, and copy a ready-made component.
+function codeLayerSource(glbBase64, cam, target, title) {
+  const v = (a) => "[" + a.map((n) => +n.toFixed(4)).join(", ") + "]";
+  return `// ${title} — made with Label to Shelf. Paste into a Figma code layer ({ } in the toolbar).
+import React, { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+
+const CAMERA = ${v(cam)};
+const TARGET = ${v(target)};
+const GLB = "${glbBase64}";
+
+export default function LabelToShelf3D() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    el.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.5;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1.2));
+    const key = new THREE.DirectionalLight(0xffffff, 2.5);
+    key.position.set(3, 5, 4);
+    scene.add(key);
+
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 100);
+    camera.position.fromArray(CAMERA);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.fromArray(TARGET);
+    controls.enableDamping = true;
+    controls.update();
+
+    const bytes = Uint8Array.from(atob(GLB), (c) => c.charCodeAt(0));
+    new GLTFLoader().parse(bytes.buffer, "", (gltf) => scene.add(gltf.scene));
+
+    const fit = () => {
+      const w = el.clientWidth || 400, h = el.clientHeight || 400;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    fit();
+
+    let raf;
+    const loop = () => { raf = requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); };
+    loop();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); controls.dispose(); renderer.dispose(); el.removeChild(renderer.domElement); };
+  }, []);
+  return <div ref={ref} style={{ width: "100%", height: "100%", minHeight: 320 }} />;
+}
+`;
+}
+
+// label image → small JPEG text (bitmaps from Figma are stored upside down for WebGL, so flip them back)
+function labelDataURL(img) {
+  const w0 = img.width, h0 = img.height, k = Math.min(1, 640 / w0);
+  const c = document.createElement("canvas"); c.width = Math.round(w0 * k); c.height = Math.round(h0 * k);
+  const x = c.getContext("2d");
+  if (img instanceof ImageBitmap) { x.translate(0, c.height); x.scale(1, -1); }
+  x.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.82);
+}
+
+function shelfCodeSource(cam, target) {
+  const r4 = (n) => +n.toFixed(2);
+  const versions = SPEC.map((v) => ({
+    x: r4(v.x),
+    parts: v.parts.map((p) => ({ color: p.color, rh: p.rh.map(([a, b]) => [r4(a), r4(b)]) })),
+    label: v.label && { b0: r4(v.label.b0), b1: r4(v.label.b1), r: r4(v.label.r), angle: +v.label.angle.toFixed(4), src: labelDataURL(v.label.image) },
+  }));
+  const v = (a) => "[" + a.map((n) => +n.toFixed(3)).join(", ") + "]";
+  return `// Label to Shelf — your label on the product, in 3D. Drag to turn it.
+import React, { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+
+const MM = 0.01; // 1 mm in three.js units
+const CAMERA = ${v(cam)};
+const TARGET = ${v(target)};
+// each version: its parts (half outline as [radius, height] in mm) and its label
+const VERSIONS = ${JSON.stringify(versions)};
+
+export default function LabelToShelf3D() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+    el.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.35;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(3, 5, 4); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xb4aaff, 1.2); rim.position.set(0, 3, -5); scene.add(rim);
+
+    const shelf = new THREE.Mesh(new THREE.BoxGeometry(4, 0.06, 1.2), new THREE.MeshStandardMaterial({ color: "#6b4a2f", roughness: 0.7 }));
+    shelf.position.y = -0.03; scene.add(shelf);
+
+    const loader = new THREE.TextureLoader();
+    for (const ver of VERSIONS) {
+      const g = new THREE.Group(); g.position.x = ver.x; scene.add(g);
+      for (const part of ver.parts) {
+        const geo = new THREE.LatheGeometry(part.rh.map(([r, h]) => new THREE.Vector2(r * MM, h * MM)), 96);
+        g.add(new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: part.color, roughness: 0.4, clearcoat: 0.5, side: THREE.DoubleSide })));
+      }
+      if (ver.label) {
+        const L = ver.label, tex = loader.load(L.src);
+        tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+        const sleeve = new THREE.Mesh(
+          new THREE.CylinderGeometry(L.r * MM, L.r * MM, (L.b1 - L.b0) * MM, 128, 1, true, -L.angle / 2, L.angle),
+          new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.5, clearcoat: 0.2, side: THREE.DoubleSide })
+        );
+        sleeve.position.y = ((L.b0 + L.b1) / 2) * MM;
+        g.add(sleeve);
+      }
+    }
+
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
+    camera.position.fromArray(CAMERA);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.fromArray(TARGET);
+    controls.enableDamping = true;
+    controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    controls.update();
+
+    const fit = () => {
+      const w = el.clientWidth || 400, h = el.clientHeight || 400;
+      renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+    };
+    const ro = new ResizeObserver(fit); ro.observe(el); fit();
+
+    let raf;
+    const loop = () => { raf = requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); };
+    loop();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); controls.dispose(); renderer.dispose(); el.removeChild(renderer.domElement); };
+  }, []);
+  return <div ref={ref} style={{ width: "100%", height: "100%", minHeight: 320 }} />;
+}
+`;
+}
+
+function copyText(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  return ok;
+}
+
+function notify(text) { parent.postMessage({ pluginMessage: { type: "notify", text } }, "*"); }
+
+// Step 1 (first click): pack the scene. Step 2 (second click): copy — Figma only allows copying during a click.
+function exportCodeLayer(view, title, msgEl, btn) {
+  if (btn.dataset.ready) {
+    const src = btn._src;
+    const ok = copyText(src);
+    notify(ok ? "Copied. Click { } in the toolbar, draw a code layer and paste into its code." : "Copy was blocked. Use the download link in the panel.");
+    msgEl.innerHTML = ok ? "<b>Copied.</b> Now click <b>{ }</b> in the toolbar, draw a code layer, open its code, select all and paste. "
+                         : "Figma blocked the copy. ";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+    a.download = "LabelToShelf3D.jsx"; a.textContent = "Download LabelToShelf3D.jsx";
+    msgEl.appendChild(a);
+    delete btn.dataset.ready; btn.textContent = "Copy as interactive 3D";
+    return;
+  }
+  const { scene: sc, camera: cam, controls: ctl } = view;
+  msgEl.hidden = false;
+  if (view.small) {
+    btn._src = shelfCodeSource(cam.position.toArray(), ctl.target.toArray());
+    btn.dataset.ready = "1";
+    btn.textContent = "Copy code (" + Math.round(btn._src.length / 1024) + " KB)";
+    msgEl.innerHTML = "Ready. Click <b>Copy code</b>.";
+    return;
+  }
+  msgEl.textContent = "Packing the 3D…"; btn.disabled = true;
+  try {
+    // label bitmaps are already upside down for WebGL; tell the exporter not to flip them again
+    const flipped = [];
+    sc.traverse((o) => { const m = o.material; if (m && m.map && m.map.image instanceof ImageBitmap && m.map.flipY) { m.map.flipY = false; flipped.push(m.map); } });
+    // export the objects only; the code layer brings its own lights
+    const objects = sc.children.filter((o) => !o.isLight && !o.isSprite && !(o.type === "Object3D" && !o.children.length));
+    new THREE.GLTFExporter().parse(objects, (glb) => {
+      flipped.forEach((t) => (t.flipY = true));
+      const b = new Uint8Array(glb); let bin = "";
+      for (let i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+      btn._src = codeLayerSource(btoa(bin), cam.position.toArray(), ctl.target.toArray(), title);
+      btn.dataset.ready = "1"; btn.disabled = false;
+      btn.textContent = "Copy code (" + Math.round(btn._src.length / 1024) + " KB)";
+      msgEl.innerHTML = "Ready. Click <b>Copy code</b>.";
+    }, { binary: true, onlyVisible: true, maxTextureSize: 1024 });
+  } catch (e) {
+    btn.disabled = false;
+    msgEl.textContent = "Couldn't pack the 3D: " + (e && e.message || e);
+    console.error(e);
+  }
+}
+
+document.getElementById("codeShelf").onclick = (e) => exportCodeLayer({ scene, camera, controls, small: true }, "Label to Shelf · shelf", document.getElementById("codeMsg"), e.currentTarget);
+document.getElementById("codeStore").onclick = (e) => exportCodeLayer(Store.view(), "Label to Shelf · store", document.getElementById("codeMsg2"), e.currentTarget);
+document.getElementById("placeStore").onclick = () => placeOnCanvas(Store.canvas, "3D store · Label to Shelf");
+
+
+/* ================= STORE: the four Kalpi store rooms, with your Figma labels on the products ================= */
+const Store = (() => {
+const $ = (s) => document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BRAND = 'Hollow Oak';
+const CATALOG=[
+ {id:'c1',type:'candle',name:'Fig & Cedar Candle',price:'$34.00',desc:'Soy wax in a smoked glass jar. 60-hour burn.',colors:['#3E4A3D','#8A5A44','#D9CDB8','#2E3550'],label:'FIG & CEDAR'},
+ {id:'c2',type:'candle',name:'Sea Salt Candle',price:'$34.00',desc:'Coconut-soy blend with a cotton wick.',colors:['#A9C2C9','#E6DFD2','#556B7A','#C9A27A'],label:'SEA SALT'},
+ {id:'b1',type:'bottle',name:'Body Wash',price:'$24.00',desc:'Gentle wash with cedar and sage, 250 ml.',colors:['#8FA595','#BA6246','#2C3A5C','#E8E0CE'],label:'BODY WASH'},
+ {id:'b2',type:'bottle',name:'Hand Oil',price:'$22.00',desc:'Cold-pressed oils with vetiver, 50 ml.',colors:['#7B4B3A','#C8B27E','#3A4E48','#9E9EAF'],label:'HAND OIL'},
+ {id:'x1',type:'box',name:'Gift Set',price:'$58.00',desc:'One candle, one mist and a matchbox in a rigid box.',colors:['#22262E','#C9B59A','#7D8F7A','#8E4E3E'],label:'GIFT SET'},
+ {id:'m1',type:'mug',name:'Stoneware Mug',price:'$28.00',desc:'Hand-thrown, 300 ml, speckled glaze.',colors:['#E8E2D6','#5C6B73','#A0644E','#2F3530'],label:'HOLLOW OAK'},
+ {id:'p1',type:'print',name:'Oak Leaf Print',price:'$40.00',desc:'A3 giclée print on cotton paper.',colors:['#C98B5B','#7A8F6A','#3E4C66','#D8C9A9'],label:'OAK'},
+ {id:'p2',type:'print',name:'Shoreline Print',price:'$40.00',desc:'A3 giclée print on cotton paper.',colors:['#6F94A6','#D2B48C','#45584A','#B5747A'],label:'SHORE'}
+];
+const state={}; CATALOG.forEach(p=>state[p.id]={color:p.colors[0],label:p.label});
+
+/* ---------- templates ---------- */
+const TEMPLATES=[
+ {id:'gallery',name:'Gallery',dot:'#E9E6E0',sw:['#F1EFEA','#C9B79C','#2B2B2B'],tag:'White walls, oak floor, spotlights. Products hang as prints or stand on plinths.',best:'Best for art, prints, ceramics'},
+ {id:'apothecary',name:'Apothecary',dot:'#2F4A3C',sw:['#2F4A3C','#8C6A43','#D9B56A'],tag:'Deep green walls, wooden shelves and brass lamps. A small, warm shop.',best:'Best for candles, beauty, home scents'},
+ {id:'stage',name:'Stage',dot:'#B4AAFF',sw:['#07060A','#B4AAFF','#3A2F55'],tag:'A dark stage with lit plinths and glowing rings, one product per light.',best:'Best for launches and hero products'},
+ {id:'loft',name:'Pop-up Loft',dot:'#9AA3AB',sw:['#B9BEC2','#5E6670','#F2A65A'],tag:'Concrete loft with long tables, window light and a neon sign.',best:'Best for makers, merch, markets'}
+];
+
+
+const cv = document.getElementById('storeCv');
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const camera = new THREE.PerspectiveCamera(50, 1, .05, 80);
+const controls = new THREE.OrbitControls(camera, cv);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.maxPolarAngle = Math.PI * .49;
+controls.minDistance = 1.2; controls.maxDistance = 9; controls.enablePan = false;
+let scene = null, pickables = [], anim = [], current = 'apothecary', running = false;
+
+/* Figma labels: every labelled product takes the next version, A, B, C, A, … */
+let figma = [], next = 0;
+function nextFigmaLabel() {
+  if (!figma.length) return null;
+  const f = figma[next % figma.length]; next++;
+  return f;
+}
+
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;t.userData={c,draw};return t;}
+function redraw(t,draw){const c=t.userData.c,g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);draw(g,c.width,c.height);t.needsUpdate=true;}
+const labelDraw=(text,bg,ink)=>(g,w,h)=>{g.fillStyle=bg;g.fillRect(0,0,w,h);g.strokeStyle=ink;g.globalAlpha=.5;g.lineWidth=3;g.strokeRect(w*.32,h*.12,w*.36,h*.76);g.globalAlpha=1;g.fillStyle=ink;g.textAlign='center';g.font='600 '+(h*.13)+'px "DM Sans", sans-serif';g.fillText(BRAND.toUpperCase(),w/2,h*.34);g.font='800 '+(h*.2)+'px Syne, sans-serif';fitText(g,text,w/2,h*.62,w*.34);g.font='400 '+(h*.1)+'px "IBM Plex Mono", monospace';g.fillText('HANDMADE',w/2,h*.8);};
+function fitText(g,text,x,y,max){let s=parseFloat(g.font.split(' ')[1]);while(g.measureText(text).width>max&&s>8){s-=2;g.font=g.font.replace(/\d+(\.\d+)?px/,s+'px');}g.fillText(text,x,y);}
+const artDraw=(seed,col,label)=>(g,w,h)=>{g.fillStyle='#F3EFE6';g.fillRect(0,0,w,h);const r=mulberry(seed);g.fillStyle=col;for(let i=0;i<5;i++){g.globalAlpha=.25+r()*.6;g.beginPath();g.ellipse(w*(.25+r()*.5),h*(.25+r()*.5),w*(.12+r()*.22),h*(.06+r()*.2),r()*3,0,7);g.fill();}g.globalAlpha=1;g.fillStyle='#2b2b2b';g.font='600 '+(h*.05)+'px "DM Sans", sans-serif';g.textAlign='center';g.fillText(label+' · '+BRAND,w/2,h*.93);};
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gradTex(inner,outer){return canvasTex(256,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,inner);gr.addColorStop(.55,inner);gr.addColorStop(.72,outer);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h);});}
+function woodTex(base,line){return canvasTex(512,512,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);const r=mulberry(7);for(let i=0;i<60;i++){g.strokeStyle=line;g.globalAlpha=.05+r()*.12;g.lineWidth=1+r()*3;g.beginPath();const y=r()*h;g.moveTo(0,y);g.bezierCurveTo(w*.3,y+r()*20-10,w*.6,y+r()*20-10,w,y+r()*16-8);g.stroke();}for(let i=1;i<6;i++){g.globalAlpha=.18;g.fillStyle='#000';g.fillRect(0,i*h/6,w,2);}});}
+function noiseTex(base,amt){return canvasTex(512,512,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);const r=mulberry(3);for(let i=0;i<9000;i++){g.globalAlpha=r()*amt;g.fillStyle=r()>.5?'#fff':'#000';g.fillRect(r()*w,r()*h,1+r()*2,1+r()*2);}});}
+
+/* ---------- products ---------- */
+function std(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:0},o||{}));}
+function makeProduct(p){
+  if(p.type==='glb')return makeGLBProduct(p);
+  const s=state[p.id], g=new THREE.Group(); g.userData.pid=p.id; const recol=[]; let labelTex=null;
+  const lt=()=>{const f=nextFigmaLabel();if(f){labelTex=f.tex;g.userData.version=f.letter;g.userData.versionName=f.name;}else labelTex=canvasTex(512,256,labelDraw(s.label,'#F4F0E8','#2A2A2A'));return labelTex;};
+  if(p.type==='candle'){
+    const glass=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.26,48,1,true),new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.08,metalness:0,transparent:true,opacity:.28,side:THREE.DoubleSide}));glass.position.y=.13;
+    const wax=new THREE.Mesh(new THREE.CylinderGeometry(.122,.122,.2,48),std(s.color,{roughness:.85}));wax.position.y=.1;recol.push(wax.material);
+    lt();const label=new THREE.Mesh(new THREE.CylinderGeometry(.1315,.1315,.11,48,1,true,-.9,1.8),std('#fff',{map:labelTex,roughness:.7}));label.position.y=.12;
+    const lid=new THREE.Mesh(new THREE.CylinderGeometry(.135,.135,.03,48),std('#B08D57',{metalness:.7,roughness:.35}));lid.position.y=.275;
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.01,48),std('#333'));base.position.y=.005;
+    g.add(glass,wax,label,lid,base);
+  } else if(p.type==='bottle'){
+    const pts=[[0,0],[.075,0],[.08,.01],[.08,.2],[.07,.24],[.03,.27],[.026,.3],[0,.3]].map(a=>new THREE.Vector2(a[0],a[1]));
+    const body=new THREE.Mesh(new THREE.LatheGeometry(pts,48),new THREE.MeshPhysicalMaterial({color:s.color,roughness:.15,metalness:0,clearcoat:1,clearcoatRoughness:.05}));recol.push(body.material);
+    lt();const label=new THREE.Mesh(new THREE.CylinderGeometry(.0815,.0815,.1,48,1,true,-.8,1.6),std('#fff',{map:labelTex}));label.position.y=.11;
+    const cap=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.07,32),std('#1E1E1E',{roughness:.4}));cap.position.y=.33;
+    g.add(body,label,cap);
+  } else if(p.type==='box'){
+    lt();const side=std(s.color,{roughness:.5});recol.push(side);const front=std('#fff',{map:labelTex});
+    const box=new THREE.Mesh(new THREE.BoxGeometry(.42,.2,.3),[side,side,side,side,front,side]);box.position.y=.1;
+    const ribbon=new THREE.Mesh(new THREE.BoxGeometry(.43,.205,.03),std('#C9A86A',{metalness:.3,roughness:.4}));ribbon.position.y=.1;
+    g.add(box,ribbon);
+  } else if(p.type==='mug'){
+    const m=std(s.color,{roughness:.45});recol.push(m);
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(.1,.09,.2,48,1,true),m);cup.position.y=.1;cup.material.side=THREE.DoubleSide;
+    const bottom=new THREE.Mesh(new THREE.CircleGeometry(.09,32),m);bottom.rotation.x=-Math.PI/2;bottom.position.y=.002;
+    const handle=new THREE.Mesh(new THREE.TorusGeometry(.055,.014,12,32,Math.PI),m);handle.position.set(.1,.1,0);handle.rotation.z=-Math.PI/2;
+    lt();const band=new THREE.Mesh(new THREE.CylinderGeometry(.0985,.0965,.07,48,1,true,-.7,1.4),std('#fff',{map:labelTex,transparent:true}));band.position.y=.1;
+    g.add(cup,bottom,handle,band);
+  } else if(p.type==='print'){
+    const art=canvasTex(512,700,artDraw(p.id.charCodeAt(1)*31,s.color,s.label));labelTex=art;
+    const frame=new THREE.Mesh(new THREE.BoxGeometry(.62,.82,.035),std('#2A2622',{roughness:.5}));
+    const pic=new THREE.Mesh(new THREE.PlaneGeometry(.52,.72),std('#fff',{map:art,roughness:.9}));pic.position.z=.019;
+    g.add(frame,pic);g.userData.print=true;
+  }
+  g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.userData.pid=p.id;}});
+  g.userData.recol=recol; g.userData.labelTex=labelTex; g.userData.type=p.type;
+  return g;
+}
+/* ---------- room helpers ---------- */
+function room(w,d,h,wallMat,floorMat,ceil){const g=new THREE.Group();
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(w,d),floorMat);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;g.add(floor);
+  const mk=(W,H,x,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),wallMat);m.position.set(x,H/2,z);m.rotation.y=ry;m.receiveShadow=true;g.add(m);};
+  mk(w,h,0,-d/2,0);mk(d,h,-w/2,0,Math.PI/2);mk(d,h,w/2,0,-Math.PI/2);
+  if(ceil){const c=new THREE.Mesh(new THREE.PlaneGeometry(w,d),ceil);c.rotation.x=Math.PI/2;c.position.y=h;g.add(c);}
+  return g;}
+function plinth(x,z,h,mat,r){const m=r?new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,48),mat):new THREE.Mesh(new THREE.BoxGeometry(.42,h,.42),mat);m.position.set(x,h/2,z);m.castShadow=m.receiveShadow=true;return m;}
+function spot(x,y,z,tx,ty,tz,col,int,ang){const s=new THREE.SpotLight(col,int,12,ang||.45,.55,1.4);s.position.set(x,y,z);s.target.position.set(tx,ty,tz);s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.bias=-.0005;return [s,s.target];}
+function place(id,x,y,z,ry){const p=CATALOG.find(c=>c.id===id);const g=makeProduct(p);g.position.set(x,y,z);g.rotation.y=ry||0;scene.add(g);pickables.push(g);return g;}
+
+/* ---------- the four templates ---------- */
+const BUILD={
+ gallery(){
+  scene.background=new THREE.Color('#E8E5DF');scene.fog=new THREE.Fog('#E8E5DF',9,18);
+  scene.add(room(8,7,3.4,std('#F1EFEA',{roughness:.95}),std('#ffffff',{map:woodTex('#C9B79C','#6b5233'),roughness:.7}),std('#F6F5F2')));
+  scene.add(new THREE.HemisphereLight('#ffffff','#b9a98f',.55));
+  const amb=new THREE.DirectionalLight('#fff7ee',.35);amb.position.set(2,5,4);scene.add(amb);
+  place('p1',-1.2,1.65,-3.47);place('p2',1.2,1.65,-3.47);
+  scene.add(...spot(-1.2,3.3,-2,-1.2,1.6,-3.5,'#fff3e2',2.2,.32),...spot(1.2,3.3,-2,1.2,1.6,-3.5,'#fff3e2',2.2,.32));
+  const pm=std('#FAFAF8',{roughness:.8});
+  [[-1.6,-1.2,'c1'],[-.55,-.6,'b1'],[.55,-.6,'m1'],[1.6,-1.2,'c2']].forEach(([x,z,id])=>{scene.add(plinth(x,z,.95,pm));place(id,x,.95,z,.4);scene.add(...spot(x,3.3,z+1.2,x,1,z,'#fff',1.3,.22));});
+  scene.add(plinth(0,-2.3,.6,pm));place('x1',0,.6,-2.3,-.3);
+  camera.position.set(0,1.6,3.2);controls.target.set(0,1,-1.2);
+ },
+ apothecary(){
+  scene.background=new THREE.Color('#162319');scene.fog=new THREE.Fog('#162319',7,14);
+  scene.add(room(6,6,3,std('#2F4A3C',{roughness:.9}),std('#fff',{map:woodTex('#5A3E26','#1d120a'),roughness:.75}),std('#1E2E24')));
+  scene.add(new THREE.HemisphereLight('#FFE2B8','#1b2a20',.35));
+  const wood=std('#fff',{map:woodTex('#8C6A43','#3b2914'),roughness:.6});
+  const shelfY=[.75,1.35,1.95];
+  shelfY.forEach(y=>{const sh=new THREE.Mesh(new THREE.BoxGeometry(4.2,.05,.38),wood);sh.position.set(0,y,-2.79);sh.castShadow=sh.receiveShadow=true;scene.add(sh);});
+  [-2.1,2.1].forEach(x=>{const up=new THREE.Mesh(new THREE.BoxGeometry(.06,2.3,.38),wood);up.position.set(x,1.15,-2.79);up.castShadow=true;scene.add(up);});
+  const rows=[['c1','c2','b1','b2','m1'],['b2','c2','x1','c1'],['m1','b1','c1','b2','c2']];
+  rows.forEach((ids,ri)=>{const n=ids.length;ids.forEach((id,i)=>{place(id,-1.6+i*3.2/(n-1),shelfY[ri]+.025,-2.75,0);});});
+  const counter=new THREE.Mesh(new THREE.BoxGeometry(1.8,.95,.6),wood);counter.position.set(1.2,.475,-.4);counter.castShadow=counter.receiveShadow=true;scene.add(counter);
+  place('x1',1.0,.95,-.4,-.4);place('c1',1.65,.95,-.35,.6);
+  [[-1.2,-1.8],[1.2,-1.8],[1.2,-.3]].forEach(([x,z])=>{
+    const cord=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,.7,6),std('#111'));cord.position.set(x,2.65,z);scene.add(cord);
+    const shade=new THREE.Mesh(new THREE.ConeGeometry(.16,.18,32,1,true),std('#D9B56A',{metalness:.85,roughness:.3,side:THREE.DoubleSide}));shade.position.set(x,2.25,z);scene.add(shade);
+    const bulb=new THREE.Mesh(new THREE.SphereGeometry(.04,16,16),new THREE.MeshBasicMaterial({color:'#FFE6B0'}));bulb.position.set(x,2.2,z);scene.add(bulb);
+    const l=new THREE.PointLight('#FFC97A',1.3,4.5,1.6);l.position.set(x,2.15,z);l.castShadow=true;l.shadow.mapSize.set(512,512);scene.add(l);});
+  camera.position.set(-.6,1.55,2.4);controls.target.set(0,1.2,-2);
+ },
+ stage(){
+  scene.background=new THREE.Color('#07060A');scene.fog=new THREE.Fog('#07060A',6,13);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(9,64),new THREE.MeshStandardMaterial({color:'#0F0D15',roughness:.35,metalness:.4}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(20,8),new THREE.MeshBasicMaterial({map:canvasTex(512,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h*.15,0,w/2,h*.15,w*.6);gr.addColorStop(0,'#3A2F55');gr.addColorStop(.5,'#140E1D');gr.addColorStop(1,'#07060A');g.fillStyle=gr;g.fillRect(0,0,w,h);})}));back.position.set(0,3.5,-5);scene.add(back);
+  scene.add(new THREE.HemisphereLight('#B4AAFF','#07060A',.18));
+  const ringTex=gradTex('rgba(0,0,0,0)','rgba(180,170,255,1)');
+  const items=[['b1',-2.2,-1.4],['c1',-1.1,-2],['x1',0,-2.3],['c2',1.1,-2],['m1',2.2,-1.4]];
+  const pm=new THREE.MeshStandardMaterial({color:'#18151F',roughness:.4,metalness:.3});
+  items.forEach(([id,x,z],i)=>{scene.add(plinth(x,z,.7,pm,.3));const g=place(id,x,.7,z,-x*.2);
+    const ring=new THREE.Mesh(new THREE.PlaneGeometry(1.1,1.1),new THREE.MeshBasicMaterial({map:ringTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,.012,z);scene.add(ring);
+    anim.push(t=>{ring.material.opacity=.65+.3*Math.sin(t*1.6+i);if(!reduce)g.rotation.y+= .003;});
+    scene.add(...spot(x*.6,4.2,z+1.6,x,.8,z,'#E9E6FF',2.4,.18));});
+  camera.position.set(0,1.5,2.8);controls.target.set(0,.9,-1.6);
+ },
+ loft(){
+  scene.background=new THREE.Color('#2A2E33');scene.fog=new THREE.Fog('#2A2E33',9,18);
+  const wall=std('#fff',{map:noiseTex('#A9AEB2',.08),roughness:.95});
+  scene.add(room(9,7,3.6,wall,std('#fff',{map:noiseTex('#7A8087',.12),roughness:.85}),std('#3A3F45')));
+  const win=new THREE.Mesh(new THREE.PlaneGeometry(3.2,2),new THREE.MeshBasicMaterial({color:'#E7F0F7'}));win.position.set(-4.49,1.8,-.5);win.rotation.y=Math.PI/2;scene.add(win);
+  for(let i=1;i<4;i++){const bar=new THREE.Mesh(new THREE.BoxGeometry(.04,2,.04),std('#1c1f22'));bar.position.set(-4.47,1.8,-.5-1.6+i*.8);scene.add(bar);}
+  const sun=new THREE.DirectionalLight('#FFF4E5',1.6);sun.position.set(-6,4,0);sun.target.position.set(0,0,-1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-5,right:5,top:5,bottom:-5});scene.add(sun,sun.target);
+  scene.add(new THREE.HemisphereLight('#dfe6ee','#3a3f45',.55));
+  const top=std('#fff',{map:woodTex('#B08A5F','#4a331c'),roughness:.6}),leg=std('#22262A',{metalness:.6,roughness:.4});
+  [[-1.2,-1.6],[1.4,-1.0]].forEach(([x,z],ti)=>{const t=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,.8),top);t.position.set(x,.88,z);t.castShadow=t.receiveShadow=true;scene.add(t);
+    [[-1,-.33],[1,-.33],[-1,.33],[1,.33]].forEach(([a,b])=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.05,.85,.05),leg);l.position.set(x+a,.425,z+b);l.castShadow=true;scene.add(l);});
+    const ids=ti?['m1','c2','b2','m1']:['c1','b1','x1','b2'];ids.forEach((id,i)=>place(id,x-.75+i*.5,.91,z,(i-1.5)*.3));});
+  const neon=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.6),new THREE.MeshBasicMaterial({map:canvasTex(1024,256,(g,w,h)=>{g.fillStyle='rgba(0,0,0,0)';g.fillRect(0,0,w,h);g.font='700 150px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='#F2A65A';g.shadowBlur=40;g.fillStyle='#FFD3A3';g.fillText(BRAND.toLowerCase(),w/2,h/2);g.shadowBlur=12;g.fillText(BRAND.toLowerCase(),w/2,h/2);}),transparent:true}));neon.position.set(.4,2.5,-3.48);scene.add(neon);
+  const glow=new THREE.PointLight('#F2A65A',.7,4);glow.position.set(.4,2.5,-3);scene.add(glow);
+  place('p1',2.6,1.7,-3.47);
+  camera.position.set(.2,1.6,2.8);controls.target.set(0,1,-1.4);
+ }
+};
+
+function dispose(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose();if(n.material){(Array.isArray(n.material)?n.material:[n.material]).forEach(m=>{if(m.map)m.map.dispose();m.dispose();});}});}
+
+function resize() {
+  const r = cv.getBoundingClientRect();
+  if (!r.width) return;
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix();
+}
+function load(id) {
+  if (scene) dispose(scene);
+  scene = new THREE.Scene(); pickables = []; anim = []; current = id; next = 0;
+  BUILD[id](); controls.update(); resize();
+  const T = TEMPLATES.find(t => t.id === id);
+  $('#roomtag').innerHTML = '<b>' + T.name + '</b> · ' + T.best;
+  document.querySelectorAll('#rooms button').forEach(b => b.classList.toggle('on', b.dataset.room === id));
+  $('#storeInfo').innerHTML = figma.length
+    ? 'Your ' + figma.length + ' label' + (figma.length > 1 ? 's are' : ' is') + ' on every candle, bottle, mug and gift box. Click a product to see which version it wears.'
+    : 'Select label frames in Figma to put them on the products.';
+}
+function setLabels(list) {
+  figma.forEach(f => f.tex.dispose());
+  figma = list.map((l, i) => {
+    const tex = new THREE.Texture(l.image);
+    tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8; tex.needsUpdate = true;
+    return { tex, letter: 'ABC'[i], name: l.name };
+  });
+  if (running) load(current);
+}
+
+/* click a product */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
+cv.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+cv.addEventListener('pointerup', e => {
+  if (!down) return; const moved = Math.hypot(e.clientX - down[0], e.clientY - down[1]); down = null; if (moved > 6) return;
+  const r = cv.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickables, true)[0]; if (!hit) return;
+  let g = hit.object; while (g && !pickables.includes(g)) g = g.parent;
+  const p = CATALOG.find(c => c.id === hit.object.userData.pid);
+  const v = g && g.userData.version ? ' · wearing <b>version ' + g.userData.version + '</b> (' + escapeHtml(g.userData.versionName) + ')' : '';
+  $('#storeInfo').innerHTML = '<b>' + p.name + '</b> · ' + p.price + v;
+});
+
+$('#rooms').innerHTML = TEMPLATES.map(t => '<button type="button" data-room="' + t.id + '"><i style="background:' + t.dot + '"></i>' + t.name + '</button>').join('');
+$('#rooms').addEventListener('click', e => { const b = e.target.closest('[data-room]'); if (b) load(b.dataset.room); });
+addEventListener('resize', resize);
+
+const clock = new THREE.Clock();
+function frame() {
+  if (!running) return;
+  requestAnimationFrame(frame);
+  const t = clock.getElapsedTime(); anim.forEach(f => f(t)); controls.update();
+  if (scene) renderer.render(scene, camera);
+}
+function show() { if (running) return; running = true; load(current); frame(); }
+function hide() { running = false; }
+return { show, hide, setLabels, canvas: cv, view: () => ({ scene, camera, controls }) };
+})();
+
+/* ---------- Shelf / Store tabs ---------- */
+document.querySelectorAll('#modes button').forEach((b) => b.onclick = () => {
+  document.querySelectorAll('#modes button').forEach((x) => x.classList.toggle('on', x === b));
+  const store = b.dataset.mode === 'store';
+  document.getElementById('shelfView').hidden = store;
+  document.getElementById('storeView').hidden = !store;
+  parent.postMessage({ pluginMessage: { type: 'resize', width: store ? 620 : 460, height: store ? 760 : 720 } }, '*');
+  if (store) Store.show(); else { Store.hide(); resize(); }
+});
+
+// ---------- Animate ----------
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+resize();
+rebuild();
+animate();
+</script>
