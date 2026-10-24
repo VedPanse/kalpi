@@ -6,7 +6,7 @@
 figma.showUI(__html__, { width: 460, height: 720, themeColors: true });
 
 const MAX_LABELS = 3; // A, B and C
-const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE"];
+const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE", "TEXT"];
 let timer = null;
 
 function isShape(n) {
@@ -34,13 +34,13 @@ async function sendSelection() {
   for (const node of sel.filter(isShape)) {
     let paths = node.vectorPaths;
     if (!paths || !paths.length) {
-      // ellipses, stars etc.: flatten a copy to get its path, then delete the copy
+      // ellipses, stars, text etc.: flatten a copy to get its outline, then delete the copy
       const copy = figma.flatten([node.clone()]);
       paths = copy.vectorPaths;
       copy.remove();
     }
     const t = node.absoluteTransform; // [[a, c, x], [b, d, y]]
-    shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], paths: paths.map((p) => p.data), color: solidColor(node) });
+    shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, paths: paths.map((p) => p.data), color: solidColor(node) });
   }
   figma.ui.postMessage({ type: "selection", labels, shapes });
 }

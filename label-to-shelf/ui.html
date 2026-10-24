@@ -10,6 +10,8 @@
   button { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; }
   button.on { background:var(--acc); color:#0b0b10; border-color:var(--acc); }
   .act { display:flex; gap:6px; padding:0 14px 12px; }
+  #shapeCtl label { display:flex; align-items:center; gap:6px; font-size:12px; }
+  #shapeCtl input[type=range] { width:90px; }
   .act button { border-radius:8px; }
   #stage { position:relative; height:400px; margin:0 14px; }
   #stage canvas { display:block; }
@@ -44,6 +46,14 @@
   <button data-p="candle">Candle 300 g</button>
   <button data-p="custom" id="customBtn" hidden>My shape</button>
   <button id="drawBtn" type="button">✎ Draw my own shape</button>
+</div>
+
+<div class="row" id="shapeCtl" hidden>
+  <button data-m="auto" class="on" type="button">Auto</button>
+  <button data-m="spin" type="button">Spin</button>
+  <button data-m="extrude" type="button">Extrude</button>
+  <label class="mut" id="depthCtl">Depth <input id="depth" type="range" min="1" max="60" value="8"> <span id="depthOut">8 mm</span></label>
+  <label class="mut" id="bevelCtl">Bevel <input id="bevel" type="range" min="0" max="5" step="0.5" value="1.5"> <span id="bevelOut">1.5 mm</span></label>
 </div>
 
 <div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
@@ -272,6 +282,70 @@ function buildCustom(label) {
   return { group: g, facts: addLabel(g, b0, b1, r, label), top: sp.top };
 }
 
+// ---------- Extrude: flat shapes (logos, icons, text, badges) pushed out into depth ----------
+let shapeMode = "auto";
+const SPIN_WORDS = /\b(spin|lathe|bottle|jar|candle|can|cup|mug|vase|body|cap|lid|neck)\b/i;
+const opFor = (sh) => shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
+const extrudeShapes = () => shapes.filter((sh) => opFor(sh) === "extrude");
+const spinShapes = () => shapes.filter((sh) => opFor(sh) === "spin");
+
+function polyArea(pts) { let a = 0; for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; a += x1 * y2 - x2 * y1; } return a / 2; }
+function inside(pt, poly) {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+
+// material from the layer name: gold/metal/chrome, glass, matte, gloss (default)
+function materialFor(name, color) {
+  const n = (name || "").toLowerCase(), col = color.clone().convertSRGBToLinear();
+  if (/gold|brass/.test(n)) return new THREE.MeshPhysicalMaterial({ color: new THREE.Color("#d4a94a").convertSRGBToLinear(), metalness: 1, roughness: 0.25, envMapIntensity: 1 });
+  if (/metal|chrome|silver|steel/.test(n)) return new THREE.MeshPhysicalMaterial({ color: col, metalness: 1, roughness: 0.2, envMapIntensity: 1 });
+  if (/glass|clear/.test(n)) return new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.05, transmission: 0.9, transparent: true, opacity: 0.55, thickness: 2, envMapIntensity: 1 });
+  if (/matte|paper|wood|clay/.test(n)) return new THREE.MeshStandardMaterial({ color: col, roughness: 0.9, envMapIntensity: ENV });
+  return new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.35, clearcoat: 0.6, envMapIntensity: ENV });
+}
+
+function buildExtrude(list) {
+  const depth = +document.getElementById("depth").value, bevel = +document.getElementById("bevel").value;
+  const g = new THREE.Group();
+  let tris = 0;
+  list.forEach((sh) => {
+    // all outlines of this layer, in mm, y up
+    const loops = sh.paths.flatMap((d) => parsePath(d)).map((pts) => pts.map(([px, py]) => [px + sh.x, -(py + sh.y)]))
+      .filter((pts) => pts.length > 2 && Math.abs(polyArea(pts)) > 0.5);
+    loops.sort((a, b) => Math.abs(polyArea(b)) - Math.abs(polyArea(a)));
+    // even-odd nesting: a loop inside an odd number of bigger loops is a hole
+    const shapesOut = [];
+    loops.forEach((pts, i) => {
+      const parents = loops.slice(0, i).filter((o) => inside(pts[0], o));
+      if (parents.length % 2 === 0) {
+        const s = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x * MM, y * MM)));
+        s.userData = { outer: pts }; shapesOut.push(s);
+      } else {
+        const owner = shapesOut.slice().reverse().find((s) => inside(pts[0], s.userData.outer));
+        if (owner) owner.holes.push(new THREE.Path(pts.map(([x, y]) => new THREE.Vector2(x * MM, y * MM))));
+      }
+    });
+    if (!shapesOut.length) return;
+    const b = Math.min(bevel, depth / 2.5);
+    const geo = new THREE.ExtrudeGeometry(shapesOut, { depth: Math.max(0.2, depth - 2 * b) * MM, bevelEnabled: b > 0, bevelThickness: b * MM, bevelSize: b * 0.8 * MM, bevelSegments: 4, curveSegments: 16 });
+    geo.translate(0, 0, -(depth / 2 - b) * MM);
+    const color = sh.color ? new THREE.Color(sh.color[0], sh.color[1], sh.color[2]) : new THREE.Color(0x2b2d33);
+    const m = new THREE.Mesh(geo, materialFor(sh.name, color));
+    m.castShadow = true;
+    g.add(m);
+    tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3;
+  });
+  // stand it on the shelf, centred
+  const box = new THREE.Box3().setFromObject(g), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  g.children.forEach((m) => m.position.set(-c.x, -box.min.y, -c.z));
+  return { group: g, size: [size.x / MM, size.y / MM, size.z / MM], tris: Math.round(tris), names: list.map((s) => s.name) };
+}
+
 // A letter tag above each version
 function tag(letter) {
   const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -287,6 +361,27 @@ function tag(letter) {
 let SPEC = [];
 function rebuild() {
   group.clear();
+  const ex = productKey === "custom" && extrudeShapes();
+  document.getElementById("shapeCtl").hidden = !(productKey === "custom" && shapes.length);
+  if (ex && ex.length) {
+    const r = buildExtrude(ex);
+    group.add(r.group);
+    if (spinShapes().length) {   // spun parts next to the extruded ones
+      const saved = shapes; shapes = spinShapes();
+      const sp = buildCustom(labels[0] || sampleLabel()); shapes = saved;
+      sp.group.position.x = r.size[0] * MM / 2 + 0.35; group.add(sp.group);
+    }
+    const [w, h, d] = r.size.map((v) => Math.round(v));
+    document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.`;
+    document.getElementById("empty").hidden = true;
+    // frame the camera on the object
+    const fitBox = new THREE.Box3().setFromObject(group), fs = fitBox.getSize(new THREE.Vector3()), fc = fitBox.getCenter(new THREE.Vector3());
+    const dist = Math.max(fs.x, fs.y * 1.6, 0.6) * 1.9;
+    controls.target.copy(fc); camera.position.set(fc.x + dist * 0.25, fc.y + dist * 0.25, fc.z + dist); controls.update();
+    SPEC = [];
+    return;
+  }
+  if (camera.userData.fitted !== false) { controls.target.set(0, 1.1, 0); camera.position.set(0, 1.5, 6.4); controls.update(); }
   const custom = productKey === "custom" && shapes.length && shapeParts();
   const p = PRODUCTS[productKey] || PRODUCTS.bottle;
   const list = labels.length ? labels : [sampleLabel()];
@@ -354,6 +449,12 @@ function selectProduct(key) {
   document.querySelectorAll("#products [data-p]").forEach((x) => x.classList.toggle("on", x.dataset.p === key));
 }
 document.querySelectorAll("#products [data-p]").forEach((b) => b.onclick = () => { selectProduct(b.dataset.p); rebuild(); });
+document.querySelectorAll("#shapeCtl [data-m]").forEach((b) => b.onclick = () => {
+  shapeMode = b.dataset.m;
+  document.querySelectorAll("#shapeCtl [data-m]").forEach((x) => x.classList.toggle("on", x === b));
+  rebuild();
+});
+for (const id of ["depth", "bevel"]) document.getElementById(id).oninput = (e) => { document.getElementById(id + "Out").textContent = e.target.value + " mm"; rebuild(); };
 document.getElementById("drawBtn").onclick = () => parent.postMessage({ pluginMessage: { type: "starter" } }, "*");
 
 // ---------- Place the 3D view on the Figma canvas as an image ----------
