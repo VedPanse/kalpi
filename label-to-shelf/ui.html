@@ -12,6 +12,7 @@
   .act { display:flex; gap:6px; padding:0 14px 12px; }
   #shapeCtl label { display:flex; align-items:center; gap:6px; font-size:12px; }
   #shapeCtl input[type=range] { width:90px; }
+  #shapeCtl select { font:inherit; font-size:12px; background:var(--card); color:inherit; border:1px solid var(--line); border-radius:6px; padding:3px 4px; }
   .act button { border-radius:8px; }
   #stage { position:relative; height:400px; margin:0 14px; }
   #stage canvas { display:block; }
@@ -54,6 +55,11 @@
   <button data-m="extrude" type="button">Extrude</button>
   <label class="mut" id="depthCtl">Depth <input id="depth" type="range" min="1" max="60" value="8"> <span id="depthOut">8 mm</span></label>
   <label class="mut" id="bevelCtl">Bevel <input id="bevel" type="range" min="0" max="5" step="0.5" value="1.5"> <span id="bevelOut">1.5 mm</span></label>
+  <label class="mut">Edge <select id="bevelShape"><option value="round">Round</option><option value="classic">Classic</option></select></label>
+  <label class="mut">Inflate <input id="inflate" type="range" min="0" max="100" value="0"> <span id="inflateOut">0%</span></label>
+  <label class="mut">View <select id="view"><option value="front">Front</option><option value="isoLeft">Isometric left</option><option value="isoRight">Isometric right</option><option value="top">Top</option><option value="offAxis">Off-axis</option></select></label>
+  <label class="mut">Light <select id="light"><option value="standard">Standard</option><option value="diffuse">Diffuse</option><option value="topLeft">Top left</option><option value="right">Right</option><option value="dramatic">Dramatic</option></select></label>
+  <label class="mut">Intensity <input id="lightI" type="range" min="20" max="200" value="100"> <span id="lightIOut">100%</span></label>
 </div>
 
 <div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
@@ -331,18 +337,42 @@ function buildExtrude(list) {
       }
     });
     if (!shapesOut.length) return;
-    const b = Math.min(bevel, depth / 2.5);
-    const geo = new THREE.ExtrudeGeometry(shapesOut, { depth: Math.max(0.2, depth - 2 * b) * MM, bevelEnabled: b > 0, bevelThickness: b * MM, bevelSize: b * 0.8 * MM, bevelSegments: 4, curveSegments: 16 });
-    geo.translate(0, 0, -(depth / 2 - b) * MM);
+    const inflate = +document.getElementById("inflate").value / 100;
+    const round = document.getElementById("bevelShape").value === "round";
+    let geo;
+    if (inflate > 0) {
+      // Inflate: a puffy, pillow-like shape (a deep rounded bevel all the way round)
+      const xs = shapesOut[0].userData.outer.map((q) => q[0]), ys = shapesOut[0].userData.outer.map((q) => q[1]);
+      const half = Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) / 2;
+      // puff outward (never inward, which folds thin parts over), then scale back to the original footprint
+      const puff = Math.max(0.5, half * 0.5 * inflate), grow = puff * 0.55;
+      geo = new THREE.ExtrudeGeometry(shapesOut, { depth: Math.max(0.2, depth * (1 - inflate)) * MM, bevelEnabled: true, bevelThickness: puff * MM, bevelSize: grow * MM, bevelSegments: 16, curveSegments: 48 });
+      geo.translate(0, 0, -(depth * (1 - inflate)) / 2 * MM);
+      const w0 = Math.max(...xs) - Math.min(...xs), h0 = Math.max(...ys) - Math.min(...ys);
+      const cx = (Math.max(...xs) + Math.min(...xs)) / 2 * MM, cy = (Math.max(...ys) + Math.min(...ys)) / 2 * MM;
+      geo.translate(-cx, -cy, 0); geo.scale(w0 / (w0 + 2 * grow), h0 / (h0 + 2 * grow), 1); geo.translate(cx, cy, 0);
+      geo.computeVertexNormals();
+    } else {
+      const b = Math.min(bevel, depth / 2.5);
+      geo = new THREE.ExtrudeGeometry(shapesOut, { depth: Math.max(0.2, depth - 2 * b) * MM, bevelEnabled: b > 0, bevelThickness: b * MM, bevelSize: b * 0.8 * MM, bevelSegments: round ? 6 : 1, curveSegments: 16 });
+      geo.translate(0, 0, -(depth / 2 - b) * MM);
+    }
     const color = sh.color ? new THREE.Color(sh.color[0], sh.color[1], sh.color[2]) : new THREE.Color(0x2b2d33);
     const m = new THREE.Mesh(geo, materialFor(sh.name, color));
     m.castShadow = true;
     g.add(m);
     tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3;
   });
-  // stand it on the shelf, centred
-  const box = new THREE.Box3().setFromObject(g), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
-  g.children.forEach((m) => m.position.set(-c.x, -box.min.y, -c.z));
+  // rotation preset (like Illustrator's 3D panel), then stand it on the shelf, centred
+  const VIEWS = { front: [0, 0, 0], isoLeft: [-35.264, -45, 0], isoRight: [-35.264, 45, 0], top: [-90, 0, 0], offAxis: [-18, -26, 0] };
+  const [rx, ry, rz] = VIEWS[document.getElementById("view").value].map((d) => THREE.MathUtils.degToRad(d));
+  const pivot = new THREE.Group(); g.children.slice().forEach((m) => pivot.add(m)); g.add(pivot);
+  const raw = new THREE.Box3().setFromObject(pivot), rc = raw.getCenter(new THREE.Vector3());
+  pivot.children.forEach((m) => m.position.sub(rc));
+  pivot.rotation.set(rx, ry, rz, "YXZ");
+  const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3());
+  pivot.position.set(-c.x, -box.min.y, -c.z);
+  const size = raw.getSize(new THREE.Vector3());
   return { group: g, size: [size.x / MM, size.y / MM, size.z / MM], tris: Math.round(tris), names: list.map((s) => s.name) };
 }
 
@@ -359,6 +389,19 @@ function tag(letter) {
 }
 
 let SPEC = [];
+const LIGHTS = {
+  standard: { key: [3, 5, 4], k: 1.4, fill: 0.5, rim: 1.2, hemi: 0.35 },
+  diffuse: { key: [0, 6, 3], k: 0.7, fill: 0.9, rim: 0.4, hemi: 0.8 },
+  topLeft: { key: [-4, 6, 3], k: 1.8, fill: 0.3, rim: 0.8, hemi: 0.3 },
+  right: { key: [6, 2, 2], k: 1.8, fill: 0.25, rim: 1, hemi: 0.3 },
+  dramatic: { key: [2, 6, -2], k: 2.4, fill: 0.1, rim: 2, hemi: 0.12 },
+};
+function applyLight() {
+  const L = LIGHTS[document.getElementById("light").value], f = +document.getElementById("lightI").value / 100;
+  key.position.set(...L.key); key.intensity = L.k * f; fill.intensity = L.fill * f; rim.intensity = L.rim * f;
+  scene.children.forEach((o) => { if (o.isHemisphereLight) o.intensity = L.hemi * f; });
+}
+
 function rebuild() {
   group.clear();
   const ex = productKey === "custom" && extrudeShapes();
@@ -455,6 +498,10 @@ document.querySelectorAll("#shapeCtl [data-m]").forEach((b) => b.onclick = () =>
   rebuild();
 });
 for (const id of ["depth", "bevel"]) document.getElementById(id).oninput = (e) => { document.getElementById(id + "Out").textContent = e.target.value + " mm"; rebuild(); };
+document.getElementById("inflate").oninput = (e) => { document.getElementById("inflateOut").textContent = e.target.value + "%"; rebuild(); };
+document.getElementById("lightI").oninput = (e) => { document.getElementById("lightIOut").textContent = e.target.value + "%"; applyLight(); };
+for (const id of ["bevelShape", "view"]) document.getElementById(id).onchange = rebuild;
+document.getElementById("light").onchange = applyLight;
 document.getElementById("drawBtn").onclick = () => parent.postMessage({ pluginMessage: { type: "starter" } }, "*");
 
 // ---------- Place the 3D view on the Figma canvas as an image ----------
