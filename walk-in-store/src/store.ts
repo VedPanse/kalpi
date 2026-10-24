@@ -26,6 +26,7 @@ export interface BuiltStore {
   aisles: number;
   in3d: number;                  // products shown as 3D models
   spinners: THREE.Object3D[];    // 3D products that turn slowly
+  layout: { aisleXs: number[]; checkout: THREE.Vector3; home: THREE.Vector3 };  // for the shop assistant
 }
 
 const loader = new THREE.TextureLoader();
@@ -127,8 +128,10 @@ export function buildStore(data: StoreData, models: ModelCatalog | null = null):
   const tagGeo = new THREE.PlaneGeometry(0.15, 0.056);
 
   let next = 0;
+  const aisleXs: number[] = [];
   for (let u = 0; u < units; u++) {
     const x = (u - (units - 1) / 2) * AISLE;
+    aisleXs.push(x);
     const zc = -UNIT_LENGTH / 2 - 0.4;
     const unit = new THREE.Group();
     unit.position.set(x, 0, zc);
@@ -224,7 +227,8 @@ export function buildStore(data: StoreData, models: ModelCatalog | null = null):
   const spinners: THREE.Object3D[] = [];
   scene.traverse((o) => { if (o.userData.spin) spinners.push(o); });
   spinners.forEach((o, i) => (o.rotation.y = i * 0.7)); // start at different angles
-  return { scene, pickables, blocks, bounds, start: new THREE.Vector3(0, 1.6, zFront + 1.6), name, count: products.length, aisles: units, in3d, spinners };
+  const layout = { aisleXs, checkout: new THREE.Vector3(W / 2 - 1.4, 0, zFront - 0.6), home: new THREE.Vector3(-1.9, 0, zFront - 1.3) };
+  return { scene, pickables, blocks, bounds, start: new THREE.Vector3(0, 1.6, zFront + 1.6), name, count: products.length, aisles: units, in3d, spinners, layout };
 }
 
 function buildShelving(unit: THREE.Group, m: Record<string, THREE.Material>): void {

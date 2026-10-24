@@ -31,7 +31,8 @@
     <h3 id="pTitle"></h3>
     <div class="price" id="pPrice"></div>
     <div class="btns">
-      <button class="btn main" id="pTest" type="button">Test a new version of this (Kalpi)</button>
+      <button class="btn main" id="pFetch" type="button">🤖 Fetch it for me</button>
+      <button class="btn ghost" id="pTest" type="button">Test a new version of this (Kalpi)</button>
       <a class="btn ghost" id="pCart" target="_blank" rel="noopener">Add to cart on their store ↗</a>
       <a class="btn ghost" id="pPage" target="_blank" rel="noopener">View product page ↗</a>
     </div>
@@ -40,6 +41,12 @@
   <div class="keys" aria-label="Walk controls">
     <span class="sp"></span><button data-k="forward" aria-label="Walk forward">↑</button><span class="sp"></span>
     <button data-k="left" aria-label="Turn left">↺</button><button data-k="back" aria-label="Walk back">↓</button><button data-k="right" aria-label="Turn right">↻</button>
+  </div>
+
+  <div class="basket" id="basket" hidden>
+    <span id="basketText">0 items</span>
+    <button class="btn main" id="checkoutBtn" type="button">Checkout with the robot</button>
+    <a class="btn ghost" id="payLink" target="_blank" rel="noopener" hidden>Pay on their store ↗</a>
   </div>
 
   <div class="toast" id="toast" hidden></div>

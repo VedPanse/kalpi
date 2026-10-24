@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { fetchModels, fetchStore } from './api';
+import { cartUrl, fetchModels, fetchStore } from './api';
+import { Assistant } from './assistant';
 import { closePanel, openPanel, toast } from './panel';
 import { buildStore, disposeScene, type BuiltStore } from './store';
 import type { Product } from './types';
@@ -27,6 +28,9 @@ const walker = new Walker(camera, canvas);
 walker.bindButtons(document.querySelectorAll('.keys button'));
 let world: BuiltStore | null = null;
 let loadedStore = '';
+let robot: Assistant | null = null;
+let picked: THREE.Object3D | null = null;   // the product the card is showing
+const basket: Product[] = [];
 
 /* load a store */
 async function load(store: string): Promise<void> {
@@ -39,6 +43,10 @@ async function load(store: string): Promise<void> {
     world = buildStore(data, models);
     loadedStore = data.store;
     walker.setWorld(world.blocks, world.bounds, world.start);
+    robot = new Assistant(world.layout);
+    world.scene.add(robot.root);
+    basket.length = 0;
+    updateBasket();
     $('#brand').textContent = world.name;
     $('#status').innerHTML = `<b>${world.count}</b> products from <b>${data.store}</b> · ${world.aisles} aisle${world.aisles > 1 ? 's' : ''}${world.in3d ? ` · <b>${world.in3d}</b> in 3D` : ''}. Walk with WASD or the arrow keys, click a product.`;
   } catch (e) {
@@ -68,6 +76,7 @@ function pickAt(x: number, y: number): void {
   const hit = ray.intersectObjects(world.pickables, false)[0];
   if (hit && hit.distance < 7) {
     if (walker.locked) document.exitPointerLock();
+    picked = hit.object;
     openPanel(loadedStore, hit.object.userData.product as Product);
     return;
   }
@@ -103,6 +112,40 @@ $('#enterBtn').addEventListener('click', () => {
 $('#closePanel').addEventListener('click', closePanel);
 $('#pTest').addEventListener('click', () => toast('Next step: Kalpi makes 2–3 versions of this product and a vote page for the shop’s customers.'));
 
+/* the shop assistant */
+function updateBasket(): void {
+  $('#basket').hidden = basket.length === 0;
+  const total = basket.reduce((a, p) => a + Number(p.price || 0), 0);
+  $('#basketText').textContent = `${basket.length} item${basket.length === 1 ? '' : 's'} · $${total.toFixed(2)}`;
+}
+$('#pFetch').addEventListener('click', () => {
+  if (!robot || !picked) return;
+  if (robot.busy) return toast('The robot is on its way. One thing at a time!');
+  const product = picked.userData.product as Product;
+  const item = picked;
+  closePanel();
+  $<HTMLAnchorElement>('#payLink').hidden = true;
+  toast('The robot is getting ' + product.title + '…');
+  robot.fetch(item, walker.position, () => {
+    basket.push(product);
+    updateBasket();
+    toast(product.title + ' is in your basket.');
+  });
+});
+$('#checkoutBtn').addEventListener('click', () => {
+  if (!robot || !basket.length) return;
+  if (robot.busy) return toast('The robot is still walking. Try again in a second.');
+  toast('Follow the robot to the checkout…');
+  robot.checkout(() => {
+    const ids = basket.map((p) => p.variant_id).join(':1,') + ':1';
+    const pay = $<HTMLAnchorElement>('#payLink');
+    pay.href = cartUrl(loadedStore, 0).replace(/\/cart\/.*$/, '/cart/' + ids);
+    pay.hidden = false;
+    robot?.dropAll();
+    toast('All packed! Pay on ' + loadedStore + '.');
+  });
+});
+
 /* loop */
 const timer = new THREE.Timer();
 function frame(): void {
@@ -110,6 +153,7 @@ function frame(): void {
   const dt = Math.min(0.05, timer.getDelta());
   walker.update(dt);
   if (world) for (const o of world.spinners) o.rotation.y += dt * 0.6; // 3D products turn slowly
+  robot?.update(dt, walker.position);
   if (world) renderer.render(world.scene, camera);
   requestAnimationFrame(frame);
 }

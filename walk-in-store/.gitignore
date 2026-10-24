@@ -5,3 +5,4 @@ __pycache__/
 .env
 data/cache/
 .venv-3d/
+public/assistant/
