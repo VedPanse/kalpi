@@ -429,7 +429,7 @@ async function pictureToShape(p) {
 // ---------- Extrude: flat shapes (logos, icons, text, badges) pushed out into depth ----------
 let shapeMode = "auto";
 const SPIN_WORDS = /\b(spin|lathe|bottle|jar|candle|can|cup|mug|vase|body|cap|lid|neck)\b/i;
-const opFor = (sh) => sh.picture ? (shapeMode === "spin" ? "spin" : "extrude") : shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
+const opFor = (sh) => sh.picture ? "extrude" : shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
 const extrudeShapes = () => shapes.filter((sh) => opFor(sh) === "extrude");
 const spinShapes = () => shapes.filter((sh) => opFor(sh) === "spin");
 
@@ -684,7 +684,9 @@ function rebuild() {
       sp.group.position.x = r.size[0] * MM / 2 + 0.35; group.add(sp.group);
     }
     const [w, h, d] = r.size.map((v) => Math.round(v));
-    document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.`;
+    const spinNote = shapeMode === "spin" && ex.some((sh) => sh.picture)
+      ? "<br><b>Spin is for round things</b> (bottles, jars, vases). For a character or picture, use <b>Inflate</b> for a puffy figure; a full sculpted 3D needs the AI step." : "";
+    document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.${spinNote}`;
     document.getElementById("empty").hidden = true;
     // frame the camera on the object
     group.updateMatrixWorld(true);
