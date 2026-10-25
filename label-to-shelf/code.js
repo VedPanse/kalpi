@@ -68,6 +68,9 @@ const STARTER = {
 figma.ui.onmessage = (msg) => {
   if (msg.type === "notify") figma.notify(msg.text);
   if (msg.type === "resize") figma.ui.resize(msg.width, msg.height);
+  if (msg.type === "selectLayer") {
+    figma.getNodeByIdAsync(msg.id).then((n) => { if (n) figma.viewport.scrollAndZoomIntoView([n]); figma.notify(n ? "Showing " + n.name : "Layer not found"); });
+  }
   if (msg.type === "place") {
     const image = figma.createImage(msg.bytes);
     const rect = figma.createRectangle();

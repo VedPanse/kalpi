@@ -12,6 +12,15 @@
   .act { display:flex; gap:6px; padding:0 14px 12px; }
   #shapeCtl label { display:flex; align-items:center; gap:6px; font-size:12px; }
   #shapeCtl input[type=range] { width:90px; }
+  #partsPanel { margin:0 14px 10px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; font-size:12px; }
+  .partsHead { display:flex; gap:8px; align-items:baseline; margin-bottom:6px; }
+  .part { display:flex; align-items:center; gap:8px; padding:3px 4px; border-radius:6px; cursor:pointer; }
+  .part.sel { background:var(--card); outline:1px solid var(--acc); }
+  .part .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .part input[type=color] { width:22px; height:18px; padding:0; border:0; background:none; }
+  .part button { padding:1px 6px; font-size:11px; border-radius:6px; }
+  .part.off .nm { opacity:.45; text-decoration:line-through; }
+  #partsPanel label { display:flex; align-items:center; gap:6px; margin-top:6px; }
   #shapeCtl select { font:inherit; font-size:12px; background:var(--card); color:inherit; border:1px solid var(--line); border-radius:6px; padding:3px 4px; }
   .act button { border-radius:8px; }
   #stage { position:relative; height:400px; margin:0 14px; }
@@ -60,6 +69,12 @@
   <label class="mut">View <select id="view"><option value="front">Front</option><option value="isoLeft">Isometric left</option><option value="isoRight">Isometric right</option><option value="top">Top</option><option value="offAxis">Off-axis</option></select></label>
   <label class="mut">Light <select id="light"><option value="standard">Standard</option><option value="diffuse">Diffuse</option><option value="topLeft">Top left</option><option value="right">Right</option><option value="dramatic">Dramatic</option></select></label>
   <label class="mut">Intensity <input id="lightI" type="range" min="20" max="200" value="100"> <span id="lightIOut">100%</span></label>
+</div>
+
+<div id="partsPanel" hidden>
+  <div class="partsHead"><b>Parts</b><span class="mut">one per Figma layer · click a part in 3D to select it</span></div>
+  <div id="partsList"></div>
+  <label class="mut">Explode <input id="explode" type="range" min="0" max="100" value="0"> <span id="explodeOut">0%</span></label>
 </div>
 
 <div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
@@ -315,6 +330,11 @@ function materialFor(name, color) {
   return new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.35, clearcoat: 0.6, envMapIntensity: ENV });
 }
 
+// ---------- Parts: every Figma layer is its own 3D part ----------
+const partState = {};   // layer id -> { hidden, color }
+let selectedPart = null;
+const partSt = (id) => (partState[id] ||= { hidden: false, color: null });
+
 function buildExtrude(list) {
   const depth = +document.getElementById("depth").value, bevel = +document.getElementById("bevel").value;
   const g = new THREE.Group();
@@ -358,7 +378,11 @@ function buildExtrude(list) {
       geo.translate(0, 0, -(depth / 2 - b) * MM);
     }
     const color = sh.color ? new THREE.Color(sh.color[0], sh.color[1], sh.color[2]) : new THREE.Color(0x2b2d33);
-    const m = new THREE.Mesh(geo, materialFor(sh.name, color));
+    const st = partSt(sh.id);
+    const m = new THREE.Mesh(geo, materialFor(sh.name, st.color ? new THREE.Color(st.color) : color));
+    m.name = sh.name; m.userData.partId = sh.id; m.userData.baseHex = "#" + color.getHexString();
+    m.visible = !st.hidden;
+    if (sh.id === selectedPart) { m.material.emissive = new THREE.Color("#b4aaff"); m.material.emissiveIntensity = 0.12; }
     m.castShadow = true;
     g.add(m);
     tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3;
@@ -369,11 +393,38 @@ function buildExtrude(list) {
   const pivot = new THREE.Group(); g.children.slice().forEach((m) => pivot.add(m)); g.add(pivot);
   const raw = new THREE.Box3().setFromObject(pivot), rc = raw.getCenter(new THREE.Vector3());
   pivot.children.forEach((m) => m.position.sub(rc));
+  // explode: push each part away from the centre, and apart in depth by layer order
+  const ex = +document.getElementById("explode").value / 100;
+  if (ex > 0) {
+    const big = raw.getSize(new THREE.Vector3()).length();
+    pivot.children.forEach((m, i) => {
+      const c = new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3()).sub(new THREE.Box3().setFromObject(pivot).getCenter(new THREE.Vector3()));
+      c.z = 0; if (c.length() > 1e-6) c.normalize();
+      m.position.addScaledVector(c, ex * big * 0.35);
+      m.position.z += (i - (pivot.children.length - 1) / 2) * ex * big * 0.25;
+    });
+  }
   pivot.rotation.set(rx, ry, rz, "YXZ");
   const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3());
   pivot.position.set(-c.x, -box.min.y, -c.z);
   const size = raw.getSize(new THREE.Vector3());
+  renderParts(list);
   return { group: g, size: [size.x / MM, size.y / MM, size.z / MM], tris: Math.round(tris), names: list.map((s) => s.name) };
+}
+
+function renderParts(list) {
+  const panel = document.getElementById("partsPanel");
+  panel.hidden = !list.length;
+  document.getElementById("partsList").innerHTML = list.map((sh) => {
+    const st = partSt(sh.id);
+    const hex = st.color || (sh.color ? "#" + new THREE.Color(sh.color[0], sh.color[1], sh.color[2]).getHexString() : "#2b2d33");
+    return `<div class="part${sh.id === selectedPart ? " sel" : ""}${st.hidden ? " off" : ""}" data-id="${escapeHtml(sh.id)}">
+      <input type="color" value="${hex}" aria-label="Colour of ${escapeHtml(sh.name)}">
+      <span class="nm">${escapeHtml(sh.name)}</span>
+      <button type="button" data-act="hide">${st.hidden ? "Show" : "Hide"}</button>
+      <button type="button" data-act="figma">Select in Figma</button>
+    </div>`;
+  }).join("");
 }
 
 // A letter tag above each version
@@ -406,6 +457,7 @@ function rebuild() {
   group.clear();
   const ex = productKey === "custom" && extrudeShapes();
   document.getElementById("shapeCtl").hidden = !(productKey === "custom" && shapes.length);
+  document.getElementById("partsPanel").hidden = true;
   if (ex && ex.length) {
     const r = buildExtrude(ex);
     group.add(r.group);
@@ -498,6 +550,34 @@ document.querySelectorAll("#shapeCtl [data-m]").forEach((b) => b.onclick = () =>
   rebuild();
 });
 for (const id of ["depth", "bevel"]) document.getElementById(id).oninput = (e) => { document.getElementById(id + "Out").textContent = e.target.value + " mm"; rebuild(); };
+document.getElementById("explode").oninput = (e) => { document.getElementById("explodeOut").textContent = e.target.value + "%"; rebuild(); };
+document.getElementById("partsList").addEventListener("click", (e) => {
+  const row = e.target.closest(".part"); if (!row) return;
+  const id = row.dataset.id, act = e.target.dataset && e.target.dataset.act;
+  if (act === "hide") partSt(id).hidden = !partSt(id).hidden;
+  else if (act === "figma") parent.postMessage({ pluginMessage: { type: "selectLayer", id } }, "*");
+  else if (e.target.type !== "color") selectedPart = selectedPart === id ? null : id;
+  rebuild();
+});
+document.getElementById("partsList").addEventListener("input", (e) => {
+  if (e.target.type !== "color") return;
+  partSt(e.target.closest(".part").dataset.id).color = e.target.value;
+  rebuild();
+});
+// click a part in the 3D view to select it
+{
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
+  renderer.domElement.addEventListener("pointerdown", (e) => (down = [e.clientX, e.clientY]));
+  renderer.domElement.addEventListener("pointerup", (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(group.children, true).find((h) => h.object.userData.partId);
+    selectedPart = hit ? hit.object.userData.partId : null;
+    if (productKey === "custom" && extrudeShapes().length) rebuild();
+  });
+}
 document.getElementById("inflate").oninput = (e) => { document.getElementById("inflateOut").textContent = e.target.value + "%"; rebuild(); };
 document.getElementById("lightI").oninput = (e) => { document.getElementById("lightIOut").textContent = e.target.value + "%"; applyLight(); };
 for (const id of ["bevelShape", "view"]) document.getElementById(id).onchange = rebuild;
