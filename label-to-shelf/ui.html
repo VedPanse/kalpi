@@ -18,13 +18,15 @@
   .part { display:flex; align-items:center; gap:8px; padding:3px 4px; border-radius:6px; cursor:pointer; }
   .part.sel { background:var(--card); outline:1px solid var(--acc); }
   .part .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .part input[type=color] { width:22px; height:18px; padding:0; border:0; background:none; }
+  .part .sw { display:flex; gap:3px; }
+  .part .sw i { width:14px; height:14px; border-radius:50%; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.2); }
+  .part .sw i.on { outline:2px solid var(--acc); outline-offset:1px; }
   .part button { padding:1px 6px; font-size:11px; border-radius:6px; }
   .part.off .nm { opacity:.45; text-decoration:line-through; }
   #partsPanel label { display:flex; align-items:center; gap:6px; margin-top:6px; }
   #shapeCtl select { font:inherit; font-size:12px; background:var(--card); color:inherit; border:1px solid var(--line); border-radius:6px; padding:3px 4px; }
   .act button { border-radius:8px; }
-  #stage { position:relative; height:400px; margin:0 14px; }
+  #stage { position:relative; height:360px; margin:0 14px 10px; border-radius:12px; overflow:hidden; background:var(--card); }
   #stage canvas { display:block; }
   #empty { position:absolute; inset:auto 0 12px; text-align:center; color:var(--mut); pointer-events:none; }
   #info { padding:10px 14px; color:var(--mut); }
@@ -51,6 +53,7 @@
 </div>
 
 <section id="shelfView">
+<div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
 <div class="row" id="products">
   <button data-p="bottle" class="on">Bottle 500 ml</button>
   <button data-p="jar">Jar 250 ml</button>
@@ -78,7 +81,6 @@
   <label class="mut">Explode <input id="explode" type="range" min="0" max="100" value="0"> <span id="explodeOut">0%</span></label>
 </div>
 
-<div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
 <div id="info"></div>
 <div id="codeMsg" class="mut" style="padding:0 14px 8px" hidden></div>
 <div class="act"><button id="codeShelf" type="button" class="on">Copy as interactive 3D</button><button id="placeShelf" type="button">Place picture</button></div>
@@ -413,6 +415,7 @@ function buildExtrude(list) {
   return { group: g, size: [size.x / MM, size.y / MM, size.z / MM], tris: Math.round(tris), names: list.map((s) => s.name) };
 }
 
+const SWATCHES = ["#1e1e22", "#f4f2ee", "#c0392b", "#e67e22", "#f1c40f", "#6f8f2e", "#2e86de", "#8e44ad", "#d4a94a", "#b0b6bd"];
 function renderParts(list) {
   const panel = document.getElementById("partsPanel");
   panel.hidden = !list.length;
@@ -420,8 +423,8 @@ function renderParts(list) {
     const st = partSt(sh.id);
     const hex = st.color || (sh.color ? "#" + new THREE.Color(sh.color[0], sh.color[1], sh.color[2]).getHexString() : "#2b2d33");
     return `<div class="part${sh.id === selectedPart ? " sel" : ""}${st.hidden ? " off" : ""}" data-id="${escapeHtml(sh.id)}">
-      <input type="color" value="${hex}" aria-label="Colour of ${escapeHtml(sh.name)}">
       <span class="nm">${escapeHtml(sh.name)}</span>
+      <span class="sw">${SWATCHES.map((c) => `<i data-c="${c}" style="background:${c}"${c.toLowerCase() === hex.toLowerCase() ? ' class="on"' : ""} title="${c}"></i>`).join("")}</span>
       <button type="button" data-act="hide">${st.hidden ? "Show" : "Hide"}</button>
       <button type="button" data-act="figma">Select in Figma</button>
     </div>`;
@@ -558,7 +561,8 @@ document.getElementById("explode").oninput = (e) => { document.getElementById("e
 document.getElementById("partsList").addEventListener("click", (e) => {
   const row = e.target.closest(".part"); if (!row) return;
   const id = row.dataset.id, act = e.target.dataset && e.target.dataset.act;
-  if (act === "hide") partSt(id).hidden = !partSt(id).hidden;
+  if (e.target.dataset && e.target.dataset.c) partSt(id).color = e.target.dataset.c;
+  else if (act === "hide") partSt(id).hidden = !partSt(id).hidden;
   else if (act === "figma") parent.postMessage({ pluginMessage: { type: "selectLayer", id } }, "*");
   else if (e.target.type !== "color") selectedPart = selectedPart === id ? null : id;
   rebuild();
