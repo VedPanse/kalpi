@@ -41,6 +41,20 @@ def fal_queue(endpoint, payload, timeout=300):
     raise RuntimeError("fal job timed out")
 
 
+def fal_3d_tripo(image_b64, mime):
+    out = fal_queue("tripo3d/h3.1/image-to-3d", {
+        "image_url": f"data:{mime};base64,{image_b64}",
+        "texture_quality": "detailed", "geometry_quality": "detailed", "pbr": True, "face_limit": 150000,
+    }, timeout=420)
+    mu = out.get("model_urls") or {}
+    url = (mu.get("glb") or mu.get("pbr_model") or {}).get("url") if isinstance(mu.get("glb") or mu.get("pbr_model"), dict) else mu.get("glb") or mu.get("pbr_model")
+    url = url or (out.get("model_mesh") or {}).get("url")
+    if not url:
+        raise RuntimeError("Tripo returned no GLB: " + json.dumps(out)[:200])
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=120) as r:
+        return r.read()
+
+
 def fal_3d(image_b64, mime):
     out = fal_queue("fal-ai/trellis-2", {
         "image_url": f"data:{mime};base64,{image_b64}",
@@ -88,7 +102,7 @@ class H(BaseHTTPRequestHandler):
                 d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 2))
                 if models >= MAX_MODELS:
                     return self.reply(429, {"error": f"Safety cap of {MAX_MODELS} AI 3D models reached; restart the helper to continue."})
-                glb = fal_3d(d["image"], d.get("mime", "image/png"))
+                glb = (fal_3d_tripo if d.get("model") == "tripo" else fal_3d)(d["image"], d.get("mime", "image/png"))
                 models += 1
                 return self.reply(200, {"glb": base64.b64encode(glb).decode(), "bytes": len(glb), "models": models})
             except urllib.error.HTTPError as e:
