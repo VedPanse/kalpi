@@ -91,6 +91,20 @@ const STARTER = {
 figma.ui.onmessage = (msg) => {
   if (msg.type === "notify") figma.notify(msg.text);
   if (msg.type === "resize") figma.ui.resize(msg.width, msg.height);
+  if (msg.type === "placeImage") {
+    const image = figma.createImage(msg.bytes);
+    image.getSizeAsync().then(({ width, height }) => {
+      const rect = figma.createRectangle();
+      const k = 300 / Math.max(width, height);           // place it 300 px (= 300 mm) across
+      rect.resize(Math.round(width * k), Math.round(height * k));
+      rect.fills = [{ type: "IMAGE", imageHash: image.hash, scaleMode: "FILL" }];
+      rect.name = msg.name || "Generated image";
+      const c = figma.viewport.center; rect.x = c.x - rect.width / 2; rect.y = c.y - rect.height / 2;
+      figma.currentPage.selection = [rect];
+      figma.viewport.scrollAndZoomIntoView([rect]);
+      figma.notify("Generated with AI: now it's 3D in the plugin");
+    });
+  }
   if (msg.type === "selectLayer") {
     figma.getNodeByIdAsync(msg.id).then((n) => { if (n) figma.viewport.scrollAndZoomIntoView([n]); figma.notify(n ? "Showing " + n.name : "Layer not found"); });
   }

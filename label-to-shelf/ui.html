@@ -3,6 +3,10 @@
   :root { --bg:var(--figma-color-bg,#fff); --fg:var(--figma-color-text,#1e1e1e); --mut:var(--figma-color-text-secondary,#757575); --card:var(--figma-color-bg-secondary,#f5f5f5); --line:var(--figma-color-border,#e6e6e6); --acc:#b4aaff; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
+  .gen { display:flex; flex-wrap:wrap; gap:6px; padding:0 14px 10px; }
+  .gen input { flex:1 1 220px; font:inherit; padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
+  .gen button { border-radius:8px; }
+  #genMsg { flex-basis:100%; font-size:12px; }
   body { margin:0; background:var(--bg); color:var(--fg); font:13px/1.4 Inter, system-ui, sans-serif; }
   header { padding:12px 14px 8px; }
   h1 { font-size:15px; margin:0 0 2px; font-weight:600; }
@@ -50,6 +54,12 @@
 <div class="tabs" id="modes">
   <button data-mode="shelf" class="on">Shelf</button>
   <button data-mode="store">Store</button>
+</div>
+
+<div class="gen" id="genBox">
+  <input id="genPrompt" placeholder="Describe something to make, e.g. a cute olive character" maxlength="300">
+  <button id="genBtn" type="button" class="on">✨ Generate 2D</button>
+  <div id="genMsg" class="mut"></div>
 </div>
 
 <section id="shelfView">
@@ -778,6 +788,26 @@ window.onmessage = async (event) => {
   rebuild();
   Store.setLabels(labels);
 };
+
+// ---------- Generate a 2D image with fal (through the local helper), drop it on the canvas ----------
+const HELPER = "http://localhost:8795";
+async function generate2D() {
+  const prompt = document.getElementById("genPrompt").value.trim(), msg = document.getElementById("genMsg"), btn = document.getElementById("genBtn");
+  if (!prompt) { msg.textContent = "Type an idea first."; return; }
+  btn.disabled = true; msg.textContent = "Generating… (about 5 seconds)";
+  try {
+    const r = await fetch(HELPER + "/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Generation failed");
+    const bytes = Uint8Array.from(atob(d.image), (c) => c.charCodeAt(0));
+    parent.postMessage({ pluginMessage: { type: "placeImage", bytes, name: prompt.slice(0, 40) } }, "*");
+    msg.textContent = "Done: it's on your canvas and selected, so the 3D appears below. Try Inflate.";
+  } catch (e) {
+    msg.innerHTML = /fetch/i.test(String(e)) ? "Can't reach the AI helper. In Terminal run: <b>python3 ~/label-to-shelf/server/fal_helper.py</b>" : "Error: " + escapeHtml(e.message || e);
+  } finally { btn.disabled = false; }
+}
+document.getElementById("genBtn").onclick = generate2D;
+document.getElementById("genPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") generate2D(); });
 
 // ---------- Product buttons ----------
 function selectProduct(key) {
