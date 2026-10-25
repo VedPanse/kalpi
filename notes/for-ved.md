@@ -1,6 +1,16 @@
 # For Ved: a suggestion for Label to Shelf (try it)
 
-Here's a direction I'd like us to consider: making Label to Shelf a free 3D tool inside Figma, so any 2D layer can become a real-size 3D object, a bit like Illustrator's 3D panel but in Figma and at no cost. I've started trying it out on my branch, and I'd love your take. The idea is that a flat shape, logo, text or pencil line could extrude into a solid object with depth and a round or sharp bevel, or inflate into something puffy, and a sketched line could become a 3D line sculpture. Spin could turn a full drawing around its own centre, while half-outlines like the bottle still become bottles with the label at true printed size (1 px = 1 mm). A pasted picture with a plain background could turn into a puffy 3D cut-out with the picture on the front. Each Figma layer would be its own part that you can recolour, hide, select or explode apart, with view presets, lighting presets and materials picked from layer names (gold, metal, glass, matte). If it feels right to you, next steps could be AI photo-to-3D (TRELLIS 2 on fal) that snaps the model to Figma's size, checks it against the Figma outline and puts the sharp Figma label back on, and Spaces for arranging objects into scenes. What do you think, and is there anything you'd change or add?
+Suggestions for Label to Shelf (on my branch to try):
+
+- Make it a free 3D tool inside Figma, like Illustrator's 3D panel but free
+- Extrude flat shapes, logos, text and pencil lines, with depth and a round or sharp bevel
+- Inflate shapes into puffy objects; pencil lines as 3D line sculptures
+- Spin full drawings around their centre; half-outlines still become bottles with the label at true size (1 px = 1 mm)
+- Pasted pictures with a plain background become puffy 3D cut-outs with the picture on the front
+- Each Figma layer as a part: recolour, hide, select, explode
+- View presets, lighting presets, materials from layer names (gold, metal, glass, matte)
+- Next: AI photo-to-3D (TRELLIS 2 on fal), snapped to Figma's size, checked against the Figma outline, with the sharp label put back on
+- Next: Spaces to arrange objects into scenes
 
 ## Try it (Figma desktop app)
 1. `git fetch && git checkout ioanna`
