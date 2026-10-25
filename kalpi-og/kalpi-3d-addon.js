@@ -26,8 +26,9 @@ const css = `
 #k3d button.main{background:#b4aaff;color:#0b0b10;border-color:#b4aaff}
 #k3d .x{position:absolute;right:12px;top:10px;background:rgba(0,0,0,.55);border:0;color:#fff;border-radius:50%;width:32px;height:32px;padding:0}
 #k3d .src{width:100%;height:130px;object-fit:contain;border-radius:10px;background:#fff}
+#k3d .size{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}#k3d .size label{display:flex;flex-direction:column;gap:4px;color:#a09eab;font-size:12px}
 #k3d .pics{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
-#k3d .pics img{width:46px;height:46px;flex:none;object-fit:contain;background:#fff;border-radius:8px;border:2px solid transparent;cursor:pointer}
+#k3d .pics img{width:64px;height:64px;flex:none;object-fit:contain;background:#fff;border-radius:8px;border:2px solid transparent;cursor:pointer}
 #k3d .pics img.on{border-color:#b4aaff}
 #k3d .status{position:absolute;left:14px;bottom:12px;padding:6px 10px;border-radius:8px;background:rgba(20,19,27,.85);color:#fff;font-size:13px}
 @media(max-width:760px){#k3d .box{grid-template-columns:1fr;grid-template-rows:55% 45%}}
@@ -41,22 +42,14 @@ wrap.innerHTML = `<div class="box">
   <div class="view"><canvas></canvas><button class="x" type="button" aria-label="Close">✕</button><div class="status">Pick a size, then Make it 3D.</div></div>
   <div class="side">
     <h3>Make it 3D</h3>
-    <button class="main" id="k3dGo" type="button">✨ Make it 3D (~$0.35)</button>
-    <img class="src" alt="Your product picture">
-    <div class="mut">Wrong picture? Pick the product here:</div>
+    <img class="src" alt="Your design">
     <div class="pics"></div>
-    <div class="grid">
-      <span>Height</span><input id="k3dH" type="number" min="1" value="250">
-      <span>Width</span><input id="k3dW" type="number" min="1" placeholder="auto">
-      <span>Depth</span><input id="k3dD" type="number" min="1" placeholder="auto">
-      <span>AI</span><select id="k3dModel"><option value="trellis">TRELLIS 2 · about 40 s</option><option value="tripo">Tripo · sharpest, about 4 min</option></select>
-    </div>
-    <label class="mut"><input id="k3dLock" type="checkbox" checked> keep proportions (set by height)</label>
-    <button id="k3dApply" type="button">Apply size</button>
-    <label class="mut"><input id="k3dDims" type="checkbox" checked> show dimensions</label>
-    <label class="mut"><input id="k3dSpin" type="checkbox" checked> spin</label>
-    <button id="k3dGlb" type="button" disabled>Download 3D file (.glb)</button>
+    <button class="main" id="k3dGo" type="button">✨ Make it 3D</button>
+    <div class="mut">Real size in mm</div>
+    <div class="size"><label>H<input id="k3dH" type="number" min="1" value="250"></label><label>W<input id="k3dW" type="number" min="1" placeholder="auto"></label><label>D<input id="k3dD" type="number" min="1" placeholder="auto"></label></div>
+    <button id="k3dGlb" type="button" hidden>Download 3D file</button>
     <div class="mut" id="k3dInfo"></div>
+    <div hidden><select id="k3dModel"><option value="trellis">t</option><option value="tripo">p</option></select><input id="k3dLock" type="checkbox" checked><input id="k3dDims" type="checkbox" checked><input id="k3dSpin" type="checkbox" checked><button id="k3dApply" type="button"></button></div>
   </div></div>`;
 document.body.appendChild(wrap);
 const $ = (s) => wrap.querySelector(s);
@@ -133,15 +126,25 @@ function applySize() {
 let pickedImg = null;
 const usable = (i) => i && i.complete && i.naturalWidth > 60 && !wrap.contains(i);
 // remember the product picture the person last clicked (a sample card, a version, the viewer)
-document.addEventListener("click", (e) => {
+function onPick(e) {
   if (wrap.contains(e.target) || e.target === btn) return;
   let el = e.target, img = null;
   for (let n = 0; el && n < 6 && !img; n++, el = el.parentElement) img = el.tagName === "IMG" ? el : el.querySelector && el.querySelector("img");
   if (usable(img)) pickedImg = img;
-}, true);
+}
+document.addEventListener("click", onPick, true);
+const frameDocs = () => [...document.querySelectorAll("iframe")].map((f) => { try { return f.contentDocument; } catch { return null; } }).filter(Boolean);
+const hooked = new WeakSet();
+function hookDocs() {
+  for (const d of frameDocs()) if (!hooked.has(d)) { hooked.add(d); d.addEventListener("click", onPick, true); watchDownloads(d); }
+}
+setInterval(hookDocs, 1000);
+// the designs: the Studio's pictures (newest AI designs first); the page's own sample photos only if the Studio has none
 function pagePictures() {
-  const seen = new Set();
-  return [...document.querySelectorAll("img")].filter((i) => usable(i) && i.offsetWidth > 40 && !seen.has(i.src) && seen.add(i.src));
+  const seen = new Set(), pick = (list) => list.filter((i) => usable(i) && !seen.has(i.src) && seen.add(i.src));
+  const studio = frameDocs().flatMap((d) => [...d.querySelectorAll("img")]).filter((i) => i.naturalWidth > 200);
+  const designs = pick([...studio].sort((a, b) => /concept|version|design/i.test(b.alt) - /concept|version|design/i.test(a.alt)));
+  return designs.length ? designs : pick([...document.querySelectorAll("img")].filter((i) => i.offsetWidth > 40));
 }
 function showPicture(img) {
   pickedImg = img;
@@ -150,6 +153,7 @@ function showPicture(img) {
 }
 function productImage() {
   if (pickedImg && pickedImg.isConnected) return pickedImg;
+  const d = pagePictures(); if (d.length) return d[0];
   // the biggest visible picture in the Studio
   const imgs = [...document.querySelectorAll("#make img, img")].filter((i) => i.offsetWidth > 120 && i.complete && i.naturalWidth);
   return imgs.sort((a, b) => b.offsetWidth * b.offsetHeight - a.offsetWidth * a.offsetHeight)[0] || null;
@@ -166,15 +170,17 @@ btn.onclick = () => {
   const pics = $(".pics"); pics.innerHTML = "";
   for (const p of pagePictures()) {
     const t = document.createElement("img"); t.src = p.src; t.alt = p.alt || "product";
-    t.onclick = () => { showPicture(p); $(".status").textContent = "Picture changed. Click ✨ Make it 3D."; };
+    t.onclick = () => { showPicture(p); $(".status").textContent = "Design picked. Click ✨ Make it 3D."; };
     pics.appendChild(t);
   }
   showPicture(img);
   wrap.classList.add("on"); fit(); frame();
-  $(".status").textContent = img ? "Click ✨ Make it 3D (top right). The model appears here in about 40 s." : "No product picture found on the page.";
+  $(".status").textContent = img ? "Pick your design, then ✨ Make it 3D." : "No product picture found on the page.";
 };
 $(".x").onclick = () => wrap.classList.remove("on");
 $("#k3dApply").onclick = applySize;
+$("#k3dH").oninput = () => { if (!$("#k3dW").value && !$("#k3dD").value) $("#k3dLock").checked = true; applySize(); };
+$("#k3dW").oninput = $("#k3dD").oninput = () => { $("#k3dLock").checked = false; applySize(); };
 $("#k3dDims").onchange = () => { drawDims(); frame(); };
 for (const id of ["#k3dH", "#k3dW", "#k3dD"]) $(id).addEventListener("change", applySize);
 
@@ -193,7 +199,7 @@ $("#k3dGo").onclick = async () => {
     model = gltf.scene; model.traverse((o) => { if (o.isMesh && o.material && o.material.map) o.material.map.anisotropy = 16; });
     holder.add(model);
     model.scale.set(1, 1, 1); natural = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
-    $("#k3dGlb").disabled = false;
+    $("#k3dGlb").disabled = false; $("#k3dGlb").hidden = false;
     applySize();
     $(".status").textContent = "Done. Drag to look around; change the size any time.";
   } catch (e) {
@@ -207,8 +213,8 @@ $("#k3dGlb").onclick = () => {
 };
 
 // also offer "Make it 3D" next to Download / New background in the picture viewer
-new MutationObserver(() => {
-  for (const b of document.querySelectorAll("button")) {
+function watchDownloads(doc) { new MutationObserver(() => {
+  for (const b of doc.querySelectorAll("button")) {
     if (b.textContent.trim() !== "Download" || b.dataset.k3dDone) continue;
     b.dataset.k3dDone = "1";
     const m = document.createElement("button");
@@ -217,10 +223,11 @@ new MutationObserver(() => {
     m.onclick = (e) => {
       e.stopPropagation();
       const dlg = b.closest("[role=dialog], dialog, .modal, div");
-      const imgs = [...(b.closest("dialog,[role=dialog]") || document).querySelectorAll("img")].filter((i) => i.offsetWidth > 120);
+      const imgs = [...(b.closest("dialog,[role=dialog]") || doc).querySelectorAll("img")].filter((i) => i.offsetWidth > 120);
       pickedImg = imgs.sort((x, y) => y.offsetWidth * y.offsetHeight - x.offsetWidth * x.offsetHeight)[0] || null;
       btn.click();
     };
     b.after(m);
   }
-}).observe(document.body, { childList: true, subtree: true });
+}).observe(doc.body, { childList: true, subtree: true }); }
+watchDownloads(document); hookDocs();
