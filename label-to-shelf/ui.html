@@ -471,9 +471,12 @@ function rebuild() {
     document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.`;
     document.getElementById("empty").hidden = true;
     // frame the camera on the object
+    group.updateMatrixWorld(true);
     const fitBox = new THREE.Box3().setFromObject(group), fs = fitBox.getSize(new THREE.Vector3()), fc = fitBox.getCenter(new THREE.Vector3());
-    const dist = Math.max(fs.x, fs.y * 1.6, 0.6) * 1.9;
-    controls.target.copy(fc); camera.position.set(fc.x + dist * 0.25, fc.y + dist * 0.25, fc.z + dist); controls.update();
+    // distance so the whole object fits the view, both ways
+    const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+    const dist = Math.max((fs.y / 2) / Math.tan(vfov / 2), (fs.x / 2) / Math.tan(hfov / 2), 0.4) * 1.25 + fs.z / 2;
+    controls.target.copy(fc); camera.position.set(fc.x, fc.y + dist * 0.12, fc.z + dist); camera.lookAt(fc); controls.update();
     SPEC = [];
     return;
   }
