@@ -3,6 +3,9 @@
   :root { --bg:var(--figma-color-bg,#fff); --fg:var(--figma-color-text,#1e1e1e); --mut:var(--figma-color-text-secondary,#757575); --card:var(--figma-color-bg-secondary,#f5f5f5); --line:var(--figma-color-border,#e6e6e6); --acc:#b4aaff; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
+  #sizeRow { align-items:center; font-size:12px; }
+  #sizeRow input[type=number] { width:62px; font:inherit; padding:4px 6px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
+  #sizeRow label { display:flex; align-items:center; gap:4px; }
   #fidelity { position:absolute; left:10px; top:10px; z-index:2; width:118px; padding:6px; border-radius:10px; background:rgba(255,255,255,.92); box-shadow:0 2px 10px rgba(0,0,0,.12); color:#16171b; font-size:11px; }
   #fidelity .fh { font-weight:600; margin-bottom:4px; }
   #fidelity img { display:block; width:100%; max-height:110px; object-fit:contain; background:#fff; border-radius:6px; }
@@ -53,8 +56,8 @@
 </style>
 
 <header>
-  <h1>Label to Shelf</h1>
-  <div class="mut">Make something in Figma (draw it, paste it, or ask Figma's AI for an image), select it, and it turns 3D here. 1 px = 1 mm.</div>
+  <h1>Kalpi</h1>
+  <div class="mut">Your Figma design as a 3D prototype, at real size. Select a shape, drawing, label or image. 1 px = 1 mm.</div>
 </header>
 
 <div class="tabs" id="modes">
@@ -77,6 +80,15 @@
 
 <section id="shelfView">
 <div id="stage"><div id="fidelity" hidden><div class="fh">Your Figma design</div><img id="fidImg" alt="Original 2D design"><div id="fidDims"></div></div><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
+<div class="row" id="sizeRow">
+  <b style="font-size:12px">Size (mm)</b>
+  <label class="mut">W <input id="dimW" type="number" min="1" step="1"></label>
+  <label class="mut">H <input id="dimH" type="number" min="1" step="1"></label>
+  <label class="mut">D <input id="dimD" type="number" min="1" step="1"></label>
+  <label class="mut"><input id="dimLock" type="checkbox" checked> keep proportions</label>
+  <label class="mut"><input id="dimShow" type="checkbox" checked> show dimensions</label>
+  <button id="dimReset" type="button">Reset size</button>
+</div>
 <div class="row" id="products">
   <button data-p="bottle" class="on">Bottle 500 ml</button>
   <button data-p="jar">Jar 250 ml</button>
@@ -698,7 +710,8 @@ function applyLight() {
 
 let lastFit = "";
 const fitKey = () => productKey + "|" + shapes.map((sh) => sh.id).join(",") + "|" + labels.length;
-function rebuild() {
+function rebuild() { rebuildInner(); applySize(); }
+function rebuildInner() {
   group.clear();
   const ex = productKey === "custom" && extrudeShapes();
   document.getElementById("shapeCtl").hidden = !(productKey === "custom" && shapes.length);
@@ -896,6 +909,79 @@ async function makeAI3D() {
 }
 document.getElementById("aiBtn").onclick = makeAI3D;
 document.getElementById("aiShow").onclick = () => { showAI = !showAI; lastFit = ""; updateAIButtons(); rebuild(); };
+
+// ---------- Product dimensions: real size in mm, editable, drawn on the model ----------
+const sizeState = {};               // per selection: { sx, sy, sz }
+let natural = null, lastDimFit = "";                 // the object's size at scale 1, in mm
+const dimGroup = new THREE.Group(); scene.add(dimGroup);
+const sizeKey = () => productKey + "|" + shapes.map((sh) => sh.id).join(",");
+
+function labelSprite(text) {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 72;
+  const x = c.getContext("2d");
+  x.fillStyle = "rgba(22,23,27,.88)"; x.beginPath(); x.roundRect(4, 8, 248, 56, 14); x.fill();
+  x.fillStyle = "#fff"; x.font = "600 34px Inter, system-ui, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText(text, 128, 37);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  sp.renderOrder = 20; return sp;
+}
+function dimLine(a, b, text, scale) {
+  const g = new THREE.Group();
+  const mat = new THREE.LineBasicMaterial({ color: 0x5b4fd6, depthTest: false });
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), mat); line.renderOrder = 19; g.add(line);
+  // end ticks
+  const dir = b.clone().sub(a).normalize(), side = new THREE.Vector3(0, 1, 0);
+  if (Math.abs(dir.y) > 0.9) side.set(1, 0, 0);
+  const tick = side.clone().multiplyScalar(scale * 0.04);
+  for (const p of [a, b]) { const t = new THREE.Line(new THREE.BufferGeometry().setFromPoints([p.clone().sub(tick), p.clone().add(tick)]), mat); t.renderOrder = 19; g.add(t); }
+  const sp = labelSprite(text); sp.position.copy(a.clone().add(b).multiplyScalar(0.5)); sp.scale.set(scale * 0.32, scale * 0.09, 1); g.add(sp);
+  return g;
+}
+function drawDims() {
+  dimGroup.clear();
+  if (!document.getElementById("dimShow").checked) return;
+  group.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(group); if (b.isEmpty()) return;
+  const sz = b.getSize(new THREE.Vector3()), big = Math.max(sz.x, sz.y, sz.z), off = big * 0.08;
+  const mm = (v) => Math.round(v / MM) + " mm";
+  const { min, max } = b;
+  dimGroup.add(dimLine(new THREE.Vector3(min.x, min.y - off * 0.2, max.z + off), new THREE.Vector3(max.x, min.y - off * 0.2, max.z + off), "W " + mm(sz.x), big));
+  dimGroup.add(dimLine(new THREE.Vector3(max.x + off, min.y, max.z + off * 0.5), new THREE.Vector3(max.x + off, max.y, max.z + off * 0.5), "H " + mm(sz.y), big));
+  dimGroup.add(dimLine(new THREE.Vector3(max.x + off, min.y - off * 0.2, min.z), new THREE.Vector3(max.x + off, min.y - off * 0.2, max.z), "D " + mm(sz.z), big));
+}
+function applySize() {
+  const st = sizeState[sizeKey()] || { sx: 1, sy: 1, sz: 1 };
+  group.scale.set(1, 1, 1); group.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(group);
+  natural = b.isEmpty() ? null : b.getSize(new THREE.Vector3()).divideScalar(MM);
+  group.scale.set(st.sx, st.sy, st.sz);
+  if (natural) {
+    document.getElementById("dimW").value = Math.round(natural.x * st.sx);
+    document.getElementById("dimH").value = Math.round(natural.y * st.sy);
+    document.getElementById("dimD").value = Math.round(natural.z * st.sz);
+  }
+  drawDims();
+  if (dimGroup.children.length && sizeKey() !== lastDimFit) {
+    lastDimFit = sizeKey();
+    const b = new THREE.Box3().setFromObject(group).union(new THREE.Box3().setFromObject(dimGroup)), fs = b.getSize(new THREE.Vector3()), fc = b.getCenter(new THREE.Vector3());
+    const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+    const dist = Math.max((fs.y / 2) / Math.tan(vfov / 2), (fs.x / 2) / Math.tan(hfov / 2), 0.4) * 1.15 + fs.z / 2;
+    controls.target.copy(fc); camera.position.set(fc.x, fc.y + dist * 0.12, fc.z + dist); controls.update();
+  }
+  if (typeof updateFidelity === "function") updateFidelity();
+}
+function setDim(axis) {
+  if (!natural) return;
+  const v = +document.getElementById("dim" + axis).value; if (!(v > 0)) return;
+  const st = sizeState[sizeKey()] ||= { sx: 1, sy: 1, sz: 1 };
+  const nat = { W: natural.x, H: natural.y, D: natural.z }[axis], k = v / nat;
+  if (document.getElementById("dimLock").checked) { st.sx = st.sy = st.sz = k; }
+  else st[{ W: "sx", H: "sy", D: "sz" }[axis]] = k;
+  applySize();
+}
+for (const a of ["W", "H", "D"]) document.getElementById("dim" + a).addEventListener("change", () => setDim(a));
+document.getElementById("dimShow").onchange = drawDims;
+document.getElementById("dimReset").onclick = () => { delete sizeState[sizeKey()]; applySize(); };
 
 // ---------- Product buttons ----------
 function selectProduct(key) {

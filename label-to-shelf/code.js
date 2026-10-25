@@ -110,7 +110,7 @@ figma.ui.onmessage = (msg) => {
       const c = figma.viewport.center; rect.x = c.x - rect.width / 2; rect.y = c.y - rect.height / 2;
       figma.currentPage.selection = [rect];
       figma.viewport.scrollAndZoomIntoView([rect]);
-      figma.notify("Generated with AI: now it's 3D in the plugin");
+      figma.notify("Generated with AI: now it's 3D in Kalpi");
     });
   }
   if (msg.type === "selectLayer") {
