@@ -339,10 +339,85 @@ function buildCustom(label) {
   return { group: g, facts: addLabel(g, b0, b1, r, label), top: sp.top };
 }
 
+// ---------- Pictures: a photo or drawing becomes a cut-out you can extrude or inflate ----------
+// Removes a plain light background (flood fill from the edges), traces the outline, and keeps the picture for the front.
+async function pictureToShape(p) {
+  const bmp = await createImageBitmap(new Blob([p.bytes], { type: "image/png" }));
+  const k = Math.min(1, 256 / Math.max(bmp.width, bmp.height)), W = Math.max(2, Math.round(bmp.width * k)), H = Math.max(2, Math.round(bmp.height * k));
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d"); x.drawImage(bmp, 0, 0, W, H);
+  const d = x.getImageData(0, 0, W, H).data;
+  const light = (i) => d[i * 4 + 3] < 24 || (d[i * 4] > 232 && d[i * 4 + 1] > 232 && d[i * 4 + 2] > 232);
+  const bg = new Uint8Array(W * H), stack = [];
+  for (let i = 0; i < W; i++) { stack.push(i, (H - 1) * W + i); }
+  for (let j = 0; j < H; j++) { stack.push(j * W, j * W + W - 1); }
+  while (stack.length) {
+    const i = stack.pop();
+    if (bg[i] || !light(i)) continue;
+    bg[i] = 1; const px = i % W, py = (i / W) | 0;
+    if (px > 0) stack.push(i - 1); if (px < W - 1) stack.push(i + 1); if (py > 0) stack.push(i - W); if (py < H - 1) stack.push(i + W);
+  }
+  // keep the biggest connected blob (drops stray marks like a watermark)
+  const lab = new Int32Array(W * H), sizes = [0];
+  for (let i = 0; i < W * H; i++) if (!bg[i] && !lab[i]) {
+    const id = sizes.length; let n = 0; const st = [i]; lab[i] = id;
+    while (st.length) { const q = st.pop(); n++; const qx = q % W, qy = (q / W) | 0;
+      for (const r of [qx > 0 ? q - 1 : -1, qx < W - 1 ? q + 1 : -1, qy > 0 ? q - W : -1, qy < H - 1 ? q + W : -1])
+        if (r >= 0 && !bg[r] && !lab[r]) { lab[r] = id; st.push(r); } }
+    sizes.push(n);
+  }
+  const best = sizes.indexOf(Math.max(...sizes.slice(1)));
+  if (best < 1) return null;
+  const fg = (px, py) => px >= 0 && py >= 0 && px < W && py < H && lab[py * W + px] === best;
+  // Moore-neighbour boundary trace
+  let sx = -1, sy = -1;
+  outer: for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) if (fg(px, py)) { sx = px; sy = py; break outer; }
+  // clockwise neighbours, starting west
+  const N = [[-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1]];
+  const pts = [[sx, sy]];
+  let cx = sx, cy = sy, bx = sx - 1, by = sy, guard = 0;
+  while (guard++ < 40000) {
+    // index of the backtrack pixel among c's neighbours
+    let k = N.findIndex(([dx, dy]) => cx + dx === bx && cy + dy === by);
+    let moved = false;
+    for (let t = 1; t <= 8; t++) {
+      const [dx, dy] = N[(k + t) % 8], nx = cx + dx, ny = cy + dy;
+      if (fg(nx, ny)) {
+        const [pdx, pdy] = N[(k + t - 1) % 8]; bx = cx + pdx; by = cy + pdy;
+        cx = nx; cy = ny; moved = true; break;
+      }
+    }
+    if (!moved || (cx === sx && cy === sy)) break;
+    pts.push([cx, cy]);
+  }
+  if (pts.length < 8) return null;
+  // simplify (Ramer–Douglas–Peucker)
+  const rdp = (a, eps) => {
+    if (a.length < 3) return a;
+    const [x1, y1] = a[0], [x2, y2] = a[a.length - 1]; let dm = 0, di = 0;
+    for (let i = 1; i < a.length - 1; i++) { const [px, py] = a[i]; const dd = Math.abs((y2 - y1) * px - (x2 - x1) * py + x2 * y1 - y2 * x1) / (Math.hypot(x2 - x1, y2 - y1) || 1); if (dd > dm) { dm = dd; di = i; } }
+    return dm > eps ? rdp(a.slice(0, di + 1), eps).slice(0, -1).concat(rdp(a.slice(di), eps)) : [a[0], a[a.length - 1]];
+  };
+  // a closed loop: split it at the point farthest from the start, simplify both halves
+  let far = 0, fd = -1;
+  pts.forEach(([px, py], i) => { const dd = Math.hypot(px - pts[0][0], py - pts[0][1]); if (dd > fd) { fd = dd; far = i; } });
+  const simple = rdp(pts.slice(0, far + 1), 0.8).slice(0, -1).concat(rdp(pts.slice(far).concat([pts[0]]), 0.8).slice(0, -1));
+  const sxm = p.w / W, sym = p.h / H;
+  const path = "M " + simple.map(([px, py]) => (px * sxm).toFixed(2) + " " + (py * sym).toFixed(2)).join(" L ") + " Z";
+  // the picture itself, full resolution, for the front face
+  const face = document.createElement("canvas"); face.width = bmp.width; face.height = bmp.height;
+  face.getContext("2d").drawImage(bmp, 0, 0);
+  // where the cut-out sits inside the picture (texture v runs bottom-up)
+  let mx0 = W, mx1 = 0, my0 = H, my1 = 0;
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) if (fg(px, py)) { mx0 = Math.min(mx0, px); mx1 = Math.max(mx1, px); my0 = Math.min(my0, py); my1 = Math.max(my1, py); }
+  const crop = { u0: mx0 / W, u1: (mx1 + 1) / W, v0: 1 - (my1 + 1) / H, v1: 1 - my0 / H };
+  return { id: p.id, name: p.name, x: p.x, y: p.y, w: p.w, h: p.h, paths: [path], color: [0.96, 0.95, 0.93], picture: face, crop };
+}
+
 // ---------- Extrude: flat shapes (logos, icons, text, badges) pushed out into depth ----------
 let shapeMode = "auto";
 const SPIN_WORDS = /\b(spin|lathe|bottle|jar|candle|can|cup|mug|vase|body|cap|lid|neck)\b/i;
-const opFor = (sh) => shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
+const opFor = (sh) => sh.picture ? "extrude" : shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
 const extrudeShapes = () => shapes.filter((sh) => opFor(sh) === "extrude");
 const spinShapes = () => shapes.filter((sh) => opFor(sh) === "spin");
 
@@ -422,10 +497,25 @@ function buildExtrude(list) {
     }
     const color = sh.color ? new THREE.Color(sh.color[0], sh.color[1], sh.color[2]) : new THREE.Color(0x2b2d33);
     const st = partSt(sh.id);
-    const m = new THREE.Mesh(geo, materialFor(sh.name, st.color ? new THREE.Color(st.color) : color));
+    let mat = materialFor(sh.name, st.color ? new THREE.Color(st.color) : color);
+    if (sh.picture) {
+      // put the picture on the flat front and back: map cap vertices to the picture by their position
+      const pos = geo.attributes.position, uv = geo.attributes.uv, capEnd = geo.groups[0] ? geo.groups[0].start + geo.groups[0].count : 0;
+      const idx = geo.index ? geo.index.array : null, capVerts = new Set();
+      for (let i = 0; i < capEnd; i++) capVerts.add(idx ? idx[i] : i);
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      capVerts.forEach((v) => { const px = pos.getX(v), py = pos.getY(v); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); });
+      const cr = sh.crop || { u0: 0, u1: 1, v0: 0, v1: 1 };
+      capVerts.forEach((v) => uv.setXY(v, cr.u0 + ((pos.getX(v) - x0) / (x1 - x0 || 1)) * (cr.u1 - cr.u0), cr.v0 + ((pos.getY(v) - y0) / (y1 - y0 || 1)) * (cr.v1 - cr.v0)));
+      uv.needsUpdate = true;
+      const tex = new THREE.CanvasTexture(sh.picture); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+      const face = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(0.62, 0.62, 0.62), roughness: 0.5, envMapIntensity: 0.15 }); face.toneMapped = false;
+      mat = [face, mat];
+    }
+    const m = new THREE.Mesh(geo, mat);
     m.name = sh.name; m.userData.partId = sh.id; m.userData.baseHex = "#" + color.getHexString();
     m.visible = !st.hidden;
-    if (sh.id === selectedPart) { m.material.emissive = new THREE.Color("#b4aaff"); m.material.emissiveIntensity = 0.12; }
+    if (sh.id === selectedPart && !Array.isArray(m.material)) { m.material.emissive = new THREE.Color("#b4aaff"); m.material.emissiveIntensity = 0.12; }
     m.castShadow = true;
     g.add(m);
     tris += geo.index ? geo.index.count / 3 : geo.attributes.position.count / 3;
@@ -582,6 +672,11 @@ window.onmessage = async (event) => {
   const msg = event.data.pluginMessage;
   if (!msg || (msg.type !== "labels" && msg.type !== "selection")) return;
   shapes = msg.shapes || [];
+  if (msg.pictures && msg.pictures.length) {
+    const pics = (await Promise.all(msg.pictures.map((p) => pictureToShape(p).catch(() => null)))).filter(Boolean);
+    shapes = shapes.concat(pics);
+    if (pics.length && +document.getElementById("inflate").value === 0) { document.getElementById("inflate").value = 45; document.getElementById("inflateOut").textContent = "45%"; }
+  }
   const btn = document.getElementById("customBtn");
   btn.hidden = !shapes.length;
   if (shapes.length) selectProduct("custom");

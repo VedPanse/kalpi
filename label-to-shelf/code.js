@@ -9,8 +9,13 @@ const MAX_LABELS = 3; // A, B and C
 const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE", "TEXT", "RECTANGLE"]; // frames and groups stay labels
 let timer = null;
 
+// a pasted photo or drawing: a layer whose fill is an image
+function isPicture(n) {
+  return "fills" in n && Array.isArray(n.fills) && n.fills.some((f) => f.type === "IMAGE" && f.visible !== false);
+}
+
 function isShape(n) {
-  return SHAPE_TYPES.includes(n.type);
+  return SHAPE_TYPES.includes(n.type) && !isPicture(n);
 }
 
 function solidColor(node) {
@@ -26,7 +31,14 @@ function solidColor(node) {
 async function sendSelection() {
   const sel = figma.currentPage.selection;
   const labels = [];
-  for (const node of sel.filter((n) => !isShape(n) && "exportAsync" in n && n.width > 0 && n.height > 0).slice(0, MAX_LABELS)) {
+  const pictures = [];
+  for (const node of sel.filter(isPicture).slice(0, 4)) {
+    const scale = Math.min(2, 1024 / Math.max(node.width, node.height));
+    const bytes = await node.exportAsync({ format: "PNG", constraint: { type: "SCALE", value: scale } });
+    const t = node.absoluteTransform;
+    pictures.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, bytes });
+  }
+  for (const node of sel.filter((n) => !isShape(n) && !isPicture(n) && "exportAsync" in n && n.width > 0 && n.height > 0).slice(0, MAX_LABELS)) {
     const bytes = await node.exportAsync({ format: "PNG", constraint: { type: "SCALE", value: 2 } });
     labels.push({ id: node.id, name: node.name, width: node.width, height: node.height, bytes });
   }
@@ -53,7 +65,7 @@ async function sendSelection() {
     shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, paths: paths.map((p) => p.data), color: solidColor(node),
       line: linePaths && { paths: linePaths, x: lx, y: ly } });
   }
-  figma.ui.postMessage({ type: "selection", labels, shapes });
+  figma.ui.postMessage({ type: "selection", labels, shapes, pictures });
 }
 
 // Wait a moment after edits so we don't export on every keystroke
