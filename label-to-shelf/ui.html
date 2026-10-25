@@ -84,7 +84,7 @@
 
 <div id="info"></div>
 <div id="codeMsg" class="mut" style="padding:0 14px 8px" hidden></div>
-<div class="act"><button id="codeShelf" type="button" class="on">Copy as interactive 3D</button><button id="placeShelf" type="button">Place picture</button></div>
+<div class="act"><button id="placeShelf" type="button" class="on">Place picture</button><button id="glbShelf" type="button">Download 3D file (.glb)</button><button id="codeShelf" type="button">Copy as interactive 3D</button></div>
 </section>
 
 <section id="storeView" hidden>
@@ -295,13 +295,14 @@ function shapeParts() {
   const parts = [];
   // shapes drawn as a half outline (the starter bottle, or named bottle/jar/cap…) spin around their left edge;
   // anything else spins around its own centre
-  const full = shapes.filter((sh) => !SPIN_WORDS.test(sh.name));
+  const full = shapes.filter((sh) => !SPIN_WORDS.test(sh.name) || sh.picture);
   if (full.length) {
     const loops = full.flatMap((sh) => sh.paths.flatMap((d) => parsePath(d)).map((pts) => pts.map(([px, py]) => [px + sh.x, py + sh.y])));
     if (loops.length) {
       const rh = centreProfile(loops);
-      const c = full.find((sh) => sh.color);
-      return { parts: [{ rh, color: c ? c.color : null, h0: 0, h1: rh[rh.length - 1][1] }], top: rh[rh.length - 1][1], centred: true };
+      const c = full.find((sh) => sh.color), pic = full.find((sh) => sh.picture);
+      const maxR = Math.max(...rh.map((q) => q[0]));
+      return { parts: [{ rh, color: c ? c.color : null, h0: 0, h1: rh[rh.length - 1][1], picture: pic && pic.picture, crop: pic && pic.crop, maxR }], top: rh[rh.length - 1][1], centred: true };
     }
   }
   shapes.forEach((sh) => sh.paths.forEach((d) => parsePath(d).forEach((pts) =>
@@ -324,10 +325,21 @@ function buildCustom(label) {
     const srgb = part.color ? new THREE.Color(part.color[0], part.color[1], part.color[2]) : new THREE.Color(0x9aae94);
     if (curSpec) curSpec.parts.push({ rh: part.rh, color: '#' + srgb.getHexString() });
     const col = srgb.clone().convertSRGBToLinear();
-    const m = new THREE.Mesh(
-      new THREE.LatheGeometry(part.rh.map(([r, h]) => new THREE.Vector2(r * MM, h * MM)), 96),
-      new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.4, clearcoat: 0.5, envMapIntensity: ENV, side: THREE.DoubleSide })
-    );
+    const lathe = new THREE.LatheGeometry(part.rh.map(([r, h]) => new THREE.Vector2(r * MM, h * MM)), 96);
+    let latheMat = new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.4, clearcoat: 0.5, envMapIntensity: ENV, side: THREE.DoubleSide });
+    if (part.picture) {
+      // the picture projected from the front (and mirrored onto the back so it reads the right way)
+      const pos = lathe.attributes.position, uv = lathe.attributes.uv, cr = part.crop || { u0: 0, u1: 1, v0: 0, v1: 1 };
+      const R2 = 2 * part.maxR * MM, Ht = part.h1 * MM;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getZ(i) < 0 ? -pos.getX(i) : pos.getX(i);
+        uv.setXY(i, cr.u0 + (x / R2 + 0.5) * (cr.u1 - cr.u0), cr.v0 + (pos.getY(i) / Ht) * (cr.v1 - cr.v0));
+      }
+      const tex = new THREE.CanvasTexture(part.picture); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+      latheMat = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(0.66, 0.66, 0.66), roughness: 0.45, envMapIntensity: 0.15, side: THREE.DoubleSide });
+      latheMat.toneMapped = false;
+    }
+    const m = new THREE.Mesh(lathe, latheMat);
     m.castShadow = true; g.add(m);
   });
   if (!labels.length) return { group: g, facts: { printed: "–", wrap: 0, hidden: 0, tooWide: false, noLabel: true }, top: sp.top };
@@ -417,7 +429,7 @@ async function pictureToShape(p) {
 // ---------- Extrude: flat shapes (logos, icons, text, badges) pushed out into depth ----------
 let shapeMode = "auto";
 const SPIN_WORDS = /\b(spin|lathe|bottle|jar|candle|can|cup|mug|vase|body|cap|lid|neck)\b/i;
-const opFor = (sh) => sh.picture ? "extrude" : shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
+const opFor = (sh) => sh.picture ? (shapeMode === "spin" ? "spin" : "extrude") : shapeMode !== "auto" ? shapeMode : (SPIN_WORDS.test(sh.name) ? "spin" : "extrude");
 const extrudeShapes = () => shapes.filter((sh) => opFor(sh) === "extrude");
 const spinShapes = () => shapes.filter((sh) => opFor(sh) === "spin");
 
@@ -814,6 +826,16 @@ function placeOnCanvas(canvas, name) {
     parent.postMessage({ pluginMessage: { type: "place", bytes, width: canvas.width, height: canvas.height, name } }, "*");
   }, "image/png");
 }
+document.getElementById("glbShelf").onclick = () => {
+  const msg = document.getElementById("codeMsg"); msg.hidden = false; msg.textContent = "Packing the 3D file…";
+  const objects = group.children.filter((o) => !o.isSprite);
+  new THREE.GLTFExporter().parse(objects, (glb) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([glb], { type: "model/gltf-binary" }));
+    a.download = "kalpi-3d.glb"; a.textContent = "Download kalpi-3d.glb";
+    msg.textContent = "Ready: "; msg.appendChild(a); a.click();
+  }, { binary: true, onlyVisible: true, maxTextureSize: 2048 });
+};
 document.getElementById("placeShelf").onclick = () => placeOnCanvas(renderer.domElement, "3D shelf · Label to Shelf");
 // ---------- Copy the live 3D as a Figma code layer ----------
 // Figma code layers (the { } tool) run React + npm packages such as three on the canvas.
