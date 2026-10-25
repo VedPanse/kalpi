@@ -10,8 +10,8 @@ const HELPER = "http://localhost:8795";
 const MM = 0.001;
 
 const css = `
-#k3d-btn{position:fixed;right:96px;bottom:28px;z-index:9998;font:600 15px Inter,system-ui,sans-serif;padding:12px 18px;border-radius:999px;border:0;cursor:pointer;color:#0b0b10;background:#b4aaff;box-shadow:0 8px 30px rgba(180,170,255,.35)}
-#k3d{position:fixed;inset:0;z-index:9999;display:none;background:rgba(8,8,12,.72);backdrop-filter:blur(6px)}
+#k3d-btn{position:fixed;right:96px;bottom:28px;z-index:2147483600;font:600 15px Inter,system-ui,sans-serif;padding:12px 18px;border-radius:999px;border:0;cursor:pointer;color:#0b0b10;background:#b4aaff;box-shadow:0 8px 30px rgba(180,170,255,.35)}
+#k3d{position:fixed;inset:0;z-index:2147483647;display:none;background:rgba(8,8,12,.72);backdrop-filter:blur(6px)}
 #k3d.on{display:grid;place-items:center}
 #k3d .box{width:min(1100px,calc(100% - 32px));height:min(720px,calc(100% - 32px));display:grid;grid-template-columns:1fr 300px;background:#14131b;border:1px solid #2a2935;border-radius:18px;overflow:hidden;color:#f4f3f7;font:14px Inter,system-ui,sans-serif}
 #k3d .view{position:relative;background:#f4f2ee}
@@ -127,6 +127,7 @@ function applySize() {
 }
 
 function productImage() {
+  if (typeof pickedImg !== "undefined" && pickedImg && pickedImg.isConnected) return pickedImg;
   // the biggest visible picture in the Studio
   const imgs = [...document.querySelectorAll("#make img, img")].filter((i) => i.offsetWidth > 120 && i.complete && i.naturalWidth);
   return imgs.sort((a, b) => b.offsetWidth * b.offsetHeight - a.offsetWidth * a.offsetHeight)[0] || null;
@@ -176,3 +177,23 @@ $("#k3dGlb").onclick = () => {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([lastGlb], { type: "model/gltf-binary" }));
   a.download = "kalpi-product-3d.glb"; a.click();
 };
+
+// also offer "Make it 3D" next to Download / New background in the picture viewer
+let pickedImg = null;
+new MutationObserver(() => {
+  for (const b of document.querySelectorAll("button")) {
+    if (b.textContent.trim() !== "Download" || b.dataset.k3dDone) continue;
+    b.dataset.k3dDone = "1";
+    const m = document.createElement("button");
+    m.type = "button"; m.className = b.className; m.textContent = "✨ Make it 3D";
+    m.style.background = "#b4aaff"; m.style.color = "#0b0b10";
+    m.onclick = (e) => {
+      e.stopPropagation();
+      const dlg = b.closest("[role=dialog], dialog, .modal, div");
+      const imgs = [...(b.closest("dialog,[role=dialog]") || document).querySelectorAll("img")].filter((i) => i.offsetWidth > 120);
+      pickedImg = imgs.sort((x, y) => y.offsetWidth * y.offsetHeight - x.offsetWidth * x.offsetHeight)[0] || null;
+      btn.click();
+    };
+    b.after(m);
+  }
+}).observe(document.body, { childList: true, subtree: true });
