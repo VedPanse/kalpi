@@ -1053,7 +1053,7 @@ document.querySelectorAll('#modes button').forEach((b) => b.onclick = () => {
   const store = b.dataset.mode === 'store';
   document.getElementById('shelfView').hidden = store;
   document.getElementById('storeView').hidden = !store;
-  parent.postMessage({ pluginMessage: { type: 'resize', width: store ? 620 : 460, height: store ? 760 : 720 } }, '*');
+  parent.postMessage({ pluginMessage: { type: 'resize', width: store ? 620 : 480, height: store ? 860 : 900 } }, '*');
   if (store) Store.show(); else { Store.hide(); resize(); }
 });
 

@@ -3,7 +3,7 @@
 //  - frames, groups, rectangles → labels (exported as PNG)
 //  - vectors → the product's shape (half its outline, 1 px = 1 mm, left edge = the centre line)
 
-figma.showUI(__html__, { width: 460, height: 720, themeColors: true });
+figma.showUI(__html__, { width: 480, height: 900, themeColors: true });
 
 const MAX_LABELS = 3; // A, B and C
 const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE", "TEXT", "RECTANGLE"]; // frames and groups stay labels
