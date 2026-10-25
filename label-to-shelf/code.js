@@ -6,7 +6,7 @@
 figma.showUI(__html__, { width: 460, height: 720, themeColors: true });
 
 const MAX_LABELS = 3; // A, B and C
-const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE", "TEXT"];
+const SHAPE_TYPES = ["VECTOR", "LINE", "BOOLEAN_OPERATION", "STAR", "POLYGON", "ELLIPSE", "TEXT", "RECTANGLE"]; // frames and groups stay labels
 let timer = null;
 
 function isShape(n) {
