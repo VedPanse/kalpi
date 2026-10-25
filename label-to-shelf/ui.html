@@ -3,6 +3,11 @@
   :root { --bg:var(--figma-color-bg,#fff); --fg:var(--figma-color-text,#1e1e1e); --mut:var(--figma-color-text-secondary,#757575); --card:var(--figma-color-bg-secondary,#f5f5f5); --line:var(--figma-color-border,#e6e6e6); --acc:#b4aaff; }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
+  #fidelity { position:absolute; left:10px; top:10px; z-index:2; width:118px; padding:6px; border-radius:10px; background:rgba(255,255,255,.92); box-shadow:0 2px 10px rgba(0,0,0,.12); color:#16171b; font-size:11px; }
+  #fidelity .fh { font-weight:600; margin-bottom:4px; }
+  #fidelity img { display:block; width:100%; max-height:110px; object-fit:contain; background:#fff; border-radius:6px; }
+  #fidDims { margin-top:4px; line-height:1.3; }
+  #fidDims b { font-weight:600; }
   .gen { display:flex; flex-wrap:wrap; gap:6px; padding:0 14px 10px; }
   .gen input { flex:1 1 220px; font:inherit; padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
   .gen button { border-radius:8px; }
@@ -71,7 +76,7 @@
 </div>
 
 <section id="shelfView">
-<div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
+<div id="stage"><div id="fidelity" hidden><div class="fh">Your Figma design</div><img id="fidImg" alt="Original 2D design"><div id="fidDims"></div></div><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
 <div class="row" id="products">
   <button data-p="bottle" class="on">Bottle 500 ml</button>
   <button data-p="jar">Jar 250 ml</button>
@@ -768,6 +773,14 @@ function rebuild() {
   if (custom && fitKey() !== lastFit) { lastFit = fitKey(); fitCamera(); }
 }
 
+function updateFidelity() {
+  const fid = document.getElementById("fidelity"); if (!snapshot || fid.hidden) return;
+  group.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(group); if (b.isEmpty()) return;
+  const sz = b.getSize(new THREE.Vector3());
+  document.getElementById("fidDims").innerHTML = `Figma: <b>${Math.round(snapshot.w)} × ${Math.round(snapshot.h)} mm</b><br>3D: <b>${Math.round(sz.x / MM)} × ${Math.round(sz.y / MM)} × ${Math.round(sz.z / MM)} mm</b>`;
+}
+
 function fitCamera() {
   group.updateMatrixWorld(true);
   const b = new THREE.Box3().setFromObject(group), fs = b.getSize(new THREE.Vector3()), fc = b.getCenter(new THREE.Vector3());
@@ -797,6 +810,9 @@ window.onmessage = async (event) => {
   shapes = msg.shapes || [];
   rawPictures = {}; (msg.pictures || []).forEach((p) => (rawPictures[p.id] = p));
   snapshot = msg.snapshot || null;
+  const fid = document.getElementById("fidelity");
+  fid.hidden = !snapshot;
+  if (snapshot) { const url = URL.createObjectURL(new Blob([snapshot.bytes], { type: "image/png" })); document.getElementById("fidImg").src = url; }
   document.getElementById("aiRow").hidden = !snapshot;
   if (snapshot) document.getElementById("aiMsg").textContent = "Turns the selected " + (msg.pictures && msg.pictures.length ? "picture" : "design") + " into a full 3D model.";
   if (msg.pictures && msg.pictures.length) {
@@ -1434,8 +1450,10 @@ function resize() {
 }
 addEventListener("resize", resize);
 
+let fidTick = 0;
 function animate() {
   requestAnimationFrame(animate);
+  if (++fidTick % 30 === 0) updateFidelity();
   controls.update();
   renderer.render(scene, camera);
 }
