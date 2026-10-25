@@ -671,6 +671,8 @@ function applyLight() {
   scene.children.forEach((o) => { if (o.isHemisphereLight) o.intensity = L.hemi * f; });
 }
 
+let lastFit = "";
+const fitKey = () => productKey + "|" + shapes.map((sh) => sh.id).join(",") + "|" + labels.length;
 function rebuild() {
   group.clear();
   const ex = productKey === "custom" && extrudeShapes();
@@ -689,17 +691,19 @@ function rebuild() {
       ? "<br><b>Round (lathe) is for round things</b> (bottles, jars, vases). For a character or picture, use <b>Inflate</b> for a puffy figure; a full sculpted 3D needs the AI step." : "";
     document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.${spinNote}`;
     document.getElementById("empty").hidden = true;
-    // frame the camera on the object
+    // frame the camera on the object only when a new selection arrives (sliders keep your view)
+    if (fitKey() !== lastFit) { lastFit = fitKey();
     group.updateMatrixWorld(true);
     const fitBox = new THREE.Box3().setFromObject(group), fs = fitBox.getSize(new THREE.Vector3()), fc = fitBox.getCenter(new THREE.Vector3());
     // distance so the whole object fits the view, both ways
     const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
     const dist = Math.max((fs.y / 2) / Math.tan(vfov / 2), (fs.x / 2) / Math.tan(hfov / 2), 0.4) * 1.25 + fs.z / 2;
     controls.target.copy(fc); camera.position.set(fc.x, fc.y + dist * 0.12, fc.z + dist); camera.lookAt(fc); controls.update();
+    }
     SPEC = [];
     return;
   }
-  if (camera.userData.fitted !== false) { controls.target.set(0, 1.1, 0); camera.position.set(0, 1.5, 6.4); controls.update(); }
+  if (!(productKey === "custom" && shapes.length) && fitKey() !== lastFit) { lastFit = fitKey(); controls.target.set(0, 1.1, 0); camera.position.set(0, 1.5, 6.4); controls.update(); }
   const custom = productKey === "custom" && shapes.length && shapeParts();
   const p = PRODUCTS[productKey] || PRODUCTS.bottle;
   const list = labels.length ? labels : [sampleLabel()];
@@ -728,7 +732,7 @@ function rebuild() {
   });
   document.getElementById("info").innerHTML = lines.join("<br>");
   document.getElementById("empty").hidden = labels.length > 0 || !!custom;
-  if (custom) fitCamera();
+  if (custom && fitKey() !== lastFit) { lastFit = fitKey(); fitCamera(); }
 }
 
 function fitCamera() {
@@ -1061,7 +1065,7 @@ function exportCodeLayer(view, title, msgEl, btn) {
   }
 }
 
-document.getElementById("codeShelf").onclick = (e) => exportCodeLayer({ scene, camera, controls, small: true }, "Label to Shelf · shelf", document.getElementById("codeMsg"), e.currentTarget);
+document.getElementById("codeShelf").onclick = (e) => exportCodeLayer({ scene, camera, controls, small: !(productKey === "custom" && extrudeShapes().length) }, "Label to Shelf · shelf", document.getElementById("codeMsg"), e.currentTarget);
 document.getElementById("codeStore").onclick = (e) => exportCodeLayer(Store.view(), "Label to Shelf · store", document.getElementById("codeMsg2"), e.currentTarget);
 document.getElementById("placeStore").onclick = () => placeOnCanvas(Store.canvas, "3D store · Label to Shelf");
 
