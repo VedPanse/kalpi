@@ -40,7 +40,18 @@ async function sendSelection() {
       copy.remove();
     }
     const t = node.absoluteTransform; // [[a, c, x], [b, d, y]]
-    shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, paths: paths.map((p) => p.data), color: solidColor(node) });
+    // pencil/pen lines with no fill: also send the outline of the stroke itself, so the drawn line can become 3D
+    let linePaths = null, lx = t[0][2], ly = t[1][2];
+    const hasFill = "fills" in node && Array.isArray(node.fills) && node.fills.some((f) => f.visible !== false);
+    const hasStroke = "strokes" in node && Array.isArray(node.strokes) && node.strokes.some((f) => f.visible !== false);
+    if (hasStroke && !hasFill && "outlineStroke" in node) {
+      try {
+        const o = node.outlineStroke();
+        if (o) { linePaths = o.vectorPaths.map((p) => p.data); lx = o.absoluteTransform[0][2]; ly = o.absoluteTransform[1][2]; o.remove(); }
+      } catch (e) {}
+    }
+    shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, paths: paths.map((p) => p.data), color: solidColor(node),
+      line: linePaths && { paths: linePaths, x: lx, y: ly } });
   }
   figma.ui.postMessage({ type: "selection", labels, shapes });
 }

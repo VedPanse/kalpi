@@ -68,6 +68,7 @@
   <button data-m="extrude" type="button">Extrude</button>
   <label class="mut" id="depthCtl">Depth <input id="depth" type="range" min="1" max="60" value="8"> <span id="depthOut">8 mm</span></label>
   <label class="mut" id="bevelCtl">Bevel <input id="bevel" type="range" min="0" max="5" step="0.5" value="1.5"> <span id="bevelOut">1.5 mm</span></label>
+  <label class="mut" id="sketchCtl" hidden>Lines as <select id="sketch"><option value="line">3D line</option><option value="fill">Filled shape</option></select></label>
   <label class="mut">Edge <select id="bevelShape"><option value="round">Round</option><option value="classic">Classic</option></select></label>
   <label class="mut">Inflate <input id="inflate" type="range" min="0" max="100" value="0"> <span id="inflateOut">0%</span></label>
   <label class="mut">View <select id="view"><option value="front">Front</option><option value="isoLeft">Isometric left</option><option value="isoRight">Isometric right</option><option value="top">Top</option><option value="offAxis">Off-axis</option></select></label>
@@ -330,7 +331,11 @@ function materialFor(name, color) {
   if (/metal|chrome|silver|steel/.test(n)) return new THREE.MeshPhysicalMaterial({ color: col, metalness: 1, roughness: 0.2, envMapIntensity: 1 });
   if (/glass|clear/.test(n)) return new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.05, transmission: 0.9, transparent: true, opacity: 0.55, thickness: 2, envMapIntensity: 1 });
   if (/matte|paper|wood|clay/.test(n)) return new THREE.MeshStandardMaterial({ color: col, roughness: 0.9, envMapIntensity: ENV });
-  return new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.35, clearcoat: 0.6, envMapIntensity: ENV });
+  // plain colours: skip the film-style tone curve so red stays red (lighting still shapes it)
+  // the studio has several lights adding up to ~1.6x, so scale down to land on the designer's exact colour
+  const mat = new THREE.MeshStandardMaterial({ color: col.clone().multiplyScalar(0.62), roughness: 0.55, metalness: 0, envMapIntensity: 0.15 });
+  mat.toneMapped = false;
+  return mat;
 }
 
 // ---------- Parts: every Figma layer is its own 3D part ----------
@@ -339,12 +344,15 @@ let selectedPart = null;
 const partSt = (id) => (partState[id] ||= { hidden: false, color: null });
 
 function buildExtrude(list) {
+  document.getElementById("sketchCtl").hidden = !list.some((sh) => sh.line);
   const depth = +document.getElementById("depth").value, bevel = +document.getElementById("bevel").value;
   const g = new THREE.Group();
   let tris = 0;
   list.forEach((sh) => {
     // all outlines of this layer, in mm, y up
-    const loops = sh.paths.flatMap((d) => parsePath(d)).map((pts) => pts.map(([px, py]) => [px + sh.x, -(py + sh.y)]))
+    const useLine = sh.line && document.getElementById("sketch").value === "line";
+    const src = useLine ? sh.line : sh;
+    const loops = src.paths.flatMap((d) => parsePath(d)).map((pts) => pts.map(([px, py]) => [px + src.x, -(py + src.y)]))
       .filter((pts) => pts.length > 2 && Math.abs(polyArea(pts)) > 0.5);
     loops.sort((a, b) => Math.abs(polyArea(b)) - Math.abs(polyArea(a)));
     // even-odd nesting: a loop inside an odd number of bigger loops is a hole
@@ -588,7 +596,7 @@ document.getElementById("partsList").addEventListener("input", (e) => {
 }
 document.getElementById("inflate").oninput = (e) => { document.getElementById("inflateOut").textContent = e.target.value + "%"; rebuild(); };
 document.getElementById("lightI").oninput = (e) => { document.getElementById("lightIOut").textContent = e.target.value + "%"; applyLight(); };
-for (const id of ["bevelShape", "view"]) document.getElementById(id).onchange = rebuild;
+for (const id of ["bevelShape", "view", "sketch"]) document.getElementById(id).onchange = rebuild;
 document.getElementById("light").onchange = applyLight;
 document.getElementById("drawBtn").onclick = () => parent.postMessage({ pluginMessage: { type: "starter" } }, "*");
 
