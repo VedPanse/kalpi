@@ -62,6 +62,12 @@
   <div id="genMsg" class="mut"></div>
 </div>
 
+<div class="row" id="aiRow" hidden>
+  <button id="aiBtn" type="button" class="on">✨ Make it 3D with AI (~$0.30)</button>
+  <button id="aiShow" type="button" hidden>Showing: AI 3D · switch to cut-out</button>
+  <span id="aiMsg" class="mut"></span>
+</div>
+
 <section id="shelfView">
 <div id="stage"><div id="empty">Showing a sample label. Select a frame in Figma.</div></div>
 <div class="row" id="products">
@@ -72,11 +78,7 @@
   <button id="drawBtn" type="button">✎ Draw my own shape</button>
 </div>
 
-<div class="row" id="aiRow" hidden>
-  <button id="aiBtn" type="button" class="on">✨ Make it 3D with AI (~$0.30)</button>
-  <button id="aiShow" type="button" hidden>Showing: AI 3D · switch to cut-out</button>
-  <span id="aiMsg" class="mut"></span>
-</div>
+
 <div class="row" id="shapeCtl" hidden>
   <button data-m="auto" class="on" type="button">Auto</button>
   <button data-m="spin" type="button" title="Make it round, like a potter's wheel (bottles, jars, vases)">Round (lathe)</button>
@@ -791,7 +793,9 @@ window.onmessage = async (event) => {
   if (!msg || (msg.type !== "labels" && msg.type !== "selection")) return;
   shapes = msg.shapes || [];
   rawPictures = {}; (msg.pictures || []).forEach((p) => (rawPictures[p.id] = p));
-  document.getElementById("aiRow").hidden = !(msg.pictures && msg.pictures.length);
+  snapshot = msg.snapshot || null;
+  document.getElementById("aiRow").hidden = !snapshot;
+  if (snapshot) document.getElementById("aiMsg").textContent = "Turns the selected " + (msg.pictures && msg.pictures.length ? "picture" : "design") + " into a full 3D model.";
   if (msg.pictures && msg.pictures.length) {
     const pics = (await Promise.all(msg.pictures.map((p) => pictureToShape(p).catch(() => null)))).filter(Boolean);
     shapes = shapes.concat(pics);
@@ -830,7 +834,7 @@ document.getElementById("genBtn").onclick = generate2D;
 document.getElementById("genPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") generate2D(); });
 
 // ---------- AI 3D: send the selected picture to TRELLIS 2 (through the local helper) ----------
-let rawPictures = {}, aiModels = {}, showAI = true;
+let rawPictures = {}, aiModels = {}, showAI = true, snapshot = null;
 function aiFor() { const sh = shapes.find((x) => x.picture && aiModels[x.id]); return sh && showAI ? sh : null; }
 function updateAIButtons() {
   const has = shapes.some((x) => x.picture && aiModels[x.id]);
@@ -838,8 +842,14 @@ function updateAIButtons() {
   b.textContent = showAI ? "Showing: AI 3D · switch to cut-out" : "Showing: cut-out · switch to AI 3D";
 }
 async function makeAI3D() {
-  const sh = shapes.find((x) => x.picture), raw = sh && rawPictures[sh.id], msg = document.getElementById("aiMsg"), btn = document.getElementById("aiBtn");
-  if (!raw) { msg.textContent = "Select a picture first."; return; }
+  let sh = shapes.find((x) => x.picture);
+  const raw = (sh && rawPictures[sh.id]) || snapshot, msg = document.getElementById("aiMsg"), btn = document.getElementById("aiBtn");
+  if (!raw) { msg.textContent = "Select something in Figma first."; return; }
+  if (!sh) {   // a design, not a picture: add it as a stand-in shape so the AI model has a home
+    sh = { id: raw.id, name: raw.name, x: 0, y: 0, w: raw.w, h: raw.h, paths: [], picture: true, crop: { u0: 0, u1: 1, v0: 0, v1: 1 } };
+    shapes = shapes.filter((x) => x.id !== sh.id).concat([sh]);
+    document.getElementById("customBtn").hidden = false; selectProduct("custom");
+  }
   btn.disabled = true; msg.textContent = "Making a full 3D model… about 30–60 seconds";
   try {
     let bin = ""; const u = raw.bytes; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));

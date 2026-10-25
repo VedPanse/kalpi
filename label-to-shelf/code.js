@@ -67,7 +67,13 @@ async function sendSelection() {
     shapes.push({ id: node.id, name: node.name, x: t[0][2], y: t[1][2], w: node.width, h: node.height, paths: paths.map((p) => p.data), color: solidColor(node),
       line: linePaths && { paths: linePaths, x: lx, y: ly } });
   }
-  figma.ui.postMessage({ type: "selection", labels, shapes, pictures });
+  // a picture of whatever is selected, so "Make it 3D with AI" works on anything (image, frame, group, design)
+  let snapshot = null;
+  if (sel.length === 1 && "exportAsync" in sel[0] && sel[0].width > 0 && sel[0].height > 0) {
+    const n = sel[0], scale = Math.min(2, 1024 / Math.max(n.width, n.height));
+    try { snapshot = { id: n.id, name: n.name, w: n.width, h: n.height, bytes: await n.exportAsync({ format: "PNG", constraint: { type: "SCALE", value: scale } }) }; } catch (e) {}
+  }
+  figma.ui.postMessage({ type: "selection", labels, shapes, pictures, snapshot });
 }
 
 // Wait a moment after edits so we don't export on every keystroke
