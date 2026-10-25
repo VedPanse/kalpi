@@ -11,7 +11,9 @@ let timer = null;
 
 // a pasted photo or drawing: a layer whose fill is an image
 function isPicture(n) {
-  return "fills" in n && Array.isArray(n.fills) && n.fills.some((f) => f.type === "IMAGE" && f.visible !== false);
+  if ("fills" in n && Array.isArray(n.fills) && n.fills.some((f) => f.type === "IMAGE" && f.visible !== false)) return true;
+  // a frame or group that just wraps one image (what Figma's AI makes) counts as that picture
+  return "children" in n && n.children.length === 1 && isPicture(n.children[0]);
 }
 
 function isShape(n) {
