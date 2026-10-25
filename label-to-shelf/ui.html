@@ -271,8 +271,39 @@ function parsePath(d) {
   return subs.filter((s) => s.length > 1);
 }
 
+// a full drawing (not a half outline): spin it around its own vertical centre line.
+// For each height, the radius is the widest point of the drawing at that height.
+function centreProfile(loops) {
+  const all = loops.flat();
+  const minX = Math.min(...all.map((q) => q[0])), maxX = Math.max(...all.map((q) => q[0]));
+  const minY = Math.min(...all.map((q) => q[1])), maxY = Math.max(...all.map((q) => q[1]));
+  const cx = (minX + maxX) / 2, H = maxY - minY, rows = 80, prof = [[0, 0]];
+  for (let i = 0; i <= rows; i++) {
+    const y = maxY - (i / rows) * H;            // Figma y grows downward: start at the bottom
+    let r = 0;
+    for (const pts of loops) for (let k = 0; k < pts.length - 1; k++) {
+      const [x1, y1] = pts[k], [x2, y2] = pts[k + 1];
+      if ((y1 - y) * (y2 - y) <= 0 && y1 !== y2) r = Math.max(r, Math.abs(x1 + ((y - y1) / (y2 - y1)) * (x2 - x1) - cx));
+    }
+    prof.push([r, (i / rows) * H]);
+  }
+  prof.push([0, H]);
+  return prof;
+}
+
 function shapeParts() {
   const parts = [];
+  // shapes drawn as a half outline (the starter bottle, or named bottle/jar/cap…) spin around their left edge;
+  // anything else spins around its own centre
+  const full = shapes.filter((sh) => !SPIN_WORDS.test(sh.name));
+  if (full.length) {
+    const loops = full.flatMap((sh) => sh.paths.flatMap((d) => parsePath(d)).map((pts) => pts.map(([px, py]) => [px + sh.x, py + sh.y])));
+    if (loops.length) {
+      const rh = centreProfile(loops);
+      const c = full.find((sh) => sh.color);
+      return { parts: [{ rh, color: c ? c.color : null, h0: 0, h1: rh[rh.length - 1][1] }], top: rh[rh.length - 1][1], centred: true };
+    }
+  }
   shapes.forEach((sh) => sh.paths.forEach((d) => parsePath(d).forEach((pts) =>
     parts.push({ pts: pts.map(([px, py]) => [px + sh.x, py + sh.y]), color: sh.color }))));
   if (!parts.length) return null;
@@ -299,6 +330,7 @@ function buildCustom(label) {
     );
     m.castShadow = true; g.add(m);
   });
+  if (!labels.length) return { group: g, facts: { printed: "–", wrap: 0, hidden: 0, tooWide: false, noLabel: true }, top: sp.top };
   // label on the tallest part, from 15 % to 55 % of its height
   const main = sp.parts.reduce((a, b) => (b.h1 - b.h0 > a.h1 - a.h0 ? b : a));
   const H = main.h1 - main.h0, b0 = main.h0 + 0.15 * H, b1 = main.h0 + 0.55 * H;
@@ -495,7 +527,7 @@ function rebuild() {
   const custom = productKey === "custom" && shapes.length && shapeParts();
   const p = PRODUCTS[productKey] || PRODUCTS.bottle;
   const list = labels.length ? labels : [sampleLabel()];
-  const gap = 1.05;
+  const gap = custom ? Math.max(1.05, (custom.parts.reduce((m, p) => Math.max(m, ...p.rh.map((q) => q[0])), 0) * 2 + 20) * MM) : 1.05;
   const lines = [];
   SPEC = [];
   list.forEach((label, i) => {
@@ -510,6 +542,7 @@ function rebuild() {
       t.position.set(g.position.x, (topMM + 22) * MM, 0);
       group.add(t);
     }
+    if (facts.noLabel) { lines.push(`<b>Spun</b> around its centre: ${Math.round(custom.top)} mm tall. Select a label frame too to wrap it on.`); return; }
     const prefix = list.length > 1 ? `<b>${"ABC"[i]}</b> · ` : "";
     lines.push(
       `${prefix}<b>${escapeHtml(label.name)}</b>: printed ${facts.printed}, wraps ${facts.wrap}°` +
@@ -518,7 +551,16 @@ function rebuild() {
     );
   });
   document.getElementById("info").innerHTML = lines.join("<br>");
-  document.getElementById("empty").hidden = labels.length > 0;
+  document.getElementById("empty").hidden = labels.length > 0 || !!custom;
+  if (custom) fitCamera();
+}
+
+function fitCamera() {
+  group.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(group), fs = b.getSize(new THREE.Vector3()), fc = b.getCenter(new THREE.Vector3());
+  const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+  const dist = Math.max((fs.y / 2) / Math.tan(vfov / 2), (fs.x / 2) / Math.tan(hfov / 2), 0.4) * 1.25 + fs.z / 2;
+  controls.target.copy(fc); camera.position.set(fc.x, fc.y + dist * 0.12, fc.z + dist); camera.lookAt(fc); controls.update();
 }
 
 // ---------- A sample label until a frame is selected ----------
