@@ -138,7 +138,20 @@ const hooked = new WeakSet();
 function hookDocs() {
   for (const d of frameDocs()) if (!hooked.has(d)) { hooked.add(d); d.addEventListener("click", onPick, true); watchDownloads(d); }
 }
-setInterval(hookDocs, 1000);
+// a "✨ Make it 3D" button on every big design picture in the Studio, for that exact picture
+function badgeDesigns() {
+  for (const d of frameDocs()) for (const i of d.querySelectorAll("img")) {
+    if (i.dataset.k3d || i.offsetWidth < 180 || !usable(i)) continue;
+    const host = i.parentElement; if (!host) continue;
+    i.dataset.k3d = "1";
+    if (d.defaultView.getComputedStyle(host).position === "static") host.style.position = "relative";
+    const m = d.createElement("button"); m.type = "button"; m.textContent = "✨ Make it 3D";
+    m.style.cssText = "position:absolute;top:10px;right:10px;z-index:5;font:600 13px Inter,system-ui,sans-serif;padding:7px 12px;border-radius:999px;border:0;cursor:pointer;color:#0b0b10;background:#b4aaff;box-shadow:0 4px 16px rgba(0,0,0,.25)";
+    m.onclick = (e) => { e.preventDefault(); e.stopPropagation(); pickedImg = i; btn.click(); };
+    host.appendChild(m);
+  }
+}
+setInterval(() => { hookDocs(); badgeDesigns(); }, 1000);
 // the designs: the Studio's pictures (newest AI designs first); the page's own sample photos only if the Studio has none
 function pagePictures() {
   const seen = new Set(), pick = (list) => list.filter((i) => usable(i) && !seen.has(i.src) && seen.add(i.src));
