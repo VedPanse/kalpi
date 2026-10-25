@@ -450,6 +450,70 @@ const partState = {};   // layer id -> { hidden, color }
 let selectedPart = null;
 const partSt = (id) => (partState[id] ||= { hidden: false, color: null });
 
+// ---------- Inflate: the whole silhouette swells like a balloon ----------
+// Rasterise the outline, measure each point's distance to the edge, and lift it on a rounded profile.
+function buildInflated(loops, puffAmount, coreMM, material, crop) {
+  const xs = loops.flat().map((q) => q[0]), ys = loops.flat().map((q) => q[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const wMM = x1 - x0, hMM = y1 - y0, step = Math.max(wMM, hMM) / 170;
+  const W = Math.ceil(wMM / step) + 3, H = Math.ceil(hMM / step) + 3;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const cx = cv.getContext("2d");
+  cx.beginPath();
+  for (const pts of loops) pts.forEach(([px, py], i) => { const X = (px - x0) / step + 1.5, Y = (y1 - py) / step + 1.5; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
+  cx.fill("evenodd");
+  const a = cx.getImageData(0, 0, W, H).data, inside = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) inside[i] = a[i * 4 + 3] > 127 ? 1 : 0;
+  // chamfer distance to the edge (in pixels)
+  const D = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) D[i] = inside[i] ? 1e9 : 0;
+  const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? 0 : D[y * W + x]);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const i = y * W + x; if (!D[i]) continue; D[i] = Math.min(D[i], at(x - 1, y) + 1, at(x, y - 1) + 1, at(x - 1, y - 1) + 1.414, at(x + 1, y - 1) + 1.414); }
+  for (let y = H - 1; y >= 0; y--) for (let x = W - 1; x >= 0; x--) { const i = y * W + x; if (!D[i]) continue; D[i] = Math.min(D[i], at(x + 1, y) + 1, at(x, y + 1) + 1, at(x + 1, y + 1) + 1.414, at(x - 1, y + 1) + 1.414); }
+  let dMax = 1; for (let i = 0; i < W * H; i++) dMax = Math.max(dMax, D[i]);
+  const t = Math.min(1, puffAmount / 0.55);               // 0..1 slider position
+  const R = dMax * (0.12 + 0.78 * t);                    // a little puff rounds only the edge; full puff rounds all the way in
+  const puff = puffAmount * dMax * step;                  // mm
+  const zAt = (i) => { const d = Math.min(D[i], R) / R; return coreMM / 2 + puff * Math.sqrt(Math.max(0, 1 - (1 - d) * (1 - d))); };
+  const cr = crop || { u0: 0, u1: 1, v0: 0, v1: 1 };
+  const pos = [], uv = [], idx = [], vid = new Int32Array(W * H).fill(-1);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x;
+    // keep pixels inside or touching the inside, so the edge closes at z = 0
+    const near = inside[i] || inside[i - 1] || inside[i + 1] || inside[i - W] || inside[i + W];
+    if (!near) continue;
+    const X = x0 + (x - 1.5) * step, Y = y1 - (y - 1.5) * step;
+    vid[i] = pos.length / 3;
+    pos.push(X * MM, Y * MM, (inside[i] ? zAt(i) : coreMM / 2) * MM);
+    uv.push(cr.u0 + ((X - x0) / (wMM || 1)) * (cr.u1 - cr.u0), cr.v0 + ((Y - y0) / (hMM || 1)) * (cr.v1 - cr.v0));
+  }
+  const nFront = pos.length / 3;
+  for (let k = 0; k < nFront; k++) { pos.push(pos[k * 3], pos[k * 3 + 1], -pos[k * 3 + 2]); uv.push(uv[k * 2], uv[k * 2 + 1]); }
+  const cellOn = (x, y) => {
+    if (x < 0 || y < 0 || x >= W - 1 || y >= H - 1) return false;
+    const a0 = vid[y * W + x], b0 = vid[y * W + x + 1], c0 = vid[(y + 1) * W + x], d0 = vid[(y + 1) * W + x + 1];
+    return a0 >= 0 && b0 >= 0 && c0 >= 0 && d0 >= 0 && !!(inside[y * W + x] || inside[y * W + x + 1] || inside[(y + 1) * W + x] || inside[(y + 1) * W + x + 1]);
+  };
+  const wall = (p, q) => idx.push(p, q, p + nFront, q, q + nFront, p + nFront);
+  for (let y = 0; y < H - 1; y++) for (let x = 0; x < W - 1; x++) {
+    if (!cellOn(x, y)) continue;
+    const a0 = vid[y * W + x], b0 = vid[y * W + x + 1], c0 = vid[(y + 1) * W + x], d0 = vid[(y + 1) * W + x + 1];
+    idx.push(a0, c0, b0, b0, c0, d0);                                        // front faces +z
+    idx.push(a0 + nFront, b0 + nFront, c0 + nFront, b0 + nFront, d0 + nFront, c0 + nFront); // back faces -z
+    // side walls where this cell is on the outer edge
+    if (!cellOn(x, y - 1)) wall(b0, a0);
+    if (!cellOn(x, y + 1)) wall(c0, d0);
+    if (!cellOn(x - 1, y)) wall(a0, c0);
+    if (!cellOn(x + 1, y)) wall(d0, b0);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+
 function buildExtrude(list) {
   document.getElementById("sketchCtl").hidden = !list.some((sh) => sh.line);
   const depth = +document.getElementById("depth").value, bevel = +document.getElementById("bevel").value;
@@ -479,6 +543,9 @@ function buildExtrude(list) {
     const round = document.getElementById("bevelShape").value === "round";
     let geo;
     if (inflate > 0) {
+      geo = buildInflated(shapesOut.flatMap((sh) => [sh.userData.outer]).concat(loops.filter((l) => !shapesOut.some((sh) => sh.userData.outer === l))), inflate * 0.55, Math.max(0.4, depth * (1 - inflate)), null, sh.crop);
+      geo.userData.inflated = true;
+    } else if (false) {
       // Inflate: a puffy, pillow-like shape (a deep rounded bevel all the way round)
       const xs = shapesOut[0].userData.outer.map((q) => q[0]), ys = shapesOut[0].userData.outer.map((q) => q[1]);
       const half = Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) / 2;
@@ -498,7 +565,11 @@ function buildExtrude(list) {
     const color = sh.color ? new THREE.Color(sh.color[0], sh.color[1], sh.color[2]) : new THREE.Color(0x2b2d33);
     const st = partSt(sh.id);
     let mat = materialFor(sh.name, st.color ? new THREE.Color(st.color) : color);
-    if (sh.picture) {
+    if (sh.picture && geo.userData.inflated) {
+      const tex = new THREE.CanvasTexture(sh.picture); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+      const face = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(0.66, 0.66, 0.66), roughness: 0.45, envMapIntensity: 0.15, side: THREE.DoubleSide }); face.toneMapped = false;
+      mat = face;
+    } else if (sh.picture) {
       // put the picture on the flat front and back: map cap vertices to the picture by their position
       const pos = geo.attributes.position, uv = geo.attributes.uv, capEnd = geo.groups[0] ? geo.groups[0].start + geo.groups[0].count : 0;
       const idx = geo.index ? geo.index.array : null, capVerts = new Set();
@@ -675,7 +746,6 @@ window.onmessage = async (event) => {
   if (msg.pictures && msg.pictures.length) {
     const pics = (await Promise.all(msg.pictures.map((p) => pictureToShape(p).catch(() => null)))).filter(Boolean);
     shapes = shapes.concat(pics);
-    if (pics.length && +document.getElementById("inflate").value === 0) { document.getElementById("inflate").value = 45; document.getElementById("inflateOut").textContent = "45%"; }
   }
   const btn = document.getElementById("customBtn");
   btn.hidden = !shapes.length;
