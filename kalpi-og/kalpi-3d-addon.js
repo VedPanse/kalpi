@@ -1,10 +1,10 @@
 // Kalpi: "Make it 3D" for the product picture in the Studio, with real product dimensions.
 // Sends the picture to the local fal helper (label-to-shelf/server/fal_helper.py on :8795),
 // shows the 3D model, lets you set W × H × D in mm, draws dimension lines, and downloads a GLB.
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/environments/RoomEnvironment.js";
+import * as THREE from "https://esm.sh/three@0.170.0";
+import { OrbitControls } from "https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "https://esm.sh/three@0.170.0/examples/jsm/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "https://esm.sh/three@0.170.0/examples/jsm/environments/RoomEnvironment.js";
 
 const HELPER = "http://localhost:8795";
 const MM = 0.001;
