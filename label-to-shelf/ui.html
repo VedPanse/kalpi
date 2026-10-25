@@ -48,7 +48,7 @@
 
 <header>
   <h1>Label to Shelf</h1>
-  <div class="mut">Select up to 3 label frames, and optionally a vector outline for the shape. 1 px = 1 mm.</div>
+  <div class="mut">Make something in Figma (draw it, paste it, or ask Figma's AI for an image), select it, and it turns 3D here. 1 px = 1 mm.</div>
 </header>
 
 <div class="tabs" id="modes">
@@ -56,7 +56,7 @@
   <button data-mode="store">Store</button>
 </div>
 
-<div class="gen" id="genBox">
+<div class="gen" id="genBox" hidden>
   <input id="genPrompt" placeholder="Describe something to make, e.g. a cute olive character" maxlength="300">
   <button id="genBtn" type="button" class="on">✨ Generate 2D</button>
   <div id="genMsg" class="mut"></div>
