@@ -44,8 +44,8 @@ def fal_queue(endpoint, payload, timeout=300):
 def fal_3d(image_b64, mime):
     out = fal_queue("fal-ai/trellis-2", {
         "image_url": f"data:{mime};base64,{image_b64}",
-        "resolution": 1024, "texture_size": 2048,
-        "decimation_target": 60000,   # web-friendly: smooth in Figma and in a video
+        "resolution": 1536, "texture_size": 4096,   # highest quality: sharper screen, text and edges
+        "decimation_target": 200000,  # more detail, still light enough to spin smoothly
     })
     url = out["model_glb"]["url"]
     with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=120) as r:

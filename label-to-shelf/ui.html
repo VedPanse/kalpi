@@ -63,7 +63,7 @@
 </div>
 
 <div class="row" id="aiRow" hidden>
-  <button id="aiBtn" type="button" class="on">✨ Make it 3D with AI (~$0.30)</button>
+  <button id="aiBtn" type="button" class="on">✨ Make it 3D with AI (~$0.35)</button>
   <button id="aiShow" type="button" hidden>Showing: AI 3D · switch to cut-out</button>
   <span id="aiMsg" class="mut"></span>
 </div>
@@ -698,6 +698,7 @@ function rebuild() {
   document.getElementById("partsPanel").hidden = true;
   updateAIButtons && typeof aiFor === "function" && updateAIButtons();
   const ai = productKey === "custom" && aiFor();
+  shelf.visible = !ai;
   if (ai) {
     group.add(aiModels[ai.id]);
     document.getElementById("partsPanel").hidden = true;
@@ -866,7 +867,7 @@ async function makeAI3D() {
     m.scale.setScalar(targetH / (size.y || 1));
     const b2 = new THREE.Box3().setFromObject(m), c2 = b2.getCenter(new THREE.Vector3());
     m.position.set(-c2.x, -b2.min.y, -c2.z);
-    m.traverse((o) => { if (o.isMesh) { o.castShadow = true; if (o.material && o.material.map) o.material.map.encoding = THREE.sRGBEncoding; } });
+    m.traverse((o) => { if (o.isMesh) { o.castShadow = true; const mt = o.material; if (mt) { if (mt.map) { mt.map.encoding = THREE.sRGBEncoding; mt.map.anisotropy = 16; } mt.envMapIntensity = 0.8; mt.needsUpdate = true; } } });
     const holder = new THREE.Group(); holder.add(m);
     aiModels[sh.id] = holder; showAI = true; lastFit = "";
     msg.textContent = `Done: ${(d.bytes / 1e6).toFixed(1)} MB model. Drag to look around, try ↻ Spin.`;
