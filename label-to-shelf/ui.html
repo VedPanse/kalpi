@@ -72,6 +72,11 @@
   <button id="drawBtn" type="button">✎ Draw my own shape</button>
 </div>
 
+<div class="row" id="aiRow" hidden>
+  <button id="aiBtn" type="button" class="on">✨ Make it 3D with AI (~$0.30)</button>
+  <button id="aiShow" type="button" hidden>Showing: AI 3D · switch to cut-out</button>
+  <span id="aiMsg" class="mut"></span>
+</div>
 <div class="row" id="shapeCtl" hidden>
   <button data-m="auto" class="on" type="button">Auto</button>
   <button data-m="spin" type="button" title="Make it round, like a potter's wheel (bottles, jars, vases)">Round (lathe)</button>
@@ -110,6 +115,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 // ---------- Products, in real millimetres ----------
 // outline = half the side profile [radius, height]; three.js spins it into the product.
@@ -688,6 +694,18 @@ function rebuild() {
   const ex = productKey === "custom" && extrudeShapes();
   document.getElementById("shapeCtl").hidden = !(productKey === "custom" && shapes.length);
   document.getElementById("partsPanel").hidden = true;
+  updateAIButtons && typeof aiFor === "function" && updateAIButtons();
+  const ai = productKey === "custom" && aiFor();
+  if (ai) {
+    group.add(aiModels[ai.id]);
+    document.getElementById("partsPanel").hidden = true;
+    const bb = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3());
+    document.getElementById("info").innerHTML = `<b>AI 3D</b> (TRELLIS 2) of ${escapeHtml(ai.name)}: ${Math.round(bb.x / MM)} × ${Math.round(bb.y / MM)} × ${Math.round(bb.z / MM)} mm, sized to your Figma layer.`;
+    document.getElementById("empty").hidden = true;
+    if (fitKey() + "|ai" !== lastFit) { lastFit = fitKey() + "|ai"; fitCamera(); }
+    SPEC = [];
+    return;
+  }
   if (ex && ex.length) {
     const r = buildExtrude(ex);
     group.add(r.group);
@@ -772,6 +790,8 @@ window.onmessage = async (event) => {
   const msg = event.data.pluginMessage;
   if (!msg || (msg.type !== "labels" && msg.type !== "selection")) return;
   shapes = msg.shapes || [];
+  rawPictures = {}; (msg.pictures || []).forEach((p) => (rawPictures[p.id] = p));
+  document.getElementById("aiRow").hidden = !(msg.pictures && msg.pictures.length);
   if (msg.pictures && msg.pictures.length) {
     const pics = (await Promise.all(msg.pictures.map((p) => pictureToShape(p).catch(() => null)))).filter(Boolean);
     shapes = shapes.concat(pics);
@@ -808,6 +828,45 @@ async function generate2D() {
 }
 document.getElementById("genBtn").onclick = generate2D;
 document.getElementById("genPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") generate2D(); });
+
+// ---------- AI 3D: send the selected picture to TRELLIS 2 (through the local helper) ----------
+let rawPictures = {}, aiModels = {}, showAI = true;
+function aiFor() { const sh = shapes.find((x) => x.picture && aiModels[x.id]); return sh && showAI ? sh : null; }
+function updateAIButtons() {
+  const has = shapes.some((x) => x.picture && aiModels[x.id]);
+  const b = document.getElementById("aiShow"); b.hidden = !has;
+  b.textContent = showAI ? "Showing: AI 3D · switch to cut-out" : "Showing: cut-out · switch to AI 3D";
+}
+async function makeAI3D() {
+  const sh = shapes.find((x) => x.picture), raw = sh && rawPictures[sh.id], msg = document.getElementById("aiMsg"), btn = document.getElementById("aiBtn");
+  if (!raw) { msg.textContent = "Select a picture first."; return; }
+  btn.disabled = true; msg.textContent = "Making a full 3D model… about 30–60 seconds";
+  try {
+    let bin = ""; const u = raw.bytes; for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    const r = await fetch(HELPER + "/make3d", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: btoa(bin), mime: "image/png" }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "3D generation failed");
+    const buf = Uint8Array.from(atob(d.glb), (c) => c.charCodeAt(0)).buffer;
+    const gltf = await new Promise((res, rej) => new THREE.GLTFLoader().parse(buf, "", res, rej));
+    const m = gltf.scene;
+    // real size: as tall as the cut-out is in Figma (1 px = 1 mm)
+    const cr = sh.crop || { v0: 0, v1: 1 };
+    const targetH = sh.h * (cr.v1 - cr.v0) * MM;
+    const b = new THREE.Box3().setFromObject(m), size = b.getSize(new THREE.Vector3());
+    m.scale.setScalar(targetH / (size.y || 1));
+    const b2 = new THREE.Box3().setFromObject(m), c2 = b2.getCenter(new THREE.Vector3());
+    m.position.set(-c2.x, -b2.min.y, -c2.z);
+    m.traverse((o) => { if (o.isMesh) { o.castShadow = true; if (o.material && o.material.map) o.material.map.encoding = THREE.sRGBEncoding; } });
+    const holder = new THREE.Group(); holder.add(m);
+    aiModels[sh.id] = holder; showAI = true; lastFit = "";
+    msg.textContent = `Done: ${(d.bytes / 1e6).toFixed(1)} MB model. Drag to look around, try ↻ Spin.`;
+    updateAIButtons(); rebuild();
+  } catch (e) {
+    msg.innerHTML = /fetch/i.test(String(e)) ? "Can't reach the AI helper. In Terminal run: <b>python3 ~/label-to-shelf/server/fal_helper.py</b>" : "Error: " + escapeHtml(e.message || e);
+  } finally { btn.disabled = false; }
+}
+document.getElementById("aiBtn").onclick = makeAI3D;
+document.getElementById("aiShow").onclick = () => { showAI = !showAI; lastFit = ""; updateAIButtons(); rebuild(); };
 
 // ---------- Product buttons ----------
 function selectProduct(key) {

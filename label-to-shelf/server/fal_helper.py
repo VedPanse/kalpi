@@ -13,9 +13,43 @@ from pathlib import Path
 
 PORT = 8795
 MAX_IMAGES = 60
+MAX_MODELS = 15          # TRELLIS 2 costs ~$0.30 each; restart the helper to allow more
+import time
 KEY = os.environ.get("FAL_KEY") or (Path.home() / ".kalpi" / "fal_key").read_text().strip()
 STYLE = ", single object, centered, front view, flat sticker illustration, thick clean outline, plain white background, no text"
 made = 0
+models = 0
+
+
+def fal_queue(endpoint, payload, timeout=300):
+    """Submit to fal's queue and wait for the result (3D jobs can take longer than a normal request)."""
+    h = {"Authorization": f"Key {KEY}", "Content-Type": "application/json"}
+    req = urllib.request.Request(f"https://queue.fal.run/{endpoint}", data=json.dumps(payload).encode(), method="POST", headers=h)
+    with urllib.request.urlopen(req, timeout=60) as r:
+        job = json.loads(r.read())
+    status_url, response_url = job["status_url"], job["response_url"]
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        time.sleep(2)
+        with urllib.request.urlopen(urllib.request.Request(status_url, headers=h), timeout=30) as r:
+            st = json.loads(r.read())
+        if st.get("status") == "COMPLETED":
+            with urllib.request.urlopen(urllib.request.Request(response_url, headers=h), timeout=60) as r:
+                return json.loads(r.read())
+        if st.get("status") in ("FAILED", "ERROR"):
+            raise RuntimeError("fal job failed: " + json.dumps(st)[:200])
+    raise RuntimeError("fal job timed out")
+
+
+def fal_3d(image_b64, mime):
+    out = fal_queue("fal-ai/trellis-2", {
+        "image_url": f"data:{mime};base64,{image_b64}",
+        "resolution": 1024, "texture_size": 2048,
+        "decimation_target": 60000,   # web-friendly: smooth in Figma and in a video
+    })
+    url = out["model_glb"]["url"]
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=120) as r:
+        return r.read()
 
 
 def fal_image(prompt):
@@ -45,10 +79,22 @@ class H(BaseHTTPRequestHandler):
         self.send_response(204); self.cors(); self.end_headers()
 
     def do_GET(self):
-        self.reply(200, {"ok": True, "made": made, "left": MAX_IMAGES - made})
+        self.reply(200, {"ok": True, "made": made, "left": MAX_IMAGES - made, "models": models, "models_left": MAX_MODELS - models})
 
     def do_POST(self):
-        global made
+        global made, models
+        if self.path == "/make3d":
+            try:
+                d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 2))
+                if models >= MAX_MODELS:
+                    return self.reply(429, {"error": f"Safety cap of {MAX_MODELS} AI 3D models reached; restart the helper to continue."})
+                glb = fal_3d(d["image"], d.get("mime", "image/png"))
+                models += 1
+                return self.reply(200, {"glb": base64.b64encode(glb).decode(), "bytes": len(glb), "models": models})
+            except urllib.error.HTTPError as e:
+                return self.reply(502, {"error": f"fal said {e.code}: {e.read()[:300].decode(errors='ignore')}"})
+            except Exception as e:
+                return self.reply(500, {"error": str(e)})
         if self.path != "/generate":
             return self.reply(404, {"error": "not found"})
         try:
