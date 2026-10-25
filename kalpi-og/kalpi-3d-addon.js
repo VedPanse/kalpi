@@ -25,7 +25,10 @@ const css = `
 #k3d button{font:600 14px Inter,system-ui,sans-serif;padding:9px 12px;border-radius:10px;border:1px solid #2a2935;background:#1d1c26;color:#fff;cursor:pointer}
 #k3d button.main{background:#b4aaff;color:#0b0b10;border-color:#b4aaff}
 #k3d .x{position:absolute;right:12px;top:10px;background:rgba(0,0,0,.55);border:0;color:#fff;border-radius:50%;width:32px;height:32px;padding:0}
-#k3d .src{width:100%;border-radius:10px;background:#fff}
+#k3d .src{width:100%;height:130px;object-fit:contain;border-radius:10px;background:#fff}
+#k3d .pics{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+#k3d .pics img{width:46px;height:46px;flex:none;object-fit:contain;background:#fff;border-radius:8px;border:2px solid transparent;cursor:pointer}
+#k3d .pics img.on{border-color:#b4aaff}
 #k3d .status{position:absolute;left:14px;bottom:12px;padding:6px 10px;border-radius:8px;background:rgba(20,19,27,.85);color:#fff;font-size:13px}
 @media(max-width:760px){#k3d .box{grid-template-columns:1fr;grid-template-rows:55% 45%}}
 `;
@@ -38,8 +41,10 @@ wrap.innerHTML = `<div class="box">
   <div class="view"><canvas></canvas><button class="x" type="button" aria-label="Close">✕</button><div class="status">Pick a size, then Make it 3D.</div></div>
   <div class="side">
     <h3>Make it 3D</h3>
+    <button class="main" id="k3dGo" type="button">✨ Make it 3D (~$0.35)</button>
     <img class="src" alt="Your product picture">
-    <div class="mut">The picture becomes a full 3D model. Set its real size; the model is scaled to it and measured.</div>
+    <div class="mut">Wrong picture? Pick the product here:</div>
+    <div class="pics"></div>
     <div class="grid">
       <span>Height</span><input id="k3dH" type="number" min="1" value="250">
       <span>Width</span><input id="k3dW" type="number" min="1" placeholder="auto">
@@ -47,7 +52,6 @@ wrap.innerHTML = `<div class="box">
       <span>AI</span><select id="k3dModel"><option value="trellis">TRELLIS 2 · about 40 s</option><option value="tripo">Tripo · sharpest, about 4 min</option></select>
     </div>
     <label class="mut"><input id="k3dLock" type="checkbox" checked> keep proportions (set by height)</label>
-    <button class="main" id="k3dGo" type="button">✨ Make it 3D (~$0.35)</button>
     <button id="k3dApply" type="button">Apply size</button>
     <label class="mut"><input id="k3dDims" type="checkbox" checked> show dimensions</label>
     <label class="mut"><input id="k3dSpin" type="checkbox" checked> spin</label>
@@ -126,8 +130,26 @@ function applySize() {
   drawDims(); frame();
 }
 
+let pickedImg = null;
+const usable = (i) => i && i.complete && i.naturalWidth > 60 && !wrap.contains(i);
+// remember the product picture the person last clicked (a sample card, a version, the viewer)
+document.addEventListener("click", (e) => {
+  if (wrap.contains(e.target) || e.target === btn) return;
+  let el = e.target, img = null;
+  for (let n = 0; el && n < 6 && !img; n++, el = el.parentElement) img = el.tagName === "IMG" ? el : el.querySelector && el.querySelector("img");
+  if (usable(img)) pickedImg = img;
+}, true);
+function pagePictures() {
+  const seen = new Set();
+  return [...document.querySelectorAll("img")].filter((i) => usable(i) && i.offsetWidth > 40 && !seen.has(i.src) && seen.add(i.src));
+}
+function showPicture(img) {
+  pickedImg = img;
+  $(".src").src = img ? img.src : "";
+  wrap.querySelectorAll(".pics img").forEach((t) => t.classList.toggle("on", !!img && t.src === img.src));
+}
 function productImage() {
-  if (typeof pickedImg !== "undefined" && pickedImg && pickedImg.isConnected) return pickedImg;
+  if (pickedImg && pickedImg.isConnected) return pickedImg;
   // the biggest visible picture in the Studio
   const imgs = [...document.querySelectorAll("#make img, img")].filter((i) => i.offsetWidth > 120 && i.complete && i.naturalWidth);
   return imgs.sort((a, b) => b.offsetWidth * b.offsetHeight - a.offsetWidth * a.offsetHeight)[0] || null;
@@ -141,9 +163,15 @@ async function imageB64(img) {
 
 btn.onclick = () => {
   const img = productImage();
-  $(".src").src = img ? img.src : "";
+  const pics = $(".pics"); pics.innerHTML = "";
+  for (const p of pagePictures()) {
+    const t = document.createElement("img"); t.src = p.src; t.alt = p.alt || "product";
+    t.onclick = () => { showPicture(p); $(".status").textContent = "Picture changed. Click ✨ Make it 3D."; };
+    pics.appendChild(t);
+  }
+  showPicture(img);
   wrap.classList.add("on"); fit(); frame();
-  $(".status").textContent = img ? "Set the real height, then Make it 3D." : "No product picture found on the page.";
+  $(".status").textContent = img ? "Click ✨ Make it 3D (top right). The model appears here in about 40 s." : "No product picture found on the page.";
 };
 $(".x").onclick = () => wrap.classList.remove("on");
 $("#k3dApply").onclick = applySize;
@@ -179,7 +207,6 @@ $("#k3dGlb").onclick = () => {
 };
 
 // also offer "Make it 3D" next to Download / New background in the picture viewer
-let pickedImg = null;
 new MutationObserver(() => {
   for (const b of document.querySelectorAll("button")) {
     if (b.textContent.trim() !== "Download" || b.dataset.k3dDone) continue;
