@@ -64,8 +64,9 @@
 
 <div class="row" id="shapeCtl" hidden>
   <button data-m="auto" class="on" type="button">Auto</button>
-  <button data-m="spin" type="button">Spin</button>
+  <button data-m="spin" type="button" title="Make it round, like a potter's wheel (bottles, jars, vases)">Round (lathe)</button>
   <button data-m="extrude" type="button">Extrude</button>
+  <button id="turntable" type="button" title="Turn the object round and round">↻ Spin</button>
   <label class="mut" id="depthCtl">Depth <input id="depth" type="range" min="1" max="60" value="8"> <span id="depthOut">8 mm</span></label>
   <label class="mut" id="bevelCtl">Bevel <input id="bevel" type="range" min="0" max="5" step="0.5" value="1.5"> <span id="bevelOut">1.5 mm</span></label>
   <label class="mut" id="sketchCtl" hidden>Lines as <select id="sketch"><option value="line">3D line</option><option value="fill">Filled shape</option></select></label>
@@ -685,7 +686,7 @@ function rebuild() {
     }
     const [w, h, d] = r.size.map((v) => Math.round(v));
     const spinNote = shapeMode === "spin" && ex.some((sh) => sh.picture)
-      ? "<br><b>Spin is for round things</b> (bottles, jars, vases). For a character or picture, use <b>Inflate</b> for a puffy figure; a full sculpted 3D needs the AI step." : "";
+      ? "<br><b>Round (lathe) is for round things</b> (bottles, jars, vases). For a character or picture, use <b>Inflate</b> for a puffy figure; a full sculpted 3D needs the AI step." : "";
     document.getElementById("info").innerHTML = `<b>Extruded</b> ${escapeHtml(r.names.join(", "))}: ${w} × ${h} × ${d} mm, ${r.tris.toLocaleString()} triangles. Name a layer "gold", "metal", "glass" or "matte" to change its material.${spinNote}`;
     document.getElementById("empty").hidden = true;
     // frame the camera on the object
@@ -815,6 +816,11 @@ document.getElementById("partsList").addEventListener("input", (e) => {
     if (productKey === "custom" && extrudeShapes().length) rebuild();
   });
 }
+// turntable: keep the object turning so you see it from every side
+document.getElementById("turntable").onclick = (e) => {
+  controls.autoRotate = !controls.autoRotate; controls.autoRotateSpeed = 4;
+  e.currentTarget.classList.toggle("on", controls.autoRotate);
+};
 document.getElementById("inflate").oninput = (e) => { document.getElementById("inflateOut").textContent = e.target.value + "%"; rebuild(); };
 document.getElementById("lightI").oninput = (e) => { document.getElementById("lightIOut").textContent = e.target.value + "%"; applyLight(); };
 for (const id of ["bevelShape", "view", "sketch"]) document.getElementById(id).onchange = rebuild;
