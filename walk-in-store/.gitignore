@@ -1,0 +1,9 @@
+node_modules/
+dist/
+__pycache__/
+.DS_Store
+.env
+data/cache/
+.venv-3d/
+public/assistant/
+assets/*/img/

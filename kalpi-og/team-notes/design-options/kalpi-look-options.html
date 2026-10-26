@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalpi Look Options</title>
+<meta name="description" content="Review sheet: the current Make screen and four directions for how Kalpi could look. Not part of the product.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Instrument+Serif&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+/* ---------- review sheet chrome (not a product style) ---------- */
+:root {
+  --bg: #f4f4f6; --card: #ffffff; --ink: #18171d; --ink-2: #55535f; --ink-3: #807d8a; --line: #e2e1e7; --chip: #ecebf1; --focus: #5b4fe0;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #111114; --card: #1a1a1f; --ink: #f1f0f4; --ink-2: #b7b5c0; --ink-3: #8f8c99; --line: #2c2b33; --chip: #24232a; --focus: #a49bff; } }
+:root[data-theme="dark"] { --bg: #111114; --card: #1a1a1f; --ink: #f1f0f4; --ink-2: #b7b5c0; --ink-3: #8f8c99; --line: #2c2b33; --chip: #24232a; --focus: #a49bff; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.55 Inter, system-ui, sans-serif; overflow-x: hidden; }
+img { max-width: 100%; }
+a { color: var(--focus); }
+.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.top { padding: 40px 0 8px; }
+.top small { font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.top h1 { font: 600 28px/1.2 Inter, sans-serif; letter-spacing: -.015em; margin: 10px 0 8px; }
+.top p { color: var(--ink-2); max-width: 70ch; margin: 0 0 6px; }
+.jump { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.jump .wrap { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+.jump a { flex: none; text-decoration: none; color: var(--ink-2); font-weight: 500; font-size: 13.5px; padding: 6px 12px; border-radius: 999px; background: var(--chip); }
+.jump a:hover { color: var(--ink); }
+section.opt { padding: 44px 0 8px; scroll-margin-top: 56px; }
+.ohead { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+.badge { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font: 600 16px/1 Inter, sans-serif; background: var(--ink); color: var(--bg); }
+.ohead h2 { font: 600 21px/1.25 Inter, sans-serif; letter-spacing: -.01em; margin: 3px 0 4px; }
+.ohead p { margin: 0; color: var(--ink-2); max-width: 72ch; }
+.tagline { display: inline-block; margin-left: 6px; font: 500 12px/1 Inter, sans-serif; padding: 4px 8px; border-radius: 999px; background: var(--chip); color: var(--ink-2); vertical-align: 3px; }
+.spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 14px; }
+.spec > div { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.spec h4 { margin: 0 0 6px; font: 600 12px/1.2 Inter, sans-serif; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+.spec p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.sw { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.sw span { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 "JetBrains Mono", monospace; color: var(--ink-2); }
+.sw i { width: 18px; height: 18px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(127,127,140,.35); }
+.spec > div.wide { grid-column: span 2; } @media (max-width: 600px) { .spec > div.wide { grid-column: auto; } }
+.states { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.states figure { margin: 0; } .states figcaption { font-size: 12px; color: var(--ink-3); margin-top: 5px; }
+.st { height: 120px; border-radius: 10px; position: relative; overflow: hidden; display: grid; place-items: center; text-align: center; font-size: 12px; padding: 10px; }
+.bul { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.bul li { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; color: var(--ink-2); font-size: 14px; }
+.bul b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 3px; }
+.now-grid { display: grid; grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.now-grid figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+.now-grid img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.now-grid figcaption { font-size: 12.5px; color: var(--ink-3); padding: 6px 4px 2px; }
+.fixes { counter-reset: f; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.fixes li { counter-increment: f; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 52px; position: relative; color: var(--ink-2); font-size: 14px; }
+.fixes li::before { content: counter(f); position: absolute; left: 16px; top: 14px; width: 24px; height: 24px; border-radius: 7px; background: var(--chip); color: var(--ink); font: 600 12px/24px Inter, sans-serif; text-align: center; }
+.fixes b { color: var(--ink); }
+code { font: 500 12.5px/1.4 "JetBrains Mono", monospace; background: var(--chip); padding: 1px 6px; border-radius: 6px; color: var(--ink); overflow-wrap: anywhere; }
+.foot { padding: 40px 0 60px; color: var(--ink-3); font-size: 13px; }
+.mockwrap { border-radius: 18px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 60px -40px rgba(20,16,40,.45); }
+@media (max-width: 760px) { .now-grid { grid-template-columns: 1fr; } .now-grid figure:last-child { max-width: 320px; } .top h1 { font-size: 23px; } }
+
+/* ---------- Option A · Keynote ---------- */
+:root { --k-bg: #060609; --k-glow: #1C1A2E; --k-surface: #101016; --k-line: #24242E; --k-text: #F4F4F6; --k-text-2: #9C9CA8; --k-text-3: #868692; --k-accent: #F4F4F6; --k-ink: #0B0B10; --k-ring: #B4AAFF; }
+.mk-a { position: relative; --bg: var(--k-bg); --surface: var(--k-surface); --line: var(--k-line); --text: var(--k-text); --text-2: var(--k-text-2); --text-3: var(--k-text-3); --accent: var(--k-accent); --ink: var(--k-ink); --ring: var(--k-ring); background: var(--bg); color: var(--text); font-family: Inter, sans-serif; transition: background-color .9s ease, color .9s ease; }
+.mk-a :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.a-top { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px clamp(16px, 3vw, 32px) 0; z-index: 2; }
+.a-eye { font: 500 13px/1 Inter, sans-serif; color: var(--text-2); letter-spacing: .01em; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.seg button { font: 500 13px/1 Inter, sans-serif; color: var(--text-2); background: none; border: 0; padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: background .25s, color .25s; }
+.seg button[aria-pressed="true"] { background: rgba(255,255,255,.12); color: var(--text); }
+.a-stage { position: relative; height: clamp(420px, 56vw, 600px); }
+.a-stage canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: pan-y; }
+.a-fallback { display: none; position: absolute; inset: 60px 0 40px; margin: auto; height: calc(100% - 100px); width: auto; max-width: 80%; object-fit: contain; border-radius: 6px; }
+.mk-a.nogl .a-fallback { display: block; } .mk-a.nogl canvas, .mk-a.nogl .a-hint, .mk-a.nogl .a-replay { display: none; }
+.a-cap { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font: 500 clamp(15px, 1.6vw, 18px)/1.3 "Inter Tight", Inter, sans-serif; letter-spacing: -.005em; color: var(--text); pointer-events: none; padding: 0 16px; }
+.a-cap span { display: inline-block; transition: opacity .7s ease, transform .9s cubic-bezier(.2,.7,.1,1), filter .7s; }
+.a-cap span.out { opacity: 0; transform: translateY(8px); filter: blur(6px); }
+.a-lab { position: absolute; left: 0; top: 0; transform: translate(-50%, 0); font: 500 12.5px/1 Inter, sans-serif; color: var(--text-2); white-space: nowrap; opacity: 0; pointer-events: none; transition: color .3s; }
+.a-lab b { color: var(--text); font-weight: 600; margin-right: 5px; }
+.a-lab.on { color: var(--text); }
+.a-replay { position: absolute; right: clamp(12px, 3vw, 28px); bottom: 24px; font: 500 12.5px/1 Inter, sans-serif; color: var(--text-2); background: rgba(255,255,255,.06); border: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); border-radius: 999px; padding: 8px 12px; cursor: pointer; transition: color .2s, background .2s; z-index: 3; }
+.a-replay:hover { color: var(--text); background: rgba(255,255,255,.1); }
+.a-hint { position: absolute; left: clamp(12px, 3vw, 28px); bottom: 30px; font-size: 12px; color: var(--text-3); opacity: 0; transition: opacity 1s, color .9s; }
+.a-hint.on { opacity: 1; }
+.a-form { padding: 30px 16px 44px; display: grid; justify-items: center; text-align: center; }
+.a-form h3 { font: 600 clamp(22px, 2.4vw, 28px)/1.2 "Inter Tight", Inter, sans-serif; letter-spacing: -.02em; margin: 0 0 16px; }
+.a-row { display: flex; gap: 8px; width: min(620px, 100%); padding: 6px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line), 0 20px 50px -20px color-mix(in srgb, var(--ring) 30%, transparent); transition: box-shadow .3s, background-color .9s; }
+.a-row:focus-within { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ring) 55%, var(--line)), 0 0 0 4px color-mix(in srgb, var(--ring) 22%, transparent), 0 20px 50px -20px color-mix(in srgb, var(--ring) 45%, transparent); }
+.a-row input { flex: 1; min-width: 0; background: none; border: 0; color: var(--text); font: 400 16px/1 Inter, sans-serif; padding: 0 14px; outline: none; }
+.a-row input::placeholder { color: var(--text-3); }
+.a-btn { flex: none; border: 0; border-radius: 999px; background: var(--accent); color: var(--ink); font: 600 14.5px/1 Inter, sans-serif; padding: 13px 20px; cursor: pointer; transition: transform .2s, box-shadow .3s, background-color .9s, color .9s; }
+.a-btn:hover { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent), 0 8px 30px color-mix(in srgb, var(--ring) 45%, transparent); }
+.a-btn:active { transform: scale(.97); }
+.a-sub { margin: 14px 0 0; font-size: 13.5px; color: var(--text-2); }
+.a-sub a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--line); }
+.a-note { margin: 18px 0 0; font-size: 12px; color: var(--text-3); max-width: 60ch; }
+.a-form.compact { padding: 22px 16px 30px; }
+.a-stage.v { height: clamp(400px, 46vw, 540px); }
+.v-chips { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; z-index: 3; padding: 0 12px; }
+.v-chip { display: inline-flex; align-items: center; gap: 7px; font: 500 13px/1 Inter, sans-serif; color: var(--text-2); background: color-mix(in srgb, var(--surface) 80%, transparent); border: 0; box-shadow: inset 0 0 0 1px var(--line); border-radius: 999px; padding: 8px 13px 8px 8px; cursor: pointer; transition: color .25s, box-shadow .35s, background-color .9s; }
+.v-chip i { width: 14px; height: 14px; border-radius: 50%; } .v-chip b { color: var(--text); font-weight: 600; }
+.v-chip:hover { color: var(--text); }
+.v-chip[aria-pressed="true"] { color: var(--text); box-shadow: inset 0 0 0 1px var(--ring), 0 0 20px -4px var(--ring); }
+.a5wrap { overflow: clip; }
+.a5-track { height: 320vh; position: relative; }
+.a5-sticky { position: sticky; top: 56px; height: min(calc(100vh - 72px), 680px); display: flex; flex-direction: column; }
+.a5-sticky .a-stage { flex: 1; height: auto; min-height: 0; }
+.a5-dots { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 9px; z-index: 3; }
+.a5-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: background-color .4s, box-shadow .4s; }
+.a5-dots i.on { background: var(--ring); box-shadow: 0 0 8px var(--ring); }
+.a-pct { position: absolute; left: 0; top: 0; font: 600 13px/1 Inter, sans-serif; color: var(--text); opacity: 0; pointer-events: none; white-space: nowrap; }
+.bgrow { margin: 0 0 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px 8px; }
+.bgrow-h { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; margin-bottom: 8px; }
+.bgrow-h b { font-size: 14px; } .bgrow-h small { color: var(--ink-3); font-size: 12px; }
+.bdots { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 4px; }
+@media (min-width: 900px) { .bdots { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+.tsw { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 6px 2px 8px; border: 0; border-radius: 10px; background: none; color: var(--ink-2); font: 500 11.5px/1.25 Inter, sans-serif; text-align: center; cursor: pointer; transition: background-color .2s, color .2s; }
+.tsw i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(127,127,140,.4); transition: transform .2s, box-shadow .2s; }
+.tsw i b { width: 11px; height: 11px; border-radius: 50%; }
+.tsw:hover { background: var(--chip); color: var(--ink); } .tsw:hover i { transform: scale(1.08); }
+.tsw[aria-checked="true"] { color: var(--ink); font-weight: 600; } .tsw[aria-checked="true"] i { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+.tsw:focus-visible, .wt:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ugrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.ugrid figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; } .ugrid img { display: block; width: 100%; height: auto; } .ugrid figcaption { padding: 8px 12px; font-size: 13px; font-weight: 600; }
+.utable { overflow-x: auto; margin-top: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.utable table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 620px; } .utable th, .utable td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); } .utable th { color: var(--ink-3); font-weight: 600; font-size: 12px; } .utable tr:last-child td { border-bottom: 0; }
+@media (max-width: 560px) { .ugrid { grid-template-columns: 1fr; } }
+.wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.wt { display: block; padding: 0; border: 1px solid var(--line); background: var(--card); border-radius: 14px; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: var(--ink); transition: transform .25s, box-shadow .25s; }
+.wt img { display: block; width: 100%; height: auto; aspect-ratio: 590 / 378; background: #08080a; }
+.wt span { display: block; padding: 9px 12px 2px; font-weight: 600; font-size: 13.5px; }
+.wt small { display: block; padding: 0 12px 11px; font: 500 10.5px/1.45 "JetBrains Mono", monospace; color: var(--ink-3); overflow-wrap: anywhere; }
+.wt:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -18px rgba(0,0,0,.55); }
+.wt[aria-current="true"] { box-shadow: 0 0 0 2px var(--ink); }
+@media (max-width: 560px) { .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .wt span { font-size: 12.5px; padding: 7px 9px 1px; } .wt small { font-size: 9.5px; padding: 0 9px 9px; } }
+.badge.w { width: 44px; font-size: 14px; }
+@media (max-width: 560px) { .a-row { flex-direction: column; border-radius: 18px; } .a-row input { padding: 12px; } .a-btn { width: 100%; } .a-hint { display: none; } }
+
+/* ---------- Option B · Orbit ---------- */
+.mk-b { --bg: #eeedf3; --panel: #ffffff; --ink: #17151f; --text-2: #5e5a6e; --line: #dcdae5; --acc: #4b3fd8; background: var(--bg); color: var(--ink); font-family: Manrope, sans-serif; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); min-height: 520px; }
+.b-left { padding: clamp(20px, 3.4vw, 40px); display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+.b-eye { font: 500 11.5px/1 "JetBrains Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.b-left h3 { font: 700 clamp(22px, 2.3vw, 28px)/1.2 Manrope, sans-serif; letter-spacing: -.02em; margin: 0; }
+.b-field { background: var(--panel); border-radius: 14px; box-shadow: 0 1px 0 rgba(0,0,0,.04), inset 0 0 0 1px var(--line); padding: 14px 16px; font-size: 16px; color: #8a8698; min-height: 76px; }
+.b-btn { align-self: flex-start; border: 0; border-radius: 12px; background: var(--acc); color: #fff; font: 600 15px/1 Manrope, sans-serif; padding: 14px 20px; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(75,63,216,.7); transition: transform .2s, box-shadow .2s; }
+.b-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(75,63,216,.8); }
+.b-small { font-size: 13.5px; color: var(--text-2); margin: 0; } .b-small a { color: var(--ink); font-weight: 600; }
+.b-stage { position: relative; min-height: 460px; }
+.b-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+.b-stage canvas:active { cursor: grabbing; }
+.b-bar { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; align-items: center; gap: 12px; pointer-events: none; }
+.b-bar button { pointer-events: auto; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(23,21,31,.12); cursor: pointer; font: 600 16px/1 Manrope, sans-serif; }
+.b-name { font: 600 14px/1 Manrope, sans-serif; background: rgba(255,255,255,.85); padding: 9px 14px; border-radius: 999px; min-width: 150px; text-align: center; }
+.b-fallback { display: none; position: absolute; inset: 24px; margin: auto; max-height: calc(100% - 80px); object-fit: contain; }
+.mk-b.nogl .b-fallback { display: block; } .mk-b.nogl canvas { display: none; }
+@media (max-width: 760px) { .mk-b { grid-template-columns: 1fr; } .b-stage { min-height: 400px; order: -1; } }
+
+/* ---------- Option C · Paper ---------- */
+.mk-c { --bg: #f6f5f4; --card: #ffffff; --ink: #1e1b1f; --text-2: #6b6670; --line: #e6e3e0; --acc: #5a2e5c; background: var(--bg); color: var(--ink); font-family: Inter, sans-serif; padding: clamp(24px, 4vw, 52px) clamp(16px, 4vw, 52px); }
+.c-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: clamp(22px, 3vw, 36px); font-size: 14px; }
+.c-tabs span { padding: 0 0 10px; color: var(--text-2); } .c-tabs span.on { color: var(--ink); box-shadow: inset 0 -1.5px 0 var(--ink); }
+.c-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.c-grid h3 { font: 400 clamp(28px, 3vw, 36px)/1.1 "Instrument Serif", serif; letter-spacing: -.005em; margin: 0 0 14px; }
+.c-field { border-bottom: 1px solid #cfcac6; padding: 10px 0; font-size: 17px; color: #9a948f; margin-bottom: 18px; }
+.c-btn { border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: 500 14.5px/1 Inter, sans-serif; padding: 14px 22px; cursor: pointer; transition: background .2s; }
+.c-btn:hover { background: var(--acc); }
+.c-sub { font-size: 13.5px; color: var(--text-2); margin: 14px 0 0; } .c-sub a { color: var(--ink); }
+.c-shelf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 18px); align-items: start; }
+.c-mount { margin: 0; background: var(--card); padding: 8%; border-radius: 4px; box-shadow: 0 1px 2px rgba(30,27,31,.06), 0 12px 30px -18px rgba(30,27,31,.3); transition: transform .5s cubic-bezier(.2,.7,.1,1), box-shadow .5s; }
+.c-mount:hover { transform: translateY(-6px); box-shadow: 0 1px 2px rgba(30,27,31,.06), 0 28px 40px -20px rgba(30,27,31,.38); }
+.c-mount img { display: block; width: 100%; height: auto; }
+.c-mount figcaption { font-size: 12px; color: var(--text-2); margin-top: 8px; }
+.c-mount:nth-child(2) { transform: translateY(18px); } .c-mount:nth-child(2):hover { transform: translateY(12px); }
+@media (max-width: 760px) { .c-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Option D · Fan ---------- */
+.mk-d { --bg: #160a1f; --bg-2: #241030; --text: #fbf3fb; --text-2: #c9b3cf; --coral: #ff6a5b; --mag: #e0459b; background: radial-gradient(900px 500px at 70% 30%, #3a1446 0%, transparent 60%), var(--bg); color: var(--text); font-family: "DM Sans", sans-serif; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 20px; padding: clamp(24px, 4vw, 48px); min-height: 500px; overflow: hidden; }
+.d-left h3 { font: 600 clamp(24px, 2.6vw, 32px)/1.1 "Bricolage Grotesque", sans-serif; letter-spacing: -.02em; margin: 10px 0 16px; }
+.d-eye { font-size: 13px; color: var(--text-2); }
+.d-field { background: rgba(255,255,255,.06); border-radius: 16px; padding: 14px 16px; color: #a48dab; font-size: 16px; min-height: 70px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); margin-bottom: 14px; }
+.d-btn { border: 0; border-radius: 16px; background: linear-gradient(100deg, var(--mag), var(--coral)); color: #fff; font: 600 15px/1 "DM Sans", sans-serif; padding: 15px 22px; cursor: pointer; box-shadow: 0 14px 30px -12px rgba(255,106,91,.7); transition: transform .2s; }
+.d-btn:hover { transform: translateY(-2px); }
+.d-sub { font-size: 13.5px; color: var(--text-2); margin: 14px 0 0; } .d-sub a { color: var(--text); }
+.d-fan { position: relative; height: 420px; perspective: 1200px; }
+.d-tilt { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.2,.7,.1,1); }
+.d-card { position: absolute; left: 50%; top: 50%; width: 172px; margin: -130px 0 0 -86px; background: #fff; border-radius: 14px; padding: 8px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.6); transition: transform .6s cubic-bezier(.2,.7,.1,1), box-shadow .6s; transform-style: preserve-3d; cursor: pointer; }
+.d-card img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: contain; border-radius: 8px; background: #efe9f1; }
+.d-card span { display: block; color: #241030; font: 600 13px/1 "DM Sans", sans-serif; padding: 9px 4px 3px; }
+.d-card:nth-child(1) { transform: translateX(-192px) rotate(-7deg) translateY(10px); }
+.d-card:nth-child(2) { transform: translateY(-14px) translateZ(20px); z-index: 2; }
+.d-card:nth-child(3) { transform: translateX(192px) rotate(7deg) translateY(10px); }
+.d-fan:hover .d-card:nth-child(1) { transform: translateX(-206px) rotate(-10deg) translateY(16px); }
+.d-fan:hover .d-card:nth-child(3) { transform: translateX(206px) rotate(10deg) translateY(16px); }
+.d-fan .d-card:hover { transform: translateY(-28px) translateZ(90px) rotate(0) !important; z-index: 5; box-shadow: 0 40px 70px -20px rgba(224,69,155,.55); }
+@media (max-width: 760px) { .mk-d { grid-template-columns: 1fr; } .d-fan { height: 340px; order: -1; } .d-card { width: 106px; margin: -84px 0 0 -53px; padding: 5px; } .d-card span { font-size: 11px; padding: 6px 2px 2px; } .d-card:nth-child(1) { transform: translateX(-114px) rotate(-6deg) translateY(8px); } .d-card:nth-child(3) { transform: translateX(114px) rotate(6deg) translateY(8px); } .d-fan:hover .d-card:nth-child(1), .d-fan:hover .d-card:nth-child(3) { transform: none; } .d-fan:hover .d-card:nth-child(1) { transform: translateX(-118px) rotate(-7deg) translateY(8px); } .d-fan:hover .d-card:nth-child(3) { transform: translateX(118px) rotate(7deg) translateY(8px); } .d-fan { height: 260px; } }
+
+/* ---------- small state demos ---------- */
+@keyframes scan { 0% { transform: translateY(46px); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(-46px); opacity: 0; } }
+@keyframes breathe { 50% { opacity: .55; } }
+@keyframes develop { 0% { filter: blur(10px) saturate(0); opacity: .35; } 70%, 100% { filter: blur(0) saturate(1); opacity: 1; } }
+@keyframes orbitdot { to { transform: rotate(360deg); } }
+@keyframes deal { 0%, 10% { transform: translateX(0) rotate(0); } 45%, 100% { transform: translateX(var(--x)) rotate(var(--r)); } }
+.st-a { background: radial-gradient(120px 70px at 50% 85%, var(--k-glow), var(--k-bg) 72%); color: var(--k-text-2); transition: color .9s; }
+.st-a .plinth { position: absolute; left: 50%; bottom: 18px; width: 90px; height: 10px; margin-left: -45px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--k-ring) 50%, transparent), transparent); }
+.st-a .ring { position: absolute; left: 50%; top: 50%; width: 70px; height: 14px; margin: -7px 0 0 -35px; border-radius: 50%; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--k-ring) 60%, #fff), 0 0 18px 4px color-mix(in srgb, var(--k-ring) 55%, transparent); animation: scan 2.4s cubic-bezier(.5,0,.3,1) infinite; }
+.st-b { background: #eeedf3; color: #5e5a6e; }
+.st-b .o { position: absolute; width: 56px; height: 56px; border-radius: 50%; border: 2px solid #dcdae5; border-top-color: #4b3fd8; animation: orbitdot 1.1s linear infinite; }
+.st-c { background: #f6f5f4; color: #6b6670; }
+.st-c .dv { display: flex; gap: 8px; } .st-c .dv i { width: 44px; height: 56px; background: #fff; padding: 4px; box-shadow: 0 6px 12px -8px rgba(0,0,0,.3); }
+.st-c .dv i::before { content: ""; display: block; height: 100%; background: linear-gradient(160deg, #e9dbe6, #c9a7c2); animation: develop 2.6s ease-in-out infinite alternate; }
+.st-c .dv i:nth-child(2)::before { animation-delay: .3s; } .st-c .dv i:nth-child(3)::before { animation-delay: .6s; }
+.st-d { background: radial-gradient(160px 90px at 50% 40%, #3a1446, #160a1f); color: #c9b3cf; }
+.st-d .dk { position: relative; width: 40px; height: 52px; } .st-d .dk i { position: absolute; inset: 0; background: #fff; border-radius: 6px; box-shadow: 0 8px 18px -6px rgba(0,0,0,.6); animation: deal 1.8s cubic-bezier(.3,.7,.2,1) infinite alternate; }
+.st-d .dk i:nth-child(1) { --x: -34px; --r: -12deg; } .st-d .dk i:nth-child(2) { --x: 0; --r: 0; background: linear-gradient(135deg, #e0459b, #ff6a5b); } .st-d .dk i:nth-child(3) { --x: 34px; --r: 12deg; }
+.st small { display: block; position: absolute; left: 0; right: 0; bottom: 8px; font-size: 11.5px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+
+<header class="top wrap">
+  <small>Review sheet · not part of Kalpi</small>
+  <h1>How the Make screen could look</h1>
+  <p>Below is the Make screen as it is today, then four directions for it. Each direction uses the same words and the same steps. Option A is the big one: move your mouse over it, drag the products, and click one.</p>
+  <p>Every option keeps one main button and shows each picture in full.</p>
+</header>
+<nav class="jump" aria-label="Jump to"><div class="wrap"><a href="#universal">Universal pick</a><a href="#themes">Themes</a><a href="#now">Now</a><a href="#a">A · Keynote</a><a href="#av">A2–A6 · Keynote variations</a><a href="#b">B · Orbit</a><a href="#c">C · Paper</a><a href="#d">D · Fan</a><a href="#fixes">Fixes for any option</a></div></nav>
+
+<main class="wrap">
+
+<!-- UNIVERSAL PICK -->
+<section class="opt" id="universal">
+  <div class="ohead"><div class="badge" style="background:var(--chip);color:var(--ink)">★</div><div><h2>Universal pick <span class="tagline">one background for any product</span></h2><p>The four shortlisted backgrounds were tested with the same model in 8 product colours: cream, jet black, gold, deep purple, teal, red, navy and silver. The pick is near-black with a soft velvet-plum glow from the top and a hint of petrol in the floor reflection. It is now the default on this page.</p></div></div>
+  <div class="sw" style="margin:0 0 14px"><span><i style="background:#070609"></i>#070609 base</span><span><i style="background:#140E1D"></i>#140E1D top</span><span><i style="background:#261C39"></i>#261C39 glow</span><span><i style="background:#8494A6"></i>#8494A6 floor reflection</span><span><i style="background:#B3A3EE"></i>#B3A3EE rim left</span><span><i style="background:#D4E2EC"></i>#D4E2EC rim right</span><span><i style="background:#B4AAFF"></i>#B4AAFF ring</span></div>
+  <div class="ugrid"><figure><img src="shots/universal/near-black-8-products.jpg" alt="Near-black: eight product colours on this background" loading="lazy"><figcaption>Near-black</figcaption></figure><figure><img src="shots/universal/velvet-plum-8-products.jpg" alt="Velvet plum: eight product colours on this background" loading="lazy"><figcaption>Velvet plum</figcaption></figure><figure><img src="shots/universal/glacier-8-products.jpg" alt="Glacier: eight product colours on this background" loading="lazy"><figcaption>Glacier</figcaption></figure><figure><img src="shots/universal/deep-petrol-8-products.jpg" alt="Deep petrol: eight product colours on this background" loading="lazy"><figcaption>Deep petrol</figcaption></figure><figure><img src="shots/universal/universal-8-products.jpg" alt="Universal blend: eight product colours on this background" loading="lazy"><figcaption>Universal blend</figcaption></figure><figure><img src="shots/universal/photos-5-themes.jpg" alt="Three real product photos on each of the five backgrounds" loading="lazy"><figcaption>Real photos, one row per background (same order)</figcaption></figure></div>
+  <div class="utable"><table><thead><tr><th>Background</th><th>Weakest edge contrast</th><th>Average edge contrast</th><th>Weakest edge colour gap (ΔE)</th><th>Colour shift (ΔE, max)</th><th>Weakest ring contrast</th></tr></thead><tbody><tr><td>Near-black</td><td>2.34 (black)</td><td>4.85</td><td>27.7</td><td>0.4</td><td>7.77</td></tr><tr><td>Velvet plum</td><td>2.13 (black)</td><td>4.39</td><td>27.5</td><td>0.6</td><td>6.74</td></tr><tr><td>Glacier</td><td>1.93 (black)</td><td>3.99</td><td>19.5</td><td>0.2</td><td>5.63</td></tr><tr><td>Deep petrol</td><td>2.04 (black)</td><td>4.19</td><td>22.8</td><td>0.5</td><td>6.30</td></tr><tr><td><b>Universal blend</b></td><td>2.29 (black)</td><td>4.74</td><td>27.9</td><td>0.3</td><td>7.31</td></tr></tbody></table></div>
+  <ul class="bul">
+    <li><b>Verdict</b>The universal blend is the most even all-rounder. It matches plain near-black on separation, colour truth and ring contrast, and adds the plum warmth that makes it feel premium.</li>
+    <li><b>Why not the others</b>Glacier and Deep petrol lift the background towards the product, so dark products blend in sooner. Velvet plum on its own is a little lower on every product.</li>
+    <li><b>Still weak</b>No background gets a jet-black product to 3:1 at the edge (about 2.3:1 at best). It stays visible, but dark products would need a brighter rim light on that product.</li>
+  </ul>
+</section>
+
+<!-- THEME WALL -->
+<section class="opt" id="themes">
+  <div class="ohead"><div class="badge" style="background:var(--chip);color:var(--ink)">◐</div><div><h2>Theme wall <span class="tagline">16 dark backgrounds</span></h2><p>Each tile is the real Keynote stage, rendered in that colour. Only the background, floor, light and ring change. The product keeps its true colours. Click a tile to try it on the live stage below.</p></div></div>
+  <div class="wall" id="wall"></div>
+</section>
+
+<!-- NOW -->
+<section class="opt" id="now">
+  <div class="ohead"><div class="badge" style="background:var(--chip);color:var(--ink)">·</div><div><h2>Now</h2><p>The live page at 1440px and 400px wide. More screenshots of the Studio and Gallery are in <code>team-notes/design-options/now/</code>.</p></div></div>
+  <div class="now-grid">
+    <figure><img src="now/make-1440.png" alt="The current Make screen on a wide screen" loading="lazy"><figcaption>1440px wide: big heading, two tabs, then the Studio inside a frame</figcaption></figure>
+    <figure><img src="now/make-400.png" alt="The current Make screen on a phone" loading="lazy"><figcaption>400px wide</figcaption></figure>
+  </div>
+  <ul class="bul">
+    <li><b>What works</b>The steps are clear, and the words are plain and honest about cost.</li>
+    <li><b>What holds it back</b>Two large headings sit on top of each other. There is no product picture on the first screen. The empty frame looks unfinished.</li>
+    <li><b>Feel</b>It looks like a developer tool, not a place where a seller sees her product come to life.</li>
+  </ul>
+</section>
+
+<!-- A · KEYNOTE -->
+<section class="opt" id="a">
+  <div class="ohead"><div class="badge">A</div><div><h2>Keynote <span class="tagline">bold · 3D · the wow one</span></h2><p>A dark studio stage. The seller's photo stands under a spotlight. A line of light scans up through it, and the photo becomes a real 3D product. That product then splits into three versions to compare. The 3D model is a real one Kalpi made, the unicorn lipstick.</p></div></div>
+  <div class="bgrow" role="radiogroup" aria-label="Background colour"><div class="bgrow-h"><b>Background colour</b><small>Tap a colour to change the stage. Your pick is remembered.</small></div><div class="bdots"></div></div>
+  <div class="mockwrap">
+    <div class="mk-a" id="mkA">
+      <div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div>
+      <div class="a-stage">
+        <canvas aria-label="A photo of a unicorn lipstick turns into a 3D product, then into three colour versions"></canvas>
+        <img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo">
+        <div class="a-cap" aria-live="polite"><span>A photo you found.</span></div>
+        <div class="a-lab"><b>A</b>Pink</div><div class="a-lab"><b>B</b>Lilac</div><div class="a-lab"><b>C</b>Sky</div>
+        <span class="a-hint">Drag to turn · click a version</span>
+        <button class="a-replay" type="button">Replay</button>
+      </div>
+      <div class="a-form">
+        <h3>What do you want to make?</h3>
+        <div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div>
+        <p class="a-sub">or <a href="#a">start from a photo of a product you found</a></p>
+        <p class="a-note">The assistant writes the picture prompt for free. You see the price before any picture is made. Generated pictures are concepts until a maker says yes.</p>
+      </div>
+    </div>
+  </div>
+  <div class="spec">
+    <div><h4>Palette</h4><div class="sw"><span><i style="background:#060609"></i>#060609</span><span><i style="background:#101016"></i>#101016</span><span><i style="background:#24242E"></i>#24242E</span><span><i style="background:#F4F4F6"></i>#F4F4F6</span><span><i style="background:#9C9CA8"></i>#9C9CA8</span><span><i style="background:#B4AAFF"></i>#B4AAFF light</span></div></div>
+    <div><h4>Type</h4><p>Inter Tight 600 for headings, capped at 28px. Inter 400/500 for everything else, 13–16px. A heading is never bigger than the product.</p></div>
+    <div><h4>Spacing and density</h4><p>Very airy. The first screen holds the stage, one caption line and one input. The tabs shrink to a small switch.</p></div>
+    <div><h4>Pictures</h4><p>The photo stands whole on a white mount, never cropped. Then the 3D product sits on a glossy floor with a soft reflection and a contact shadow.</p></div>
+    <div><h4>Buttons</h4><p>One white pill, "Start with this idea", inside the input. Everything else is a text link or a quiet ghost chip, such as Replay.</p></div>
+    <div class="wide"><h4>Empty and loading</h4><div class="states"><figure><div class="st st-a"><span class="plinth"></span><small>Type an idea or add a photo.<br>It will stand here.</small></div><figcaption>Empty: a lit, empty plinth</figcaption></figure><figure><div class="st st-a"><span class="ring"></span><small>Making your versions…</small></div><figcaption>Loading: the scan ring rises</figcaption></figure></div></div>
+  </div>
+  <ul class="bul">
+    <li><b>What changes</b>The first screen becomes a lit stage with her real product as the hero. The big headings go, and so does the tool frame. One input with one button sits under the stage.</li>
+    <li><b>Why it helps a seller</b>In a few seconds she sees her photo become a product she can turn around, and then become versions to choose from. That moment is the whole promise of Kalpi.</li>
+    <li><b>Trade-off</b>It is the most work to build, and it needs a 3D model, which costs a little per product. Older phones get a still picture instead. The dark stage also has to match the rest of the site.</li>
+  </ul>
+</section>
+
+
+<!-- KEYNOTE VARIATIONS -->
+<section class="opt" id="av">
+  <div class="ohead"><div class="badge" style="background:var(--chip);color:var(--ink)">A+</div><div><h2>Keynote variations</h2><p>Five more layouts in the same style: a dark stage, a glossy floor, the glowing ring, and very few words. Each one is live, so move the mouse, drag, or click. The colour swatches change all of them at once.</p></div></div>
+  <div class="bgrow" role="radiogroup" aria-label="Background colour"><div class="bgrow-h"><b>Background colour</b><small>Tap a colour to change the stage. Your pick is remembered.</small></div><div class="bdots"></div></div>
+</section>
+
+<section class="opt" id="a2">
+  <div class="ohead"><div class="badge w">A2</div><div><h2>Solo spotlight <span class="tagline">one product · big</span></h2><p>One product, large and centred under the light. The versions are small swatches below it.</p></div></div>
+  <div class="mockwrap"><div class="mk-a" id="mkA2"><div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div><div class="a-stage v"><canvas aria-label="One large unicorn lipstick under a spotlight"></canvas><img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo"><div class="a-cap"><span>Version A · Pink</span></div><div class="v-chips" role="group" aria-label="Versions"><button type="button" class="v-chip" aria-pressed="true"><i style="background:#E472A6"></i><b>A</b>Pink</button><button type="button" class="v-chip" aria-pressed="false"><i style="background:#B48AF0"></i><b>B</b>Lilac</button><button type="button" class="v-chip" aria-pressed="false"><i style="background:#7FB2EE"></i><b>C</b>Sky</button></div></div><div class="a-form compact"><div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div><p class="a-sub">or <a href="#av">start from a photo of a product you found</a></p></div></div></div>
+  <ul class="bul"><li><b>What it is</b>One large product sits under the spotlight, with the versions as small swatches below it. Click a swatch, and a ring of light repaints the product from the floor up.</li><li><b>Why it helps a seller</b>Her product fills the screen and looks its best. Switching versions in the same place makes small differences easy to see.</li><li><b>Trade-off</b>Only one version shows at a time, so she can never see all three side by side.</li></ul>
+</section>
+
+<section class="opt" id="a3">
+  <div class="ohead"><div class="badge w">A3</div><div><h2>Carousel <span class="tagline">turntable</span></h2><p>The versions ride a slow, dark turntable. Click one to bring it to the front.</p></div></div>
+  <div class="mockwrap"><div class="mk-a" id="mkA3"><div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div><div class="a-stage v"><canvas aria-label="Three versions on a dark turntable"></canvas><img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo"><div class="a-cap"><span>A · Pink is in front</span></div><span class="a-hint on">Click a version to bring it to the front</span></div><div class="a-form compact"><div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div><p class="a-sub">or <a href="#av">start from a photo of a product you found</a></p></div></div></div>
+  <ul class="bul"><li><b>What it is</b>The three versions ride a slow, dark turntable. Click one to bring it to the front, where a ring of light waits on the floor.</li><li><b>Why it helps a seller</b>It feels like turning real samples on a shop counter, and each version gets its turn in the light.</li><li><b>Trade-off</b>The versions at the back are smaller and dimmer, and the slow turning means some waiting.</li></ul>
+</section>
+
+<section class="opt" id="a4">
+  <div class="ohead"><div class="badge w">A4</div><div><h2>Split <span class="tagline">photo → 3D</span></h2><p>Her photo on the left, the 3D product on the right. A ring of light carries one into the other.</p></div></div>
+  <div class="mockwrap"><div class="mk-a" id="mkA4"><div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div><div class="a-stage v"><canvas aria-label="The original photo next to the 3D product"></canvas><img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo"><div class="a-cap"><span>From your photo to a product you can turn.</span></div><div class="a-lab"><b>Your photo</b></div><div class="a-lab"><b>In 3D</b></div><span class="a-hint on">Drag to turn the product</span></div><div class="a-form compact"><div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div><p class="a-sub">or <a href="#av">start from a photo of a product you found</a></p></div></div></div>
+  <ul class="bul"><li><b>What it is</b>Her original photo sits in a lit frame on the left, and the 3D product stands on the right. A ring of light travels from the photo to the product and builds it.</li><li><b>Why it helps a seller</b>She sees exactly what Kalpi made from her own photo, so she can trust the 3D view.</li><li><b>Trade-off</b>Two things share the screen, so the product is smaller, and this layout does not show versions.</li></ul>
+</section>
+
+<section class="opt" id="a5">
+  <div class="ohead"><div class="badge w">A5</div><div><h2>Scroll story <span class="tagline">scroll to play</span></h2><p>Scrolling moves the camera through each step. Scroll slowly through this one.</p></div></div>
+  <div class="mockwrap a5wrap"><div class="mk-a" id="mkA5"><div class="a5-track"><div class="a5-sticky"><div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div><div class="a-stage"><canvas aria-label="A scroll story: photo, 3D, colour change, versions, votes, winner"></canvas><img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo"><div class="a-cap"><span>Your photo.</span></div><div class="a-lab"><b>B</b>Lilac</div><div class="a-lab"><b>A</b>Pink</div><div class="a-lab"><b>C</b>Sky</div><div class="a-pct">0%</div><div class="a-pct">0%</div><div class="a-pct">0%</div><div class="a5-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div><span class="a-hint on">Keep scrolling</span></div></div></div><div class="a-form compact"><div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div><p class="a-sub">or <a href="#av">start from a photo of a product you found</a></p></div></div></div>
+  <ul class="bul"><li><b>What it is</b>Scrolling moves the camera through the steps: her photo, the 3D product, one part changing colour, three versions, votes rising as bars of light, then the winner.</li><li><b>Why it helps a seller</b>It explains the whole of Kalpi in one scroll, which suits a first visit or the landing page.</li><li><b>Trade-off</b>It tells a story rather than being a tool. It needs a long scroll, and the votes are sample numbers.</li></ul>
+</section>
+
+<section class="opt" id="a6">
+  <div class="ohead"><div class="badge w">A6</div><div><h2>Floating glass <span class="tagline">premium · depth</span></h2><p>Each version floats in its own dark glass panel. The panels tilt with the mouse.</p></div></div>
+  <div class="mockwrap"><div class="mk-a" id="mkA6"><div class="a-top"><span class="a-eye">Make it</span><div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Studio</button><button type="button" aria-pressed="false">Gallery</button></div></div><div class="a-stage v"><canvas aria-label="Three versions floating in dark glass panels"></canvas><img class="a-fallback" src="assets/unicorn-photo.jpg" alt="Unicorn lipstick, the product photo"><div class="a-cap"><span>Three versions, side by side.</span></div><div class="a-lab"><b>A</b>Pink</div><div class="a-lab"><b>B</b>Lilac</div><div class="a-lab"><b>C</b>Sky</div><span class="a-hint on">Hover a panel to bring it forward</span></div><div class="a-form compact"><div class="a-row"><input type="text" placeholder="a marble candle for slow evenings" aria-label="What do you want to make?"><button class="a-btn" type="button">Start with this idea</button></div><p class="a-sub">or <a href="#av">start from a photo of a product you found</a></p></div></div></div>
+  <ul class="bul"><li><b>What it is</b>Each version floats in its own dark glass panel above the floor. The panels tilt with the mouse, and hovering one brings it forward onto a ring of light.</li><li><b>Why it helps a seller</b>It feels the most premium, like a product launch, and it keeps all three versions in view.</li><li><b>Trade-off</b>The glass and floating are decoration, not information. It is also the heaviest scene to draw.</li></ul>
+</section>
+
+<!-- B · ORBIT -->
+<section class="opt" id="b">
+  <div class="ohead"><div class="badge">B</div><div><h2>Orbit <span class="tagline">premium · light · 3D cards</span></h2><p>A bright studio. Versions A, B and C stand as printed cards on a turntable, and you drag to orbit between them. The form sits beside them, calm and plain.</p></div></div>
+  <div class="mockwrap">
+    <div class="mk-b" id="mkB">
+      <div class="b-left">
+        <span class="b-eye">Make it · Studio</span>
+        <h3>What do you want to make?</h3>
+        <div class="b-field">a marble candle for slow evenings</div>
+        <button class="b-btn" type="button">Start with this idea</button>
+        <p class="b-small">or <a href="#b">start from a photo of a product you found</a>. You see the price before any picture is made.</p>
+      </div>
+      <div class="b-stage">
+        <canvas aria-label="Three versions of a lip gloss on a turntable"></canvas>
+        <img class="b-fallback" src="assets/gloss-gem.jpg" alt="Lip gloss with a gem cap">
+        <div class="b-bar"><button type="button" data-d="-1" aria-label="Previous version">‹</button><span class="b-name">A · Gem cap</span><button type="button" data-d="1" aria-label="Next version">›</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="spec">
+    <div><h4>Palette</h4><div class="sw"><span><i style="background:#EEEDF3"></i>#EEEDF3</span><span><i style="background:#FFFFFF"></i>#FFFFFF</span><span><i style="background:#DCDAE5"></i>#DCDAE5</span><span><i style="background:#17151F"></i>#17151F</span><span><i style="background:#5E5A6E"></i>#5E5A6E</span><span><i style="background:#4B3FD8"></i>#4B3FD8</span></div></div>
+    <div><h4>Type</h4><p>Manrope 700 for headings, max 28px, and Manrope 400–600 for text. JetBrains Mono only for the small section label.</p></div>
+    <div><h4>Spacing and density</h4><p>Two columns: the form on the left, the stage on the right. Medium density, so it works on a laptop without scrolling.</p></div>
+    <div><h4>Pictures</h4><p>Each version is a white-bordered print with the whole photo inside. Soft shadows sit under each card on a pale floor.</p></div>
+    <div><h4>Buttons</h4><p>One solid indigo button with a soft coloured shadow. The arrows are small white circles.</p></div>
+    <div class="wide"><h4>Empty and loading</h4><div class="states"><figure><div class="st st-b"><span style="max-width:16ch">Your versions will stand here</span></div><figcaption>Empty: a clean turntable</figcaption></figure><figure><div class="st st-b"><span class="o"></span><small>Making 3 versions…</small></div><figcaption>Loading: a quiet spinning ring</figcaption></figure></div></div>
+  </div>
+  <ul class="bul">
+    <li><b>What changes</b>The page turns light and calm. The tool frame becomes a two-column screen, and the versions get their own 3D turntable.</li>
+    <li><b>Why it helps a seller</b>Comparing A, B and C feels like picking up real samples. The light background shows true product colour.</li>
+    <li><b>Trade-off</b>Less drama than A. The light look breaks from the dark landing page, so the two would need to meet in the middle.</li>
+  </ul>
+</section>
+
+<!-- C · PAPER -->
+<section class="opt" id="c">
+  <div class="ohead"><div class="badge">C</div><div><h2>Paper <span class="tagline">quiet · premium · no 3D</span></h2><p>An editorial, gallery-wall feel. Product photos sit in white mounts, like prints. Small serif headings and lots of space. It is the calmest option and the fastest to build.</p></div></div>
+  <div class="mockwrap">
+    <div class="mk-c">
+      <div class="c-tabs"><span class="on">Studio</span><span>Gallery</span></div>
+      <div class="c-grid">
+        <div>
+          <h3>What do you want to make?</h3>
+          <div class="c-field">a marble candle for slow evenings</div>
+          <button class="c-btn" type="button">Start with this idea</button>
+          <p class="c-sub">or <a href="#c">start from a photo of a product you found</a><br>35 pictures you made before are in the <a href="#c">Gallery</a>.</p>
+        </div>
+        <div class="c-shelf">
+          <figure class="c-mount"><img src="assets/unicorn-photo.jpg" alt="Unicorn lipstick"><figcaption>Unicorn lipstick</figcaption></figure>
+          <figure class="c-mount"><img src="assets/gloss-cat.jpg" alt="Lip gloss with a cat cap"><figcaption>Cat-cap gloss</figcaption></figure>
+          <figure class="c-mount"><img src="assets/case-unicorn.jpg" alt="Unicorn phone case"><figcaption>Phone case</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="spec">
+    <div><h4>Palette</h4><div class="sw"><span><i style="background:#F6F5F4"></i>#F6F5F4</span><span><i style="background:#FFFFFF"></i>#FFFFFF</span><span><i style="background:#E6E3E0"></i>#E6E3E0</span><span><i style="background:#1E1B1F"></i>#1E1B1F</span><span><i style="background:#6B6670"></i>#6B6670</span><span><i style="background:#5A2E5C"></i>#5A2E5C plum</span></div></div>
+    <div><h4>Type</h4><p>Instrument Serif for headings, at 36px or less. Inter for text and buttons. The serif makes it feel premium without large sizes.</p></div>
+    <div><h4>Spacing and density</h4><p>Generous margins, thin lines and no boxes inside boxes. Tabs become underlined words.</p></div>
+    <div><h4>Pictures</h4><p>White mounts with 8% padding. Each mount takes its photo's own shape, so square and portrait photos both show whole, with no bands.</p></div>
+    <div><h4>Buttons</h4><p>One near-black pill that turns plum on hover. Links are underlined words.</p></div>
+    <div class="wide"><h4>Empty and loading</h4><div class="states"><figure><div class="st st-c"><span>No products yet.<br>Your first will hang here.</span></div><figcaption>Empty: a bare wall with one line</figcaption></figure><figure><div class="st st-c"><span class="dv"><i></i><i></i><i></i></span><small>Developing your versions…</small></div><figcaption>Loading: prints develop like film</figcaption></figure></div></div>
+  </div>
+  <ul class="bul">
+    <li><b>What changes</b>Dark purple becomes warm-neutral paper. Big display type becomes small serif headings. The photos move up to the first screen.</li>
+    <li><b>Why it helps a seller</b>It feels like a boutique buyer's desk: calm and serious about her product. It also prints and screenshots well for sharing.</li>
+    <li><b>Trade-off</b>There is no wow moment, and it could feel plain next to tools with motion. Kalpi's playful brand colours mostly disappear.</li>
+  </ul>
+</section>
+
+<!-- D · FAN -->
+<section class="opt" id="d">
+  <div class="ohead"><div class="badge">D</div><div><h2>Fan <span class="tagline">bold · rich colour · light 3D in CSS</span></h2><p>Deep aubergine with a coral-to-magenta button. The three versions fan out like a hand of cards. Hover the fan to spread it, and hover a card to lift it.</p></div></div>
+  <div class="mockwrap">
+    <div class="mk-d">
+      <div class="d-left">
+        <span class="d-eye">Make it · Studio</span>
+        <h3>What do you want to make?</h3>
+        <div class="d-field">a marble candle for slow evenings</div>
+        <button class="d-btn" type="button">Start with this idea</button>
+        <p class="d-sub">or <a href="#d">start from a photo of a product you found</a></p>
+      </div>
+      <div class="d-fan" id="dFan"><div class="d-tilt">
+        <figure class="d-card"><img src="assets/gloss-gem.jpg" alt="Gloss, gem cap"><span>A · Gem cap</span></figure>
+        <figure class="d-card"><img src="assets/gloss-cat.jpg" alt="Gloss, cat cap"><span>B · Cat cap</span></figure>
+        <figure class="d-card"><img src="assets/gloss-gold.jpg" alt="Gloss, gold cap"><span>C · Gold cap</span></figure>
+      </div></div>
+    </div>
+  </div>
+  <div class="spec">
+    <div><h4>Palette</h4><div class="sw"><span><i style="background:#160A1F"></i>#160A1F</span><span><i style="background:#241030"></i>#241030</span><span><i style="background:#FBF3FB"></i>#FBF3FB</span><span><i style="background:#C9B3CF"></i>#C9B3CF</span><span><i style="background:#E0459B"></i>#E0459B</span><span><i style="background:#FF6A5B"></i>#FF6A5B</span></div></div>
+    <div><h4>Type</h4><p>Bricolage Grotesque 600 for headings, at 32px or less, which gives character without size. DM Sans for text.</p></div>
+    <div><h4>Spacing and density</h4><p>Two columns, with the cards breaking slightly out of their space. Tight and lively, but still with one clear path.</p></div>
+    <div><h4>Pictures</h4><p>White cards with the whole photo inside, on a soft lilac backing. Cards tilt in 3D, but the photo is never cut.</p></div>
+    <div><h4>Buttons</h4><p>One gradient button, magenta to coral, with a warm glow. It is the only coloured button on the screen.</p></div>
+    <div class="wide"><h4>Empty and loading</h4><div class="states"><figure><div class="st st-d"><span>Three blank cards, face down.<br>Type an idea to deal them.</span></div><figcaption>Empty: a face-down hand</figcaption></figure><figure><div class="st st-d"><span class="dk"><i></i><i></i><i></i></span><small>Dealing your versions…</small></div><figcaption>Loading: the cards deal out</figcaption></figure></div></div>
+  </div>
+  <ul class="bul">
+    <li><b>What changes</b>The colours stay close to Kalpi's brand but grow richer. The tool frame goes, and the versions become a tactile fan.</li>
+    <li><b>Why it helps a seller</b>It feels fun and confident, like a product launch. "Pick a card" makes comparing versions instant.</li>
+    <li><b>Trade-off</b>It is louder, and strong colour can fight with the product photos. The fan works best with exactly three versions.</li>
+  </ul>
+</section>
+
+<!-- FIXES -->
+<section class="opt" id="fixes">
+  <div class="ohead"><div class="badge" style="background:var(--chip);color:var(--ink)">✓</div><div><h2>Fixes for any option</h2><p>Small things I saw on the live page. Each one is worth doing whichever direction you pick.</p></div></div>
+  <ol class="fixes">
+    <li><b>Some pictures can still be cropped.</b> The default rule fills the frame and cuts the edges. Only the source pictures are switched to "contain". Use <code>object-fit: contain</code> everywhere a product is shown. <br><code>kalpi-vote.html</code> · <code>.pic &gt; img</code> (line 125)</li>
+    <li><b>Lavender bands under square pictures in the Gallery.</b> Square photos, like the phone cases, sit in a 4:5 frame with a lavender fill below them. Fill the frame with a neutral that matches the photo backdrop, or let each card take its picture's own shape. <br><code>kalpi-vote.html</code> · <code>.pic.msrc { background: #e9e4f7 }</code> and <code>.gal .pic.msrc { aspect-ratio: 4/5 }</code></li>
+    <li><b>Gallery cards don't line up.</b> One-line titles make shorter cards, so the Save buttons sit at different heights in the same row. Pin the button to the bottom of the card (flex column, <code>margin-top: auto</code>). <br><code>kalpi-vote.html</code> · Gallery card markup in <code>shelf()</code>, grid <code>.gal</code></li>
+    <li><b>The status line is cut off with "…".</b> "VOTES ARE A SIMULAT…" and "THE IMAGE SERVICE T…" are truncated in tiny uppercase mono. Use sentence case at 12px, and let the line wrap or shorten the words. <br><code>kalpi-vote.html</code> · <code>.sfoot</code>, <code>.sfoot span</code> (lines 67 and 272)</li>
+    <li><b>The main button looks broken before you type.</b> While disabled, it fades to 50% and keeps its orange dot, so it reads as an error. Keep it at full colour with a clear "Type an idea first" hint, or use a calm disabled style without the dot. <br><code>kalpi-vote.html</code> · <code>.btn:disabled</code>, <code>.btn.pri .dot</code></li>
+    <li><b>Empty dark space under the Studio.</b> The frame is at least 720px tall, so the short start screen leaves a large dotted gap. Size the frame to its content, or make the start screen fill it. <br><code>kalpi.html</code> · <code>.kx-frame iframe { height: max(720px, …) }</code></li>
+    <li><b>The helper badge looks like debug output.</b> The green mono pill is pushed 4px right of the sentence and wraps onto its own line. Use a small dot with plain words in the body font, aligned to the text. <br><code>kalpi.html</code> · <code>.kx-state</code>, <code>.kx-state.on</code></li>
+    <li><b>Mismatched tabs and stacked headings.</b> The Studio tab is twice as wide as Gallery, and each tab has its own gradient. Then "What do you want to make?" repeats the section heading at the same large size. Use one small tab switch and one heading. Also hide the textarea's resize grip with <code>resize: none</code>. <br><code>kalpi.html</code> · <code>.kx-tabs</code>, <code>.kx-h</code> · <code>kalpi-vote.html</code> · <code>.start h1</code>, <code>textarea.fld</code></li>
+  </ol>
+</section>
+
+<p class="foot">Mock-ups only. Nothing here touches the product files. The 3D model and photos are Kalpi's own pictures from earlier runs, copied into <code>team-notes/design-options/assets/</code>.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+<script src="assets/kalpi-data.js"></script>
+<script>
+(() => {
+'use strict';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const lerp = (a, b, t) => a + (b - a) * t;
+function glOK() { try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } }
+function whenVisible(el, cb) { if (!('IntersectionObserver' in window)) { cb(true); return; } new IntersectionObserver(es => cb(es[es.length - 1].isIntersecting), { rootMargin: '100px' }).observe(el); }
+function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+function softSprite(inner, outer) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, inner); r.addColorStop(1, outer); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); return t; }
+/* a whole photo on a white mount: the photo is drawn with its own aspect, never cropped */
+function mountTexture(img, pad, mount, radius) {
+  const W = 1024, ar = img.width / img.height, ph = W / ar, H = Math.round(ph + 0) ;
+  const p = Math.round(W * pad), c = document.createElement('canvas'); c.width = W + 2 * p; c.height = H + 2 * p;
+  const g = c.getContext('2d'); g.fillStyle = mount; const r = radius || 0;
+  g.beginPath(); g.moveTo(r, 0); g.arcTo(c.width, 0, c.width, c.height, r); g.arcTo(c.width, c.height, 0, c.height, r); g.arcTo(0, c.height, 0, 0, r); g.arcTo(0, 0, c.width, 0, r); g.fill();
+  g.drawImage(img, p, p, W, H);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return { tex: t, aspect: c.width / c.height };
+}
+
+/* =================== DARK STAGE THEMES =================== */
+/* Only the environment changes: backdrop, floor, fog, rim lights, dust, the ring, and the page chrome.
+   The key light stays neutral white, so the product's own colours stay true. */
+const THEMES = [
+  { id: 'universal', name: 'Universal (near-black + plum)', bg: '#070609', top: '#140E1D', glow: '#261C39', surface: '#121016', line: '#262033', text: '#F4F3F7', text2: '#A29DAE', text3: '#87829A', accent: '#F4F4F6', ink: '#0B0B10', ring: '#B4AAFF', rimL: '#B3A3EE', rimR: '#D4E2EC', floor: '#8494A6', dust: '#DCD8FF' },
+  { id: 'night', name: 'Near-black', bg: '#060609', top: '#100F1A', glow: '#1C1A2E', surface: '#101016', line: '#24242E', text: '#F4F4F6', text2: '#9C9CA8', text3: '#868692', accent: '#F4F4F6', ink: '#0B0B10', ring: '#B4AAFF', rimL: '#9D8CFF', rimR: '#CFE3FF', floor: '#8A8A98', dust: '#DCD8FF' },
+  { id: 'plum', name: 'Midnight plum', bg: '#120A1C', top: '#221432', glow: '#36204D', surface: '#1C1229', line: '#33233F', text: '#F5F0FA', text2: '#B9A9C9', text3: '#9A8AAB', accent: '#D9C8F5', ink: '#1A0F26', ring: '#C9A2FF', rimL: '#B48CFF', rimR: '#E2CFFF', floor: '#9A86AE', dust: '#E6D8FF' },
+  { id: 'navy', name: 'Deep navy', bg: '#070D1F', top: '#0F1A36', glow: '#192B52', surface: '#0F182E', line: '#1F2C48', text: '#F1F4FB', text2: '#A3B0CC', text3: '#8593B0', accent: '#C9D8FF', ink: '#0A1430', ring: '#8FB4FF', rimL: '#7FA2FF', rimR: '#CFE0FF', floor: '#7E8DAE', dust: '#D4E0FF' },
+  { id: 'ink', name: 'Ink blue-black', bg: '#05080D', top: '#0C141D', glow: '#142231', surface: '#0D131B', line: '#1C2633', text: '#EEF2F6', text2: '#98A4B3', text3: '#7F8B9A', accent: '#BFD6EA', ink: '#08111B', ring: '#8CC8E8', rimL: '#7DB3D6', rimR: '#D3E6F2', floor: '#7D8A99', dust: '#D2E4F0' },
+  { id: 'forest', name: 'Dark forest', bg: '#06110C', top: '#0D221A', glow: '#15362A', surface: '#0D1D15', line: '#1B3226', text: '#EEF5F0', text2: '#9DB5A6', text3: '#80998A', accent: '#BFE3CF', ink: '#0A1A12', ring: '#8FD9B0', rimL: '#7CC9A0', rimR: '#D2EEDF', floor: '#7D9787', dust: '#D3EEDF' },
+  { id: 'wine', name: 'Aubergine wine', bg: '#16070F', top: '#280E1C', glow: '#3E162B', surface: '#22101A', line: '#3A1F2D', text: '#F9EFF3', text2: '#C4A3B3', text3: '#A68796', accent: '#F0C6D6', ink: '#250C18', ring: '#F29AC0', rimL: '#E08AB4', rimR: '#F6D3E2', floor: '#A68797', dust: '#F6D8E6' },
+  { id: 'velvet', name: 'Velvet plum', bg: '#0B0812', top: '#1A1028', glow: '#2D2146', surface: '#17141E', line: '#2A2241', text: '#F3EFFA', text2: '#A79DB8', text3: '#8B829A', accent: '#B79CFF', ink: '#0B0812', ring: '#A48BFF', rimL: '#A48BFF', rimR: '#C9B8FF', floor: '#908AB2', dust: '#E8E2FF' },
+  { id: 'mnavy', name: 'Midnight navy', bg: '#060A14', top: '#0F1A2E', glow: '#1C2D4B', surface: '#121620', line: '#1B2943', text: '#EEF3FB', text2: '#93A2BA', text3: '#7A879C', accent: '#7FB0FF', ink: '#060A14', ring: '#6FA3FF', rimL: '#6FA3FF', rimR: '#A9C8FF', floor: '#8390B2', dust: '#DBE8FF' },
+  { id: 'fnight', name: 'Forest night', bg: '#050C09', top: '#0E1F17', glow: '#19382A', surface: '#121815', line: '#173427', text: '#EDF5F0', text2: '#93AA9D', text3: '#798E82', accent: '#6FDDAE', ink: '#050C09', ring: '#5FD3A0', rimL: '#5FD3A0', rimR: '#B8E3CC', floor: '#7F9C9A', dust: '#D7F4E7' },
+  { id: 'cellar', name: 'Wine cellar', bg: '#0E0609', top: '#2A0E18', glow: '#431C28', surface: '#1A1215', line: '#381B23', text: '#F8EEF1', text2: '#B59AA2', text3: '#977F86', accent: '#EC8AA1', ink: '#0E0609', ring: '#E0718C', rimL: '#E0718C', rimR: '#F2C4CF', floor: '#A08495', dust: '#F7DCE2' },
+  { id: 'column', name: 'Light column', bg: '#04050C', top: '#121436', glow: '#232652', surface: '#111218', line: '#1F213D', text: '#F1F2FF', text2: '#9EA2C4', text3: '#8286A3', accent: '#9AA0FF', ink: '#04050C', ring: '#8C93FF', rimL: '#8C93FF', rimR: '#D6DAFF', floor: '#8A8CB2', dust: '#E2E4FF' },
+  { id: 'chrome', name: 'Graphite chrome', bg: '#050506', top: '#17171B', glow: '#303035', surface: '#121212', line: '#2C2D30', text: '#F5F5F7', text2: '#9D9DA6', text3: '#828289', accent: '#D9DDE8', ink: '#050506', ring: '#C8CCD8', rimL: '#C8CCD8', rimR: '#E8E8EE', floor: '#9A9AA8', dust: '#F1F2F5' },
+  { id: 'tealmon', name: 'Teal monitor', bg: '#04090B', top: '#0D1E22', glow: '#143839', surface: '#111517', line: '#103330', text: '#ECF7F6', text2: '#8FAEAB', text3: '#76908E', accent: '#4FE0CE', ink: '#04090B', ring: '#3FD9C6', rimL: '#3FD9C6', rimR: '#A8F0E6', floor: '#779EA4', dust: '#CFF6F1' },
+  { id: 'glacier', name: 'Glacier', bg: '#070A0E', top: '#1A2129', glow: '#2E3A46', surface: '#13161A', line: '#27323C', text: '#F2F6FA', text2: '#9AA6B3', text3: '#808A95', accent: '#B5DCF7', ink: '#070A0E', ring: '#A9D4F5', rimL: '#A9D4F5', rimR: '#E6F1FF', floor: '#929CAF', dust: '#EAF4FC' },
+  { id: 'ember', name: 'Ember cork', bg: '#0D0705', top: '#24130C', glow: '#3F2317', surface: '#191312', line: '#392116', text: '#FAF1EA', text2: '#B8A194', text3: '#99857A', accent: '#F0956A', ink: '#0D0705', ring: '#E8875A', rimL: '#E8875A', rimR: '#F5CDB6', floor: '#A28988', dust: '#F9E1D6' },
+  { id: 'dpetrol', name: 'Deep petrol', bg: '#03080C', top: '#0B2230', glow: '#113545', surface: '#101418', line: '#0E2832', text: '#EAF4F8', text2: '#8AA7B4', text3: '#728A96', accent: '#4DB8D8', ink: '#03080C', ring: '#38A7C9', rimL: '#38A7C9', rimR: '#9FD6E8', floor: '#7691A4', dust: '#CDE9F2' }
+];
+const TKEY = 'kalpi.look.theme2', themeSubs = [];
+let theme = THEMES[0];
+try { const saved = localStorage.getItem(TKEY), f = THEMES.find(t => t.id === saved); if (f) theme = f; } catch (e) {}
+function cssTheme(t) {
+  const r = document.documentElement.style;
+  [['bg', 'bg'], ['glow', 'glow'], ['surface', 'surface'], ['line', 'line'], ['text', 'text'], ['text-2', 'text2'], ['text-3', 'text3'], ['accent', 'accent'], ['ink', 'ink'], ['ring', 'ring']].forEach(([k, p]) => r.setProperty('--k-' + k, t[p]));
+}
+function setTheme(id) {
+  const t = THEMES.find(x => x.id === id) || THEMES[0]; theme = t; cssTheme(t); themeSubs.forEach(f => f(t, false));
+  document.querySelectorAll('.tsw').forEach(b => b.setAttribute('aria-checked', String(b.dataset.id === t.id))); document.querySelectorAll('.wt').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === t.id)));
+  try { localStorage.setItem(TKEY, t.id); } catch (e) {}
+}
+const hexLine = t => [t.bg, t.glow, t.ring, t.accent].join(' · ');
+function buildSwitchers() {
+  document.querySelectorAll('.bgrow .bdots').forEach(g => {
+    g.innerHTML = THEMES.map(t => '<button type="button" class="tsw" role="radio" data-id="' + t.id + '" aria-checked="' + (t.id === theme.id) + '" title="' + hexLine(t) + '">' +
+      '<i style="background:radial-gradient(circle at 50% 34%,' + t.glow + ',' + t.bg + ' 76%)"><b style="box-shadow:0 0 0 1.5px ' + t.ring + ',0 0 8px 1px ' + t.ring + '90"></b></i>' + t.name + '</button>').join('');
+    g.addEventListener('click', e => { const b = e.target.closest('.tsw'); if (b) setTheme(b.dataset.id); });
+  });
+  /* theme wall: real screenshots of the Keynote stage in each colour. Clicking one applies it to the live stage */
+  const wall = document.getElementById('wall');
+  if (wall) {
+    wall.innerHTML = THEMES.map(t => '<button type="button" class="wt" data-id="' + t.id + '" aria-current="' + (t.id === theme.id) + '"><img src="shots/theme-wall/' + t.id + '.jpg" alt="The Keynote stage in ' + t.name + '" loading="lazy" width="590" height="378"><span>' + t.name + '</span><small>' + hexLine(t) + '</small></button>').join('');
+    wall.addEventListener('click', e => { const b = e.target.closest('.wt'); if (!b) return; setTheme(b.dataset.id); document.getElementById('a').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); });
+  }
+}
+cssTheme(theme); buildSwitchers();
+
+/* =================== SHARED DARK STAGE KIT =================== */
+const VS_UV = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }';
+const NOISE = 'float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); } float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }';
+const HSV = 'vec3 rgb2hsv(vec3 c){ vec4 K = vec4(0., -1./3., 2./3., -1.); vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g)); vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r)); float d = q.x - min(q.w, q.y); float e = 1.0e-10; return vec3(abs(q.z + (q.w - q.y) / (6. * d + e)), d / (q.x + e), q.x); } vec3 hsv2rgb(vec3 c){ vec3 p = abs(fract(c.xxx + vec3(1., 2./3., 1./3.)) * 6. - 3.); return c.z * mix(vec3(1.), clamp(p - 1., 0., 1.), c.y); }';
+/* the signature ring: a thin white-hot core inside a soft halo in the theme's own hue */
+const RING_FS = 'uniform vec3 uC; uniform float uA; uniform float uR; uniform float uW; uniform float uFill; varying vec2 vUv; void main(){ float r = length(vUv - .5) * 2.; float band = exp(-pow((r - uR) / uW, 2.)); float core = exp(-pow((r - uR) / (uW * .22), 2.)); float fill = uFill * smoothstep(uR, 0., r) * .2; vec3 c = uC * (band + fill) + vec3(1.) * core * .5; gl_FragColor = vec4(c * uA, 1.); }';
+/* hue = the target hue for the pink parts (0 = keep the real pink). B is 287°, C is 212° */
+const VERS = [{ L: 'A', name: 'Pink', hue: 0, chip: '#E472A6' }, { L: 'B', name: 'Lilac', hue: .797, chip: '#B48AF0' }, { L: 'C', name: 'Sky', hue: .589, chip: '#7FB2EE' }];
+
+let MODEL_P = null;
+function modelData() {
+  if (MODEL_P) return MODEL_P;
+  const bin = Uint8Array.from(atob(window.KALPI_DATA.glb), c => c.charCodeAt(0)).buffer;
+  MODEL_P = new Promise((res, rej) => new THREE.GLTFLoader().parse(bin, '', res, rej)).then(g => {
+    let src = null; g.scene.traverse(o => { if (o.isMesh && !src) src = o; });
+    src.geometry.computeVertexNormals();
+    const map = src.material.map; map.encoding = THREE.sRGBEncoding; map.anisotropy = 4;
+    const box = new THREE.Box3().setFromObject(g.scene);
+    return { scene: g.scene, map, box, size: box.getSize(new THREE.Vector3()), ctr: box.getCenter(new THREE.Vector3()) };
+  });
+  return MODEL_P;
+}
+let PHOTO_P = null;
+const photoImg = () => PHOTO_P || (PHOTO_P = loadImg(window.KALPI_DATA.img['unicorn-photo']));
+
+function kStage(stageEl, opt) {
+  opt = opt || {};
+  const cv = stageEl.querySelector('canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.NoToneMapping; /* colour fix: ACES washed the pinks out */
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(opt.fov || 26, 1, .1, 60);
+  const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new THREE.RoomEnvironment(), .04).texture; pm.dispose();
+  const C = { bg: new THREE.Color(), top: new THREE.Color(), glow: new THREE.Color(), ring: new THREE.Color(), rimL: new THREE.Color(), rimR: new THREE.Color(), floor: new THREE.Color(), dust: new THREE.Color(), cone: new THREE.Color() };
+  scene.fog = new THREE.Fog(0, 8, 18); scene.fog.color = C.bg;
+
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(40, 18), new THREE.ShaderMaterial({ fog: false, uniforms: { uI: { value: 1 }, uBg: { value: C.bg }, uTop: { value: C.top }, uGlow: { value: C.glow } }, vertexShader: VS_UV,
+    fragmentShader: 'uniform float uI; uniform vec3 uBg; uniform vec3 uTop; uniform vec3 uGlow; varying vec2 vUv; void main(){ vec2 d = (vUv - vec2(.5,.42)) * vec2(2.2,1.); float g = exp(-dot(d,d)*8.) * smoothstep(.27, .4, vUv.y); vec3 base = mix(uBg, uTop, smoothstep(.28, .62, vUv.y)); gl_FragColor = vec4(mix(base, uGlow, g * uI), 1.); }' }));
+  back.position.set(0, 4, -7); scene.add(back);
+
+  const floorGeo = new THREE.PlaneGeometry(40, 40); let mirror = null;
+  if (THREE.Reflector) { mirror = new THREE.Reflector(floorGeo, { textureWidth: 512, textureHeight: 512, color: 0x8a8a98, clipBias: .003 }); mirror.rotation.x = -Math.PI / 2; mirror.material.uniforms.color.value = C.floor; scene.add(mirror); }
+  const veil = new THREE.Mesh(floorGeo, new THREE.ShaderMaterial({ transparent: true, depthWrite: false, fog: false, uniforms: { uPool: { value: 1 }, uCol: { value: C.bg }, uGlow: { value: C.glow } },
+    vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform float uPool; uniform vec3 uCol; uniform vec3 uGlow; varying vec3 vW; void main(){ float d = length(vW.xz*vec2(.8,1.1)); float a = mix(.66, 1., smoothstep(.4, 4.2, d)); vec3 pool = uGlow * 1.6 * uPool * exp(-d*d*.55); gl_FragColor = vec4(uCol + pool, a); }' }));
+  veil.rotation.x = -Math.PI / 2; veil.position.y = .002; veil.renderOrder = -1; scene.add(veil);
+  const hideInMirror = [veil];
+  if (mirror) { const ob = mirror.onBeforeRender; mirror.onBeforeRender = function () { hideInMirror.forEach(o => { o.userData.wasVis = o.visible; o.visible = false; }); ob.apply(this, arguments); hideInMirror.forEach(o => { o.visible = o.userData.wasVis; }); }; }
+
+  const key = new THREE.SpotLight(0xf7f6f8, 2.3, 0, .5, .85, 1); key.position.set(.4, 5.6, 2.8); key.target.position.set(0, .6, 0); scene.add(key, key.target);
+  const rimL = new THREE.DirectionalLight(0xffffff, 1.25); rimL.color = C.rimL; rimL.position.set(-3, 2.4, -2.6); scene.add(rimL);
+  const rimR = new THREE.DirectionalLight(0xffffff, .9); rimR.color = C.rimR; rimR.position.set(3.2, 2, -2.2); scene.add(rimR);
+  const fill = new THREE.HemisphereLight(0xe9e9eb, 0x08080a, .18); scene.add(fill);
+  const sweep = new THREE.PointLight(0xffffff, 0, 6, 2); sweep.position.set(-3, 1.1, 1.4); scene.add(sweep);
+
+  const coneH = 5.4, coneMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false, uniforms: { uI: { value: 1 }, uC: { value: C.cone } },
+    vertexShader: 'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ vY = position.y/' + coneH.toFixed(1) + ' + .5; vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform float uI; uniform vec3 uC; varying float vY; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(abs(dot(vN, vV)), 2.2); float a = uI * .085 * f * smoothstep(0., .55, vY) * (1. - smoothstep(.85, 1., vY)); gl_FragColor = vec4(uC*a, 1.); }' });
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(opt.coneR || 1.45, coneH, 64, 1, true), coneMat); cone.position.set(.08, coneH / 2, .55); cone.rotation.z = -.03; scene.add(cone);
+
+  const dustTex = softSprite('rgba(255,255,255,1)', 'rgba(255,255,255,0)');
+  function dust(n, spread, size, op, near) {
+    const g = new THREE.BufferGeometry(), p = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * spread; p[i * 3] = Math.cos(a) * r; p[i * 3 + 1] = Math.random() * 4; p[i * 3 + 2] = Math.sin(a) * r * .7 + (near ? 2.6 : .4); }
+    g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+    const m = new THREE.PointsMaterial({ map: dustTex, size, transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }); m.color = C.dust;
+    const pts = new THREE.Points(g, m); pts.userData.op = op; scene.add(pts); return pts;
+  }
+  const motes = dust(opt.motes || 220, opt.dustSpread || 1.3, .022, .55, false), bokeh = dust(14, 1.6, .32, .07, true);
+  const shadowTex = softSprite('rgba(0,0,0,0.9)', 'rgba(0,0,0,0)');
+
+  const S = { renderer, scene, cam, C, mirror, hideInMirror, key, rimL, rimR, sweep, el: stageEl, cv, W: 1, H: 1, mouse: { x: 0, y: 0, sx: 0, sy: 0 }, onResize: null, rings: [] };
+  S.light = li => { key.intensity = 2.3 * li * .75; rimL.intensity = 1.25 * li * .6; rimR.intensity = .9 * li * .6; fill.intensity = .18 * li; coneMat.uniforms.uI.value = li; back.material.uniforms.uI.value = li; veil.material.uniforms.uPool.value = li; motes.material.opacity = motes.userData.op * li; bokeh.material.opacity = bokeh.userData.op * li; };
+  S.ring = (size, R, W, fill) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+      uniforms: { uC: { value: C.ring }, uA: { value: 0 }, uR: { value: R || .72 }, uW: { value: W || .1 }, uFill: { value: fill || 0 } }, vertexShader: VS_UV, fragmentShader: RING_FS }));
+    m.rotation.x = -Math.PI / 2; m.renderOrder = 3; scene.add(m); hideInMirror.push(m); return m;
+  };
+  S.shadow = (w, d) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: .75, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.y = .006; m.renderOrder = 2; scene.add(m); hideInMirror.push(m); return m; };
+  const vf = () => THREE.MathUtils.degToRad(cam.fov / 2);
+  S.fitDist = (hw, hh, extra) => { const hf = Math.atan(Math.tan(vf()) * cam.aspect); return Math.max(hw / Math.tan(hf), hh / Math.tan(vf())) + (extra == null ? .4 : extra); };
+  const tmp = new THREE.Vector3();
+  S.place = (el, x, y, z, op) => { tmp.set(x, y, z).project(cam); el.style.transform = 'translate(' + ((tmp.x * .5 + .5) * S.W).toFixed(1) + 'px,' + ((-tmp.y * .5 + .5) * S.H).toFixed(1) + 'px) translate(-50%,0)'; if (op != null) el.style.opacity = op; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  S.pick = (e, objs) => { const r = cv.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, cam); const h = ray.intersectObjects(objs, true); return h.length ? h[0].object.userData.v : -1; };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); S.mouse.x = ((e.clientX - r.left) / r.width - .5) * 2; S.mouse.y = ((e.clientY - r.top) / r.height - .5) * 2; });
+  cv.addEventListener('pointerleave', () => { S.mouse.x = S.mouse.y = 0; });
+
+  /* theme cross-fade: every environment colour eases to the new theme in 0.9s */
+  /* base = the theme's colours (cross-faded); C = what the scene uses: base plus the selected version's tint on the ring and rims */
+  const base = {}, from = {}, to = {}; let tk = 1;
+  for (const k in C) base[k] = new THREE.Color();
+  function themeTo(t, instant) {
+    const tg = { bg: t.bg, top: t.top || t.bg, glow: t.glow, ring: t.ring, rimL: t.rimL, rimR: t.rimR, floor: t.floor, dust: t.dust };
+    for (const k in tg) { from[k] = base[k].clone(); to[k] = new THREE.Color(tg[k]); }
+    from.cone = base.cone.clone(); to.cone = new THREE.Color(0xffffff).lerp(to.ring, .35);
+    if (instant || reduce) { for (const k in to) base[k].copy(to[k]); tk = 1; } else tk = 0;
+    derive();
+  }
+  const VCOL = ['#F07FB0', '#B58CF5', '#7FB8F0'].map(h => new THREE.Color(h)), vc = new THREE.Color(), vcTo = new THREE.Color(); let vk = 0, vkTo = 0;
+  S.version = i => { if (i >= 0) { vcTo.copy(VCOL[i]); if (vk < .01) vc.copy(vcTo); vkTo = 1; } else vkTo = 0; };
+  function derive() {
+    for (const k in base) C[k].copy(base[k]);
+    if (vk > .001) { C.ring.lerp(vc, vk); C.rimL.lerp(vc, .35 * vk); C.rimR.lerp(vc, .2 * vk); C.cone.lerp(vc, .15 * vk); }
+  }
+  themeTo(theme, true); themeSubs.push(themeTo);
+
+  function resize() {
+    S.W = Math.max(1, stageEl.clientWidth); S.H = Math.max(1, stageEl.clientHeight); renderer.setSize(S.W, S.H, false); cam.aspect = S.W / S.H; cam.updateProjectionMatrix();
+    if (mirror) mirror.getRenderTarget().setSize(Math.min(1024, S.W * renderer.getPixelRatio() * .5), Math.min(1024, S.H * renderer.getPixelRatio() * .5));
+    if (S.onResize) S.onResize();
+  }
+  new ResizeObserver(resize).observe(stageEl); resize();
+
+  /* render only while this stage is on screen and the tab is visible */
+  let visible = false, running = false, last = 0, upd = null;
+  function loop() {
+    if (running || !upd || !visible) return; running = true; last = 0;
+    const f = now => {
+      if (!visible || document.hidden) { running = false; return; }
+      const raw = last ? (now - last) / 1000 : .016, dt = Math.min(.05, raw); last = now;
+      if (tk < 1) { tk = Math.min(1, tk + raw / .9); const e = ease(tk); for (const k in to) base[k].copy(from[k]).lerp(to[k], e); }
+      vk += (vkTo - vk) * Math.min(1, dt * 3); vc.lerp(vcTo, Math.min(1, dt * 3)); derive();
+      renderer.setClearColor(C.bg, 1);
+      const m = S.mouse; m.sx += (m.x - m.sx) * Math.min(1, dt * 2.2); m.sy += (m.y - m.sy) * Math.min(1, dt * 2.2);
+      motes.rotation.y = now / 1000 * .02; bokeh.position.x = Math.sin(now / 10000) * .3;
+      upd(dt, now / 1000, raw); renderer.render(scene, cam); requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f);
+  }
+  whenVisible(stageEl, v => { visible = v; if (v) loop(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
+  S.start = fn => { upd = fn; loop(); };
+  return S;
+}
+
+/* the real 3D model Kalpi made. Hue shifts only make the colour versions (A, B, C); themes never touch it */
+function makeProduct(S, M, h, idx) {
+  const u = { uScan: { value: 99 }, uDir: { value: new THREE.Vector3(0, 1, 0) }, uHue: { value: 0 }, uHue2: { value: 0 }, uAmt: { value: 1 }, uMorph: { value: -99 }, uMG: { value: 0 }, uGlow: { value: 0 }, uLift: { value: 0 }, uGlowC: { value: S.C.ring } };
+  const m = new THREE.MeshStandardMaterial({ map: M.map, roughness: .6, metalness: 0, envMapIntensity: .25 });
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, u);
+    sh.vertexShader = 'varying vec3 vWP;\n' + sh.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n vWP = (modelMatrix * vec4(transformed, 1.)).xyz;');
+    sh.fragmentShader = 'uniform float uScan; uniform vec3 uDir; uniform float uHue; uniform float uHue2; uniform float uAmt; uniform float uMorph; uniform float uMG; uniform float uGlow; uniform float uLift; uniform vec3 uGlowC; varying vec3 vWP;\n' + HSV + '\n' + sh.fragmentShader
+      .replace('void main() {', 'void main() {\n float sd = dot(vWP, uDir); if (sd > uScan) discard;')
+      .replace('#include <map_fragment>', '#include <map_fragment>\n { float hh = vWP.y < uMorph ? uHue2 : uHue; float am = (vWP.y < uMorph ? 1. : uAmt) * step(.001, hh); vec3 sc = pow(max(diffuseColor.rgb, 0.), vec3(1./2.2)); vec3 hsv = rgb2hsv(sc); float d = abs(fract(hsv.x - .94 + .5) - .5); float pink = smoothstep(.10, .05, d) * smoothstep(.20, .32, hsv.y); sc = mix(sc, hsv2rgb(vec3(hh, hsv.y, hsv.z)), pink * am); diffuseColor.rgb = pow(sc, vec3(2.2)); }')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n { float g = uGlow * smoothstep(.07, 0., uScan - sd) + uMG * smoothstep(.05, 0., abs(uMorph - vWP.y)); totalEmissiveRadiance += uGlowC * g * 2.2 + vec3(.05) * uLift; }');
+  };
+  const s = h / M.size.y, inner = M.scene.clone(true);
+  inner.traverse(o => { if (o.isMesh) { o.material = m; o.userData.v = idx; } });
+  inner.position.set(-M.ctr.x * s, -M.box.min.y * s, -M.ctr.z * s); inner.scale.setScalar(s);
+  const g = new THREE.Group(); g.add(inner); S.scene.add(g);
+  return { g, inner, m, u, lift: 0, dim: 1 };
+}
+const setDim = (p, d, dt) => { p.dim += (d - p.dim) * Math.min(1, dt * 6); p.m.color.setScalar(p.dim); };
+
+/* the seller's photo, whole, on a white mount (never cropped). It can dissolve along a scan line */
+function makePhoto(S, img, h) {
+  const t = mountTexture(img, .035, '#f3f2f7', 10), w = h * t.aspect;
+  const u = { map: { value: t.tex }, uScan: { value: -99 }, uDir: { value: new THREE.Vector3(0, 1, 0) }, uA: { value: 1 }, uSweep: { value: -1 }, uGC: { value: S.C.ring } };
+  const m = new THREE.ShaderMaterial({ uniforms: u, transparent: true, side: THREE.DoubleSide,
+    vertexShader: 'varying vec2 vUv; varying vec3 vWP; void main(){ vUv = uv; vec4 w = modelMatrix * vec4(position,1.); vWP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform sampler2D map; uniform float uScan; uniform vec3 uDir; uniform float uA; uniform float uSweep; uniform vec3 uGC; varying vec2 vUv; varying vec3 vWP;\n' + NOISE + '\nvoid main(){ float n = vnoise(vUv*vec2(26.,32.))*.09; float e = dot(vWP, uDir) - uScan + n; if (e < 0.) discard; vec4 c = texture2D(map, vUv); c.rgb *= .88; float band = exp(-pow((vUv.x*.6 + vUv.y*.4 - uSweep)*6., 2.)); c.rgb += band * .26; float g = smoothstep(.07, 0., e); c.rgb = mix(c.rgb, uGC*1.5 + .15, g*.85); gl_FragColor = vec4(c.rgb, c.a * uA); }' });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); mesh.userData.u = u; mesh.userData.h = h; mesh.userData.w = w; S.scene.add(mesh); return mesh;
+}
+
+function guard(root, fn) {
+  if (!window.THREE || !THREE.GLTFLoader || !window.KALPI_DATA || !glOK()) { root.classList.add('nogl'); return; }
+  try { fn(); } catch (e) { console.warn(e); root.classList.add('nogl'); }
+}
+const fail = root => err => { console.warn('stage fallback:', err); root.classList.add('nogl'); };
+
+/* =================== OPTION A · KEYNOTE =================== */
+function keynote() {
+  const root = document.getElementById('mkA'), stage = root.querySelector('.a-stage'), cv = stage.querySelector('canvas');
+  const cap = stage.querySelector('.a-cap span'), labs = [...stage.querySelectorAll('.a-lab')], hint = stage.querySelector('.a-hint'), replay = stage.querySelector('.a-replay');
+  const S = kStage(stage), cam = S.cam;
+  const scanRing = S.ring(1.5, .62, .1, 1);
+  let finalDist = 7; S.onResize = () => { finalDist = S.fitDist(1.68, 1.0); S.scene.fog.near = finalDist + .8; S.scene.fog.far = finalDist + 9; };
+  S.onResize();
+  Promise.all([modelData(), photoImg()]).then(([M, img]) => {
+    const V = VERS.map((ver, i) => { const p = makeProduct(S, M, 1.38, i); p.sh = S.shadow(1.1, .7); p.fr = S.ring(1.35, .72, .09, 1); p.fr.position.y = .008; p.g.visible = i === 0; return p; });
+    const photo = makePhoto(S, img, 1.5); photo.position.set(0, .77, .32);
+    const END = 10.6, caps = [[0, 'A photo you found.'], [3.1, 'Kalpi builds it in 3D.'], [7.2, 'Then makes versions to compare.'], [9.8, 'Ask people which one they would buy.']];
+    let t = reduce ? END : 0, capI = -1, sel = 0, hover = -1, focus = -1, focusK = 0, drag = null, spinAll = 0, spinVel = 0;
+    const P = (a, b) => clamp((t - a) / (b - a), 0, 1);
+    const setCap = i => { if (i === capI) return; const first = capI < 0; capI = i; if (first) { cap.textContent = caps[i][1]; return; } cap.classList.add('out'); setTimeout(() => { cap.textContent = caps[i][1]; cap.classList.remove('out'); }, 380); };
+    replay.onclick = () => { focus = -1; spinAll = 0; spinVel = 0; t = 0; hint.classList.remove('on'); };
+    const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(), curTgt = new THREE.Vector3(0, .7, 0);
+    S.start((dt, time, raw) => {
+      if (t < END) t = Math.min(END, t + Math.min(.1, raw));
+      S.light(ease(P(0, 1.6)));
+      const pin = ease(P(.3, 1.8)), turn = ease(P(.3, 2.8));
+      photo.userData.u.uA.value = pin; photo.rotation.y = -.42 * (1 - turn); photo.position.y = .77 + .1 * (1 - pin);
+      photo.userData.u.uSweep.value = lerp(-.4, 1.5, ease(P(1.7, 3.0)));
+      const sc = ease(P(3.1, 5.4)), SCAN = t < 3.1 ? -.2 : lerp(-.05, 1.62, sc), scanOn = Math.sin(Math.PI * clamp(sc * 1.04, 0, 1));
+      photo.userData.u.uScan.value = SCAN; photo.visible = sc < 1;
+      scanRing.position.y = Math.max(.01, SCAN); scanRing.material.uniforms.uA.value = scanOn; scanRing.scale.setScalar(1 + .05 * Math.sin(time * 6));
+      const tr = ease(P(5.0, 7.6)); S.sweep.intensity = 2.4 * Math.sin(Math.PI * tr); S.sweep.position.x = lerp(-2.6, 2.6, tr);
+      const sp = ease(P(7.2, 9.4)), slots = [[0, 0], [-1.18, -.42], [1.18, -.42]];
+      V.forEach((v, i) => {
+        v.g.visible = i === 0 || sp > 0;
+        const arc = Math.sin(Math.PI * sp) * .38, x = slots[i][0] * sp, z = slots[i][1] * sp - (i ? arc : 0) + (i === 0 ? .18 * sp : 0);
+        const target = (hover === i && t >= END ? 1 : 0) + (focus === i ? .5 : 0); v.lift += (target - v.lift) * Math.min(1, dt * 7);
+        v.g.position.set(x, .07 * v.lift, z);
+        v.g.rotation.y = -.25 + 2 * Math.PI * tr + (i === 1 ? .35 : i === 2 ? -.35 : 0) * sp + (t >= END ? Math.sin(time * .45 + i * 1.7) * .32 : 0) + spinAll;
+        v.u.uScan.value = t < 3.1 ? -1 : SCAN; v.u.uHue.value = VERS[i].hue; v.u.uAmt.value = ease(clamp((sp - .25) / .75, 0, 1)); v.u.uGlow.value = 1 - P(5.2, 5.8); v.u.uLift.value = v.lift;
+        setDim(v, focus >= 0 && focus !== i ? .35 : 1, dt);
+        v.sh.position.set(x, .006, z); v.sh.material.opacity = (t < 3.1 ? 0 : .75 * clamp(sc * 1.5, 0, 1)) * (1 - .35 * v.lift) * (i === 0 || sp > .02 ? 1 : 0);
+        v.fr.position.set(x, .008, z); v.fr.material.uniforms.uA.value = Math.min(1, Math.max(v.lift, focus === i ? 1 : 0, i === sel ? .75 * ease(P(9.2, 10.4)) : 0)) * .9;
+      });
+      const cs = ease(P(6.8, 9.8)), fd = finalDist, startD = Math.max(5.8, fd * .8);
+      focusK += ((focus >= 0 ? 1 : 0) - focusK) * Math.min(1, dt * 3);
+      const d = lerp(lerp(startD, fd, cs), Math.max(3.2, fd * .55), focusK);
+      camTgt.set(0, lerp(.74, .7, cs), 0);
+      if (focus >= 0) { camTgt.x = lerp(0, V[focus].g.position.x, focusK); camTgt.z = lerp(0, V[focus].g.position.z, focusK); }
+      camPos.set(camTgt.x + S.mouse.sx * .55 + Math.sin(time * .17) * .06, lerp(.95, 1.25, cs) - S.mouse.sy * .25, camTgt.z + d);
+      cam.position.lerp(camPos, t < .05 ? 1 : Math.min(1, dt * 4)); curTgt.lerp(camTgt, Math.min(1, dt * 4)); cam.lookAt(curTgt);
+      let ci = 0; caps.forEach((c, i) => { if (t >= c[0]) ci = i; }); setCap(ci);
+      const lo = ease(P(8.9, 9.9));
+      labs.forEach((el, i) => { const v = V[i]; S.place(el, v.g.position.x, -.16, v.g.position.z, lo * (focus >= 0 && focus !== i ? .35 : 1)); el.classList.toggle('on', hover === i || focus === i); });
+      S.version(t > 9.2 ? (focus >= 0 ? focus : sel) : -1);
+      if (t >= END) hint.classList.add('on');
+      if (!drag) { spinAll += spinVel * dt; spinVel *= Math.pow(.04, dt); }
+    });
+    const objs = V.map(v => v.inner);
+    cv.addEventListener('pointermove', e => {
+      if (drag) { const dx = e.clientX - drag.x; drag.moved += Math.abs(dx); spinVel = dx * .35; spinAll += dx * .008; drag.x = e.clientX; return; }
+      if (t >= END && e.pointerType === 'mouse') { hover = S.pick(e, objs); cv.style.cursor = hover >= 0 ? 'pointer' : 'grab'; } });
+    cv.addEventListener('pointerleave', () => { hover = -1; });
+    cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, moved: 0 }; });
+    addEventListener('pointerup', e => { if (!drag) return; const moved = drag.moved; drag = null; if (moved < 6 && t >= END && e.target === cv) { const v = S.pick(e, objs); focus = v === focus ? -1 : v; if (v >= 0) sel = v; } });
+    addEventListener('keydown', e => { if (e.key === 'Escape') focus = -1; });
+  }).catch(fail(root));
+}
+
+/* simple drag-to-turn used by several variations */
+function dragSpin(cv) {
+  const st = { spin: 0, vel: 0, drag: null, moved: 0 };
+  cv.addEventListener('pointerdown', e => { st.drag = e.clientX; st.moved = 0; });
+  cv.addEventListener('pointermove', e => { if (st.drag == null) return; const dx = e.clientX - st.drag; st.drag = e.clientX; st.moved += Math.abs(dx); st.spin += dx * .008; st.vel = dx * .35; });
+  addEventListener('pointerup', () => { st.drag = null; });
+  st.step = dt => { if (st.drag == null) { st.spin += st.vel * dt; st.vel *= Math.pow(.04, dt); } };
+  return st;
+}
+
+/* =================== A2 · SOLO SPOTLIGHT =================== */
+function vSolo() {
+  const root = document.getElementById('mkA2'), stage = root.querySelector('.a-stage'), cap = stage.querySelector('.a-cap span'), chips = [...root.querySelectorAll('.v-chip')];
+  const S = kStage(stage, { fov: 24, coneR: 1.2 }), cam = S.cam;
+  let d = 6; S.onResize = () => { d = S.fitDist(.8, 1.22, .3); }; S.onResize();
+  modelData().then(M => {
+    const p = makeProduct(S, M, 1.62, 0), sh = S.shadow(1.3, .85), floorRing = S.ring(1.7, .72, .08, 1), morphRing = S.ring(1.15, .72, .09, 0);
+    floorRing.position.y = .008;
+    const spin = dragSpin(S.cv);
+    let cur = 0, mt = 1, fromH = 0, toH = 0; S.version(0);
+    chips.forEach((c, i) => c.onclick = () => { if (i === cur && mt >= 1) return; fromH = VERS[cur].hue; toH = VERS[i].hue; cur = i; S.version(i); mt = reduce ? 1 : 0; chips.forEach((x, j) => x.setAttribute('aria-pressed', String(j === i))); cap.textContent = 'Version ' + VERS[i].L + ' · ' + VERS[i].name; });
+    S.start((dt, time) => {
+      S.light(1); spin.step(dt);
+      mt = Math.min(1, mt + dt / 1.5); const e = ease(mt), y = lerp(-.05, 1.75, e);
+      p.u.uHue.value = fromH; p.u.uHue2.value = toH; p.u.uMorph.value = mt < 1 ? y : 99; p.u.uMG.value = mt < 1 ? 1 : 0;
+      morphRing.position.y = y; morphRing.material.uniforms.uA.value = mt < 1 ? Math.sin(Math.PI * e) : 0;
+      p.g.rotation.y = Math.sin(time * .35) * .5 + spin.spin;
+      floorRing.material.uniforms.uA.value = .55 + .12 * Math.sin(time * 1.6);
+      cam.position.set(S.mouse.sx * .35, 1.0 - S.mouse.sy * .18, d); cam.lookAt(0, .82, 0);
+    });
+  }).catch(fail(root));
+}
+
+/* =================== A3 · CAROUSEL =================== */
+function vCarousel() {
+  const root = document.getElementById('mkA3'), stage = root.querySelector('.a-stage'), cap = stage.querySelector('.a-cap span');
+  const S = kStage(stage, { coneR: 1.9 }), cam = S.cam;
+  let d = 8; S.onResize = () => { d = S.fitDist(1.75, 1.3, .3); S.scene.fog.near = d + 1; S.scene.fog.far = d + 9; }; S.onResize();
+  modelData().then(M => {
+    const R = .9, tt = new THREE.Group(); S.scene.add(tt);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.42, 1.47, .07, 96), new THREE.MeshStandardMaterial({ color: 0x0d0d11, metalness: .75, roughness: .3, envMapIntensity: .8 }));
+    disc.position.y = .035; S.scene.add(disc);
+    const front = S.ring(1.2, .72, .09, 1); front.position.set(0, .075, R);
+    const V = VERS.map((ver, i) => { const p = makeProduct(S, M, 1.45, i); p.u.uHue.value = ver.hue; const a = i / 3 * Math.PI * 2; p.a = a; tt.add(p.g); p.g.position.set(Math.sin(a) * R, .07, Math.cos(a) * R); p.g.rotation.y = a; return p; });
+    let rot = 0, target = null, hold = 0, frontI = 0;
+    const objs = V.map(v => v.inner);
+    S.cv.addEventListener('click', e => { const i = S.pick(e, objs); if (i < 0) return; const want = -V[i].a; let diff = Math.atan2(Math.sin(want - rot), Math.cos(want - rot)); target = rot + diff; hold = 5; });
+    S.cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') S.cv.style.cursor = S.pick(e, objs) >= 0 ? 'pointer' : 'default'; });
+    S.start((dt, time) => {
+      S.light(1);
+      if (target != null) { rot += (target - rot) * Math.min(1, dt * 3.2); if (Math.abs(target - rot) < .002) { rot = target; target = null; } }
+      else if (hold > 0) hold -= dt; else if (!reduce) rot += dt * .16;
+      tt.rotation.y = rot;
+      let best = -2; V.forEach((v, i) => { const c = Math.cos(v.a + rot); if (c > best) { best = c; frontI = i; } setDim(v, .55 + .45 * Math.max(0, c), dt); });
+      front.material.uniforms.uA.value = Math.pow(Math.max(0, best), 40) * .95;
+      cap.textContent = VERS[frontI].L + ' · ' + VERS[frontI].name + ' is in front'; S.version(frontI);
+      cam.position.set(S.mouse.sx * .5, 1.75 - S.mouse.sy * .25, d); cam.lookAt(0, .72, 0);
+    });
+  }).catch(fail(root));
+}
+
+/* =================== A4 · SPLIT =================== */
+function vSplit() {
+  const root = document.getElementById('mkA4'), stage = root.querySelector('.a-stage'), labs = [...stage.querySelectorAll('.a-lab')];
+  const S = kStage(stage, { coneR: 2.1 }), cam = S.cam;
+  let d = 8, xo = .95; S.onResize = () => { xo = S.cam.aspect < .9 ? .62 : .95; d = S.fitDist(xo + .62, 1.0); S.scene.fog.near = d + 1; S.scene.fog.far = d + 9; }; S.onResize();
+  Promise.all([modelData(), photoImg()]).then(([M, img]) => {
+    const photo = makePhoto(S, img, 1.4), p = makeProduct(S, M, 1.3, 0), sh = S.shadow(1.0, .65);
+    p.u.uDir.value.set(1, 0, 0); p.u.uGlow.value = 1;
+    const ring = S.ring(1.9, .74, .06, 0); ring.rotation.set(0, Math.PI / 2 - .5, 0);
+    const spin = dragSpin(S.cv), CYC = 8.5; S.version(0);
+    S.start((dt, time) => {
+      S.light(1); spin.step(dt);
+      const s = cam.aspect < .9 ? .72 : 1;
+      photo.scale.setScalar(s); photo.position.set(-xo, .72 * s, 0); p.g.scale.setScalar(s); p.g.position.set(xo, 0, 0); sh.position.set(xo, .006, 0); sh.scale.setScalar(s);
+      const tc = reduce ? 5 : time % CYC, k = ease(clamp((tc - .5) / 3.2, 0, 1));
+      const x0 = -xo - .55 * s, x1 = xo + .5 * s, rx = lerp(x0, x1, k);
+      let scan = rx; if (tc > 7.4) scan = lerp(x1, xo - .4 * s, ease(clamp((tc - 7.4) / 1, 0, 1)));
+      p.u.uScan.value = tc < .5 ? -99 : scan;
+      ring.position.set(rx, .72 * s, 0); ring.scale.setScalar(s); ring.material.uniforms.uA.value = tc > .5 && tc < 3.8 ? Math.sin(Math.PI * k) : 0;
+      photo.userData.u.uSweep.value = lerp(-.3, 1.5, clamp((rx - (-xo - .5 * s)) / (1.0 * s), 0, 1));
+      sh.material.opacity = .7 * clamp((scan - xo + .3) / .5, 0, 1);
+      p.g.rotation.y = Math.sin(time * .4) * .45 + spin.spin; photo.rotation.y = .12 + S.mouse.sx * .05;
+      cam.position.set(S.mouse.sx * .4, 1.05 - S.mouse.sy * .2, d); cam.lookAt(0, .7 * s, 0);
+      S.place(labs[0], -xo, -.12, 0); S.place(labs[1], xo, -.12, 0);
+    });
+  }).catch(fail(root));
+}
+
+/* =================== A5 · SCROLL STORY =================== */
+function vStory() {
+  const root = document.getElementById('mkA5'), track = root.querySelector('.a5-track'), sticky = root.querySelector('.a5-sticky'), stage = root.querySelector('.a-stage');
+  const cap = stage.querySelector('.a-cap span'), labs = [...stage.querySelectorAll('.a-lab')], pcts = [...stage.querySelectorAll('.a-pct')], dots = [...root.querySelectorAll('.a5-dots i')];
+  const S = kStage(stage), cam = S.cam;
+  let fd = 7; S.onResize = () => { fd = S.fitDist(1.95, 1.05); S.scene.fog.near = fd + .8; S.scene.fog.far = fd + 9; }; S.onResize();
+  const steps = [[0, 'Your photo.'], [.17, 'Kalpi builds it in 3D.'], [.34, 'Change one part: the colour.'], [.5, 'Three versions, side by side.'], [.66, 'People vote. (Sample numbers.)'], [.83, 'C, Sky, wins. Now ask a maker for a price.']];
+  const votes = [31, 23, 46];
+  Promise.all([modelData(), photoImg()]).then(([M, img]) => {
+    const photo = makePhoto(S, img, 1.5); photo.position.set(0, .77, .32);
+    const order = [1, 0, 2]; /* centre is B after the paint step, left A, right C */
+    const V = [0, 1, 2].map(i => { const p = makeProduct(S, M, 1.38, i); p.sh = S.shadow(1.1, .7); return p; });
+    const scanRing = S.ring(1.5, .62, .1, 1), paintRing = S.ring(1.0, .72, .09, 0), winRing = S.ring(1.5, .72, .08, 1); winRing.position.y = .008;
+    const barMat = () => new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, uniforms: { uC: { value: S.C.ring }, uA: { value: 0 } }, vertexShader: VS_UV,
+      fragmentShader: 'uniform vec3 uC; uniform float uA; varying vec2 vUv; void main(){ float x = exp(-pow((vUv.x - .5) * 5., 2.)); float top = smoothstep(1., .9, vUv.y) + exp(-pow((vUv.y - .97) * 30., 2.)) * 1.5; gl_FragColor = vec4((uC * x * (.35 + .65 * vUv.y) + vec3(1.) * x * exp(-pow((vUv.y - .985) * 60., 2.)) * .6) * uA, 1.); }' });
+    const bars = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.PlaneGeometry(.16, 1), barMat()); S.scene.add(m); return m; });
+    let p = 0, ps = 0;
+    const measure = () => { const r = track.getBoundingClientRect(), h = track.offsetHeight - sticky.offsetHeight; p = clamp((56 - r.top) / Math.max(1, h), 0, 1); };
+    addEventListener('scroll', measure, { passive: true }); measure();
+    const camPos = new THREE.Vector3(), camTgt = new THREE.Vector3(0, .74, 0), cur = new THREE.Vector3(0, .74, 0);
+    const R = (a, b) => ease(clamp((ps - a) / (b - a), 0, 1));
+    S.start((dt, time) => {
+      ps += (p - ps) * Math.min(1, dt * 5); S.light(1);
+      let si = 0; steps.forEach((s, i) => { if (ps >= s[0]) si = i; }); if (cap.dataset.i !== String(si)) { cap.dataset.i = si; cap.textContent = steps[si][1]; dots.forEach((d, i) => d.classList.toggle('on', i <= si)); }
+      const sc = R(.15, .32), SCAN = ps < .15 ? -1 : lerp(-.05, 1.62, sc);
+      photo.userData.u.uScan.value = ps < .15 ? -99 : SCAN; photo.visible = sc < 1; photo.userData.u.uSweep.value = lerp(-.4, 1.5, R(.04, .15));
+      scanRing.position.y = Math.max(.01, SCAN); scanRing.material.uniforms.uA.value = Math.sin(Math.PI * clamp(sc * 1.04, 0, 1));
+      const paint = R(.36, .48), py = lerp(-.05, 1.7, paint);
+      const sp = R(.5, .64), slots = [[0, .18], [-1.18, -.42], [1.18, -.42]], vt = R(.66, .8), win = R(.84, .97);
+      V.forEach((v, i) => {
+        const vi = order[i]; v.g.visible = i === 0 || sp > 0;
+        v.g.position.set(slots[i][0] * sp, 0, i === 0 ? slots[0][1] * sp : slots[i][1] * sp - Math.sin(Math.PI * sp) * .38);
+        if (i === 0) { v.u.uHue.value = 0; v.u.uHue2.value = VERS[1].hue; v.u.uMorph.value = paint <= 0 ? -9 : paint >= 1 ? 99 : py; v.u.uMG.value = paint > 0 && paint < 1 ? 1 : 0; }
+        else v.u.uHue.value = VERS[vi].hue;
+        v.u.uScan.value = i === 0 ? SCAN : 99; v.u.uGlow.value = i === 0 ? 1 - R(.3, .34) : 0;
+        v.g.rotation.y = -.2 + Math.sin(time * .4 + i * 1.7) * .25 + (i === 1 ? .35 : i === 2 ? -.35 : 0) * sp;
+        setDim(v, win > 0 && i !== 2 ? lerp(1, .4, win) : 1, dt);
+        v.sh.position.set(v.g.position.x, .006, v.g.position.z); v.sh.material.opacity = (i === 0 ? .75 * clamp(sc * 1.5, 0, 1) : .75 * sp);
+        const b = bars[i], h = Math.max(.001, votes[vi] / 46 * 1.55 * vt);
+        b.scale.y = h; b.position.set(v.g.position.x + .4, h / 2 + .01, v.g.position.z); b.material.uniforms.uA.value = vt * (win > 0 && i !== 2 ? lerp(1, .35, win) : 1);
+        S.place(labs[i], v.g.position.x, -.16, v.g.position.z, ease(clamp((sp - .6) / .4, 0, 1)) * (win > 0 && i !== 2 ? lerp(1, .45, win) : 1));
+        S.place(pcts[i], v.g.position.x + .4, h + .16, v.g.position.z, vt); pcts[i].textContent = Math.round(votes[vi] * vt) + '%';
+      });
+      S.version(win > 0 ? 2 : paint >= 1 && sp <= 0 ? 1 : -1);
+      paintRing.position.y = py; paintRing.material.uniforms.uA.value = paint > 0 && paint < 1 ? Math.sin(Math.PI * paint) : 0;
+      winRing.position.set(V[2].g.position.x, .008, V[2].g.position.z); winRing.material.uniforms.uA.value = win * (.85 + .1 * Math.sin(time * 2));
+      const dz = lerp(lerp(Math.max(5.8, fd * .8), fd, sp), fd * .9, win);
+      camTgt.set(lerp(0, 1.18, win * .35), .72, lerp(0, -.42, win * .35));
+      camPos.set(camTgt.x + S.mouse.sx * .45, lerp(.95, 1.3, sp) + .25 * vt * (1 - win) - S.mouse.sy * .2, camTgt.z + dz);
+      cam.position.lerp(camPos, Math.min(1, dt * 4)); cur.lerp(camTgt, Math.min(1, dt * 4)); cam.lookAt(cur);
+    });
+  }).catch(fail(root));
+}
+
+/* =================== A6 · FLOATING GLASS =================== */
+function vGlass() {
+  const root = document.getElementById('mkA6'), stage = root.querySelector('.a-stage'), labs = [...stage.querySelectorAll('.a-lab')];
+  const S = kStage(stage, { coneR: 2.3, dustSpread: 2.2, motes: 320 }), cam = S.cam;
+  let d = 8, gap = 1.32; S.onResize = () => { gap = S.cam.aspect < .9 ? 1.08 : 1.32; d = S.fitDist(gap + .62, 1.25); S.scene.fog.near = d + .5; S.scene.fog.far = d + 8; }; S.onResize();
+  function glass(w, h) {
+    const shape = new THREE.Shape(), r = .07, x = -w / 2, y = -h / 2;
+    shape.moveTo(x + r, y); shape.lineTo(x + w - r, y); shape.quadraticCurveTo(x + w, y, x + w, y + r); shape.lineTo(x + w, y + h - r); shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h); shape.lineTo(x + r, y + h); shape.quadraticCurveTo(x, y + h, x, y + h - r); shape.lineTo(x, y + r); shape.quadraticCurveTo(x, y, x + r, y);
+    const geo = new THREE.ShapeGeometry(shape, 8), pos = geo.attributes.position, uv = new Float32Array(pos.count * 2);
+    for (let i = 0; i < pos.count; i++) { uv[i * 2] = (pos.getX(i) - x) / w; uv[i * 2 + 1] = (pos.getY(i) - y) / h; } geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false, uniforms: { uT: { value: S.C.glow }, uE: { value: S.C.ring }, uA: { value: 1 }, uW: { value: w }, uH: { value: h }, uS: { value: 0 } }, vertexShader: VS_UV,
+      fragmentShader: 'uniform vec3 uT; uniform vec3 uE; uniform float uA; uniform float uW; uniform float uH; uniform float uS; varying vec2 vUv; void main(){ float e = min(min(vUv.x, 1. - vUv.x) * uW, min(vUv.y, 1. - vUv.y) * uH); float rim = smoothstep(.022, 0., e); float sheen = exp(-pow((vUv.x + vUv.y * .55 - .35 - uS) * 3.2, 2.)) * .09 + vUv.y * .05; vec3 c = uT * .7 + vec3(sheen) + uE * rim * .9; gl_FragColor = vec4(c, (.34 + rim * .55 + sheen) * uA); }' });
+    return new THREE.Mesh(geo, m);
+  }
+  modelData().then(M => {
+    const rig = new THREE.Group(); S.scene.add(rig);
+    const P = VERS.map((ver, i) => {
+      const g = new THREE.Group(), pane = glass(1.02, 1.62), p = makeProduct(S, M, 1.3, i);
+      p.u.uHue.value = ver.hue; S.scene.remove(p.g); g.add(pane, p.g); pane.position.set(0, .81, -.16); p.g.position.set(0, .1, .02);
+      pane.userData.v = i; rig.add(g);
+      const sh = S.shadow(.95, .55), fr = S.ring(1.3, .72, .09, 1); fr.position.y = .008;
+      return { g, pane, p, sh, fr, lift: 0 };
+    });
+    let hover = -1;
+    const objs = P.map(x => x.g);
+    S.cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; hover = S.pick(e, objs); S.cv.style.cursor = hover >= 0 ? 'pointer' : 'default'; });
+    S.cv.addEventListener('pointerleave', () => { hover = -1; });
+    S.cv.addEventListener('click', e => { const i = S.pick(e, objs); hover = i === hover ? -1 : i; });
+    const wp = new THREE.Vector3();
+    S.start((dt, time) => {
+      S.light(1); S.version(hover);
+      rig.rotation.y += (S.mouse.sx * .32 - rig.rotation.y) * Math.min(1, dt * 3); rig.rotation.x += (S.mouse.sy * .08 - rig.rotation.x) * Math.min(1, dt * 3);
+      P.forEach((o, i) => {
+        o.lift += ((hover === i ? 1 : 0) - o.lift) * Math.min(1, dt * 5);
+        const x = (i - 1) * gap, z = (i === 1 ? .1 : -.38) + o.lift * .35, bob = Math.sin(time * .9 + i * 2.1) * .05;
+        o.g.position.set(x, .32 + bob + o.lift * .06, z); o.g.rotation.y = -x * .14 + Math.sin(time * .5 + i) * .05;
+        o.p.g.rotation.y = Math.sin(time * .45 + i * 1.3) * .5;
+        o.pane.material.uniforms.uS.value = Math.sin(time * .3 + i) * .4 + S.mouse.sx * .3;
+        setDim(o.p, hover >= 0 && hover !== i ? .55 : (i === 1 ? 1 : .8), dt);
+        o.g.getWorldPosition(wp);
+        o.sh.position.set(wp.x, .006, wp.z); o.sh.material.opacity = .32 - bob * .8; o.sh.scale.setScalar(1.1 - bob);
+        o.fr.position.set(wp.x, .008, wp.z); o.fr.material.uniforms.uA.value = o.lift * .9;
+        S.place(labs[i], wp.x, .04, wp.z, hover >= 0 && hover !== i ? .5 : 1);
+      });
+      cam.position.set(S.mouse.sx * .3, 1.35 - S.mouse.sy * .2, d); cam.lookAt(0, .95, 0);
+    });
+  }).catch(fail(root));
+}
+
+/* =================== OPTION B · ORBIT =================== */
+function orbit() {
+  const root = document.getElementById('mkB'), stage = root.querySelector('.b-stage'), cv = stage.querySelector('canvas'), name = stage.querySelector('.b-name');
+  const D = window.KALPI_DATA;
+  if (!window.THREE || !D || !glOK()) { root.classList.add('nogl'); return; }
+  let renderer; try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false }); } catch (e) { root.classList.add('nogl'); return; }
+  const BG = 0xeeedf3; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.outputEncoding = THREE.sRGBEncoding; renderer.setClearColor(BG, 1);
+  const scene = new THREE.Scene(); scene.fog = new THREE.Fog(BG, 6, 11);
+  const cam = new THREE.PerspectiveCamera(30, 1, .1, 40);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d7e6, 1.0)); const dl = new THREE.DirectionalLight(0xffffff, .6); dl.position.set(2, 4, 3); scene.add(dl);
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(2.05, 2.1, .06, 96), new THREE.MeshStandardMaterial({ color: 0xf7f6fb, roughness: .5 })); plate.position.y = .03; scene.add(plate);
+  const shadowTex = softSprite('rgba(40,30,80,0.32)', 'rgba(40,30,80,0)');
+  const items = [['gloss-gem', 'A · Gem cap'], ['gloss-gold', 'B · Gold cap'], ['gloss-cat', 'C · Cat cap']];
+  const ring = new THREE.Group(); scene.add(ring); const R = 1.5; const cards = [];
+  Promise.all(items.map(it => loadImg(D.img[it[0]]))).then(imgs => {
+    imgs.forEach((img, i) => {
+      const t = mountTexture(img, .05, '#ffffff', 14), h = 1.45, w = h * t.aspect;
+      const g = new THREE.Group(), a = i / 3 * Math.PI * 2;
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t.tex, toneMapped: false }));
+      const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, .025), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .6 })); body.position.z = -.0135;
+      const card = new THREE.Group(); card.add(face, body); card.position.y = h / 2 + .09;
+      const sh = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.3, .6), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.y = .062;
+      g.add(card, sh); g.position.set(Math.sin(a) * R, 0, Math.cos(a) * R); g.rotation.y = a; ring.add(g); cards.push({ g, card, face });
+    });
+    resize(); loop();
+  }).catch(() => root.classList.add('nogl'));
+  let W = 1, H = 1; function resize() { W = stage.clientWidth; H = stage.clientHeight; renderer.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix(); const hf = Math.atan(Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect), d = Math.max(5.1, 2.1 / Math.tan(hf)); cam.position.set(0, 1.55 * d / 5.1, d); cam.lookAt(0, .78, 0); scene.fog.near = d + .6; scene.fog.far = d + 7; }
+  new ResizeObserver(resize).observe(stage);
+  let rot = 0, target = 0, vel = 0, drag = null, idx = 0, visible = false, running = false, last = 0, mx = 0, my = 0;
+  const snap = () => { target = Math.round(rot / (Math.PI * 2 / 3)) * (Math.PI * 2 / 3); };
+  function setName() { const n = ((Math.round(-target / (Math.PI * 2 / 3)) % 3) + 3) % 3; if (n !== idx || name.textContent === '') { idx = n; } name.textContent = items[n][1]; }
+  stage.querySelectorAll('.b-bar button').forEach(b => b.onclick = () => { target -= +b.dataset.d * Math.PI * 2 / 3; setName(); });
+  cv.addEventListener('pointerdown', e => { drag = { x: e.clientX }; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width - .5; my = (e.clientY - r.top) / r.height - .5; if (!drag) return; const dx = e.clientX - drag.x; drag.x = e.clientX; rot += dx * .006; target = rot; vel = dx * .006; });
+  cv.addEventListener('pointerup', () => { drag = null; rot += vel * 6; target = rot; snap(); setName(); });
+  cv.addEventListener('pointerleave', () => { mx = my = 0; });
+  function loop() { if (running) return; running = true; last = 0; const f = now => { if (!visible || document.hidden) { running = false; return; } const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now;
+      if (!drag) rot += (target - rot) * Math.min(1, dt * 5);
+      ring.rotation.y = rot;
+      cards.forEach((c, i) => { const wa = i / 3 * Math.PI * 2 + rot, front = (Math.cos(wa) + 1) / 2; c.card.rotation.y = -Math.atan2(Math.sin(wa), Math.cos(wa)) * .72 - mx * .25 * front; c.card.rotation.x = my * .12 * front; c.card.position.y = .09 + .725 + .05 * front * front; });
+      renderer.render(scene, cam); requestAnimationFrame(f); }; requestAnimationFrame(f); }
+  whenVisible(stage, v => { visible = v; if (v && cards.length) loop(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && visible && cards.length) loop(); });
+}
+
+/* =================== OPTION D · gentle tilt for the CSS fan =================== */
+function fan() {
+  const f = document.getElementById('dFan'), tilt = f.querySelector('.d-tilt'); if (reduce) return;
+  f.addEventListener('pointermove', e => { const r = f.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; tilt.style.transform = 'rotateY(' + (x * 14) + 'deg) rotateX(' + (-y * 10) + 'deg)'; });
+  f.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
+}
+
+/* the Studio/Gallery switch in option A is only a look: it just moves the highlight */
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => b.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)));
+[['mkA', keynote], ['mkA2', vSolo], ['mkA3', vCarousel], ['mkA4', vSplit], ['mkA5', vStory], ['mkA6', vGlass]].forEach(([id, fn]) => guard(document.getElementById(id), fn));
+try { orbit(); } catch (e) { console.warn(e); document.getElementById('mkB').classList.add('nogl'); }
+fan();
+})();
+</script>
+</body>
+</html>

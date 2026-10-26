@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalpi Dark Palettes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root { --page: #0a0a0c; --card: #121215; --line: #24242b; --ink: #f2f2f5; --ink2: #a2a2ad; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+header { max-width: 1240px; margin: 0 auto; padding: 40px 16px 8px; }
+header h1 { font-size: 28px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 6px; }
+header p { color: var(--ink2); margin: 0; max-width: 70ch; }
+.grid { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+
+/* ---- stage ---- */
+.stage { position: relative; height: 300px; overflow: hidden; background: linear-gradient(180deg, var(--bg0), var(--bg1)); }
+.stage::before { /* spotlight cone */
+  content: ""; position: absolute; left: 68%; top: -10%; width: 70%; height: 95%; transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 100% at 50% 0%, color-mix(in oklab, var(--rim) 22%, transparent), transparent 70%);
+  filter: blur(6px); pointer-events: none; }
+.floor { position: absolute; left: -10%; right: -10%; bottom: 0; height: 42%;
+  background: radial-gradient(ellipse 60% 70% at 50% 20%, color-mix(in oklab, var(--floor) 70%, var(--rim) 6%), var(--floor) 55%, var(--fog) 100%); }
+.fog { position: absolute; inset: auto 0 0 0; height: 30%; background: linear-gradient(180deg, transparent, var(--fog)); opacity: .85; }
+.ring, .ring-r { position: absolute; left: 68%; width: 170px; height: 42px; border-radius: 50%; transform: translateX(-50%); }
+.ring { bottom: 88px; border: 2px solid var(--ring);
+  box-shadow: 0 0 10px var(--ring), 0 0 28px color-mix(in oklab, var(--ring) 70%, transparent), inset 0 0 14px color-mix(in oklab, var(--ring) 55%, transparent);
+  animation: pulse 3.6s ease-in-out infinite; }
+.ring-r { bottom: 30px; border: 2px solid color-mix(in oklab, var(--ring) 45%, transparent); filter: blur(3px); opacity: .55; transform: translateX(-50%) scaleY(.8); }
+.prod { position: absolute; left: 68%; bottom: 108px; width: 64px; height: 128px; transform: translateX(-50%); border-radius: 14px 14px 10px 10px;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--rim) 70%, #000) 0%, #1b1b20 18%, #0e0e12 55%, #17171c 82%, var(--rim) 100%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--rim) 25%, transparent), 0 18px 30px -10px #000; }
+.prod::after { content: ""; position: absolute; left: 10px; right: 10px; top: -22px; height: 26px; border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 60%, #000), var(--accent) 45%, color-mix(in oklab, var(--accent) 50%, #000)); }
+.prod-r { position: absolute; left: 68%; bottom: 0; width: 64px; height: 96px; transform: translateX(-50%); border-radius: 10px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--rim) 18%, transparent), transparent 80%); filter: blur(4px); opacity: .5; }
+.copy { position: absolute; left: 18px; top: 16px; right: 18px; }
+.copy .eye { font: 500 11px/1 Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.copy h2 { margin: 6px 0 4px; font-size: 24px; font-weight: 600; letter-spacing: -.02em; color: var(--text); }
+.copy p { margin: 0; font-size: 13px; color: var(--text2); max-width: 20ch; }
+@keyframes pulse { 50% { box-shadow: 0 0 14px var(--ring), 0 0 44px color-mix(in oklab, var(--ring) 80%, transparent), inset 0 0 18px color-mix(in oklab, var(--ring) 60%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
+
+/* ---- meta ---- */
+.meta { padding: 14px 16px 16px; }
+.meta h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.meta .src { color: var(--ink2); font-size: 13px; margin: 2px 0 12px; }
+.sw { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; }
+.s { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.s i { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 1px solid #ffffff22; }
+.s span { font: 400 12px/1.2 "JetBrains Mono", ui-monospace, monospace; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s b { font-weight: 400; color: var(--ink); }
+.aa { margin-top: 10px; font-size: 12px; color: var(--ink2); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kalpi · dark stage palettes</h1>
+  <p>This is a review sheet of 10 palettes for option A, Keynote. Each stage uses the palette's real colours for the background gradient, floor, fog, rim light, ring glow, text, secondary text and accent. Every contrast ratio below is checked against the lighter background stop, the worst case, and all text passes WCAG AA. The full notes are in DARK-STAGE-INSPIRATION.md.</p>
+</header>
+<main class="grid" id="grid"></main>
+<script>
+const P = [
+  ["Velvet Plum","Deep purple, from the founder's original list",{bg0:"#1A1028",bg1:"#0B0812",floor:"#120C1C",fog:"#140E20",rim:"#C9B8FF",ring:"#A48BFF",text:"#F3EFFA",text2:"#A79DB8",accent:"#B79CFF"},"16.1 / 7.1 / 8.0"],
+  ["Midnight Navy","After Overworld Audio",{bg0:"#0F1A2E",bg1:"#060A14",floor:"#0A1220",fog:"#0C1526",rim:"#A9C8FF",ring:"#6FA3FF",text:"#EEF3FB",text2:"#93A2BA",accent:"#7FB0FF"},"15.6 / 6.7 / 7.9"],
+  ["Forest Night","After Belgrade Arbor",{bg0:"#0E1F17",bg1:"#050C09",floor:"#08130E",fog:"#0B1812",rim:"#B8E3CC",ring:"#5FD3A0",text:"#EDF5F0",text2:"#93AA9D",accent:"#6FDDAE"},"15.4 / 6.9 / 10.3"],
+  ["Wine Cellar","After the iPhone 18 Pro burgundy",{bg0:"#2A0E18",bg1:"#0E0609",floor:"#160A0F",fog:"#1C0C13",rim:"#F2C4CF",ring:"#E0718C",text:"#F8EEF1",text2:"#B59AA2",accent:"#EC8AA1"},"15.7 / 6.9 / 7.4"],
+  ["Light Column","After Huly's beam",{bg0:"#121436",bg1:"#04050C",floor:"#080A18",fog:"#0D1028",rim:"#D6DAFF",ring:"#8C93FF",text:"#F1F2FF",text2:"#9EA2C4",accent:"#9AA0FF"},"16.0 / 7.1 / 7.5"],
+  ["Graphite Chrome","After the iPhone 18 Pro chrome type",{bg0:"#17171B",bg1:"#050506",floor:"#0C0C0F",fog:"#111114",rim:"#E8E8EE",ring:"#C8CCD8",text:"#F5F5F7",text2:"#9D9DA6",accent:"#D9DDE8"},"16.4 / 6.7 / 13.2"],
+  ["Teal Monitor","After pmndrs Monitors",{bg0:"#0D1E22",bg1:"#04090B",floor:"#071114",fog:"#0A1A1E",rim:"#A8F0E6",ring:"#3FD9C6",text:"#ECF7F6",text2:"#8FAEAB",accent:"#4FE0CE"},"15.7 / 7.2 / 10.5"],
+  ["Glacier","After Igloo Inc",{bg0:"#1A2129",bg1:"#070A0E",floor:"#0D1218",fog:"#141A21",rim:"#E6F1FF",ring:"#A9D4F5",text:"#F2F6FA",text2:"#9AA6B3",accent:"#B5DCF7"},"15.0 / 6.6 / 11.2"],
+  ["Ember Cork","After Oryzo",{bg0:"#24130C",bg1:"#0D0705",floor:"#160C08",fog:"#1C100B",rim:"#F5CDB6",ring:"#E8875A",text:"#FAF1EA",text2:"#B8A194",accent:"#F0956A"},"16.1 / 7.3 / 7.9"],
+  ["Deep Petrol","Ink in water",{bg0:"#0B2230",bg1:"#03080C",floor:"#061620",fog:"#081B27",rim:"#9FD6E8",ring:"#38A7C9",text:"#EAF4F8",text2:"#8AA7B4",accent:"#4DB8D8"},"14.6 / 6.4 / 7.1"],
+];
+const labels = {bg0:"bg top",bg1:"bg bottom",floor:"floor",fog:"fog",rim:"rim light",ring:"ring glow",text:"text",text2:"secondary",accent:"accent"};
+const grid = document.getElementById("grid");
+P.forEach(([name, src, c, aa], i) => {
+  const vars = Object.entries(c).map(([k, v]) => `--${k}:${v}`).join(";");
+  const sw = Object.entries(c).map(([k, v]) => `<div class="s"><i style="background:${v}"></i><span><b>${v}</b> ${labels[k]}</span></div>`).join("");
+  grid.insertAdjacentHTML("beforeend", `
+  <article class="card" style="${vars}">
+    <div class="stage" role="img" aria-label="${name} stage preview">
+      <div class="floor"></div><div class="prod-r"></div><div class="ring-r"></div>
+      <div class="fog"></div><div class="ring"></div><div class="prod"></div>
+      <div class="copy"><div class="eye">Palette ${String(i + 1).padStart(2, "0")}</div><h2>Make it real.</h2><p>Your photo becomes a product people can vote on.</p></div>
+    </div>
+    <div class="meta"><h3>${i + 1}. ${name}</h3><div class="src">${src}</div><div class="sw">${sw}</div>
+      <div class="aa">Contrast on the lighter bg stop: text / secondary / accent ${aa}, all AA ✓</div></div>
+  </article>`);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+"""Tiny local helper so the Figma plugin can use fal.ai without the key ever being in the plugin.
+
+Run:  python3 server/fal_helper.py     (key read from ~/.kalpi/fal_key or FAL_KEY)
+POST http://localhost:8795/generate  {"prompt": "..."}  ->  {"image": "<base64 png/jpg>", "mime": "..."}
+Uses FLUX schnell (~$0.003 per image). Stops after MAX_IMAGES per run as a safety cap.
+"""
+import base64
+import json
+import os
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+PORT = 8795
+MAX_IMAGES = 60
+MAX_MODELS = 15          # TRELLIS 2 costs ~$0.30 each; restart the helper to allow more
+import time
+KEY = os.environ.get("FAL_KEY") or (Path.home() / ".kalpi" / "fal_key").read_text().strip()
+STYLE = ", single object, centered, front view, flat sticker illustration, thick clean outline, plain white background, no text"
+made = 0
+models = 0
+
+
+def fal_queue(endpoint, payload, timeout=300):
+    """Submit to fal's queue and wait for the result (3D jobs can take longer than a normal request)."""
+    h = {"Authorization": f"Key {KEY}", "Content-Type": "application/json"}
+    req = urllib.request.Request(f"https://queue.fal.run/{endpoint}", data=json.dumps(payload).encode(), method="POST", headers=h)
+    with urllib.request.urlopen(req, timeout=60) as r:
+        job = json.loads(r.read())
+    status_url, response_url = job["status_url"], job["response_url"]
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        time.sleep(2)
+        with urllib.request.urlopen(urllib.request.Request(status_url, headers=h), timeout=30) as r:
+            st = json.loads(r.read())
+        if st.get("status") == "COMPLETED":
+            with urllib.request.urlopen(urllib.request.Request(response_url, headers=h), timeout=60) as r:
+                return json.loads(r.read())
+        if st.get("status") in ("FAILED", "ERROR"):
+            raise RuntimeError("fal job failed: " + json.dumps(st)[:200])
+    raise RuntimeError("fal job timed out")
+
+
+def fal_3d_tripo(image_b64, mime):
+    out = fal_queue("tripo3d/h3.1/image-to-3d", {
+        "image_url": f"data:{mime};base64,{image_b64}",
+        "texture_quality": "detailed", "geometry_quality": "detailed", "pbr": True, "face_limit": 150000,
+    }, timeout=420)
+    mu = out.get("model_urls") or {}
+    url = (mu.get("glb") or mu.get("pbr_model") or {}).get("url") if isinstance(mu.get("glb") or mu.get("pbr_model"), dict) else mu.get("glb") or mu.get("pbr_model")
+    url = url or (out.get("model_mesh") or {}).get("url")
+    if not url:
+        raise RuntimeError("Tripo returned no GLB: " + json.dumps(out)[:200])
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=120) as r:
+        return r.read()
+
+
+def fal_3d(image_b64, mime):
+    out = fal_queue("fal-ai/trellis-2", {
+        "image_url": f"data:{mime};base64,{image_b64}",
+        "resolution": 1536, "texture_size": 4096,   # highest quality: sharper screen, text and edges
+        "decimation_target": 200000,  # more detail, still light enough to spin smoothly
+    })
+    url = out["model_glb"]["url"]
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=120) as r:
+        return r.read()
+
+
+def fal_image(prompt):
+    body = json.dumps({"prompt": prompt + STYLE, "image_size": "square", "num_images": 1, "num_inference_steps": 4}).encode()
+    req = urllib.request.Request("https://fal.run/fal-ai/flux/schnell", data=body, method="POST",
+                                 headers={"Authorization": f"Key {KEY}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        out = json.loads(r.read())
+    url = out["images"][0]["url"]
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kalpi"}), timeout=60) as r:
+        return r.read(), r.headers.get("Content-Type", "image/jpeg")
+
+
+class H(BaseHTTPRequestHandler):
+    def cors(self):
+        self.send_header("Access-Control-Allow-Origin", "*")   # Figma plugin windows have a "null" origin
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+
+    def reply(self, code, obj):
+        data = json.dumps(obj).encode()
+        self.send_response(code); self.cors()
+        self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(data)))
+        self.end_headers(); self.wfile.write(data)
+
+    def do_OPTIONS(self):
+        self.send_response(204); self.cors(); self.end_headers()
+
+    def do_GET(self):
+        self.reply(200, {"ok": True, "made": made, "left": MAX_IMAGES - made, "models": models, "models_left": MAX_MODELS - models})
+
+    def do_POST(self):
+        global made, models
+        if self.path == "/make3d":
+            try:
+                d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 2))
+                if models >= MAX_MODELS:
+                    return self.reply(429, {"error": f"Safety cap of {MAX_MODELS} AI 3D models reached; restart the helper to continue."})
+                glb = (fal_3d_tripo if d.get("model") == "tripo" else fal_3d)(d["image"], d.get("mime", "image/png"))
+                models += 1
+                return self.reply(200, {"glb": base64.b64encode(glb).decode(), "bytes": len(glb), "models": models})
+            except urllib.error.HTTPError as e:
+                return self.reply(502, {"error": f"fal said {e.code}: {e.read()[:300].decode(errors='ignore')}"})
+            except Exception as e:
+                return self.reply(500, {"error": str(e)})
+        if self.path != "/generate":
+            return self.reply(404, {"error": "not found"})
+        try:
+            prompt = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)) or 2)).get("prompt", "").strip()[:400]
+            if not prompt:
+                return self.reply(400, {"error": "Type an idea first."})
+            if made >= MAX_IMAGES:
+                return self.reply(429, {"error": f"Safety cap of {MAX_IMAGES} images reached; restart the helper to continue."})
+            img, mime = fal_image(prompt)
+            made += 1
+            self.reply(200, {"image": base64.b64encode(img).decode(), "mime": mime, "made": made})
+        except urllib.error.HTTPError as e:
+            self.reply(502, {"error": f"fal said {e.code}: {e.read()[:200].decode(errors='ignore')}"})
+        except Exception as e:
+            self.reply(500, {"error": str(e)})
+
+    def log_message(self, *a):
+        pass
+
+
+if __name__ == "__main__":
+    print(f"fal helper on http://localhost:{PORT}  (cap {MAX_IMAGES} images)")
+    ThreadingHTTPServer(("127.0.0.1", PORT), H).serve_forever()

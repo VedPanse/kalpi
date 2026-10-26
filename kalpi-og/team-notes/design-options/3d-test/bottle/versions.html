@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bottle Colour Versions</title>
+<meta name="description" content="The sage bottle in four colours: the 2D photos on top, the matching 3D models underneath on the dark stage. Review page, not part of the product. It only reads files; nothing here makes or pays for anything.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0b0b0f; --card: #070609; --ink: #f1f0f4; --ink-2: #b7b5c0; --ink-3: #8f8c99; --line: #24232b; --chip: #1a1a20; --focus: #a49bff; --bad: #ff8f8f; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 14px/1.5 Inter, system-ui, sans-serif; overflow-x: hidden; }
+.wrap { width: min(1400px, 100% - 32px); margin-inline: auto; padding: 24px 0 40px; }
+h1 { font: 600 22px/1.25 Inter, sans-serif; letter-spacing: -.01em; margin: 0 0 4px; }
+h2 { font: 600 13px/1.3 Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin: 22px 0 10px; }
+.sub { color: var(--ink-2); margin: 0 0 16px; max-width: 80ch; }
+.bar { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 0 12px; border-bottom: 1px solid var(--line); }
+.bar label { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--ink-2); max-width: 100%; min-width: 0; }
+.bar input[type=range] { width: min(320px, 55vw); accent-color: var(--focus); }
+.bar output { font: 500 12px/1 "JetBrains Mono", monospace; color: var(--ink); min-width: 4ch; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg button { font: inherit; color: var(--ink-2); background: var(--chip); border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button[aria-pressed=true] { background: #2a2740; color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 1000px) { .row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.cap { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--line); font-weight: 500; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px #ffffff22; }
+.cap small { margin-left: auto; font: 500 11.5px/1 "JetBrains Mono", monospace; color: var(--ink-3); }
+.photo img { display: block; width: 100%; height: auto; aspect-ratio: 864 / 1152; object-fit: contain; background: #d5cdc3; }
+.stage { position: relative; aspect-ratio: 864 / 1152; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+.msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: var(--ink-2); pointer-events: none; }
+.msg.bad { color: var(--bad); }
+.msg[hidden] { display: none; }
+.tag { position: absolute; left: 10px; top: 10px; font: 500 11px/1 "JetBrains Mono", monospace; color: var(--ink-2); background: #00000080; padding: 5px 7px; border-radius: 6px; pointer-events: none; }
+.stats { padding: 8px 12px 10px; font: 500 11.5px/1.6 "JetBrains Mono", monospace; color: var(--ink-2); border-top: 1px solid var(--line); min-height: 40px; }
+.stats b { color: var(--ink); font-weight: 500; }
+.foot { color: var(--ink-3); font-size: 12.5px; margin-top: 18px; max-width: 95ch; }
+.foot code { font: 500 12px "JetBrains Mono", monospace; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>The bottle in four colours: photo and 3D</h1>
+  <p class="sub">Top row: the 2D colour versions, uncropped. Bottom row: the matching 3D models on the dark stage (no tone mapping, env 0.25, ring in the version's colour), all turned by one slider. "Painted back" is Rodin's model with the photo projected onto its front and the hidden sides colour-matched to it. "Rodin as it came" is the untouched model; Rodin made only the sage one, so it shows in every slot.</p>
+
+  <div class="bar" role="group" aria-label="View controls">
+    <label>Angle <input id="angle" type="range" min="0" max="359" value="0" step="1"><output id="angleOut">0°</output></label>
+    <label><input id="spin" type="checkbox"> Turn slowly</label>
+    <span class="seg" role="group" aria-label="Which 3D model">
+      <button type="button" id="mPaint" aria-pressed="true">Painted back</button>
+      <button type="button" id="mRodin" aria-pressed="false">Rodin as it came</button>
+    </span>
+    <label><input id="mirror" type="checkbox" checked> Glossy floor</label>
+  </div>
+
+  <h2>2D photos</h2>
+  <div class="row" id="photos"></div>
+  <h2>3D models</h2>
+  <div class="row" id="stages"></div>
+
+  <p class="foot">Files in <code>models/</code>, compressed copies for this page (WebP textures at 2048, meshopt geometry): <code>3d-sage.glb</code>, <code>3d-terracotta.glb</code>, <code>3d-navy.glb</code>, <code>3d-cream.glb</code>, <code>rodin.glb</code> (as it came). Full-size originals sit next to the Rodin run: <code>kalpi-local/imagelab/runs/20261017-192413-b53dc2/</code> (<code>paintback.glb</code>, <code>3d-*.glb</code>; <code>model.glb</code> untouched). Previews and side-by-sides: <code>shots/</code>. Made locally and for free; this page only reads files.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+<script>
+(() => {
+'use strict';
+const VERSIONS = [
+  { id: 'sage',       name: 'Sage',       hex: '#8e9481', ring: '#b4c4a4' },
+  { id: 'terracotta', name: 'Terracotta', hex: '#b96246', ring: '#e48a68' },
+  { id: 'navy',       name: 'Navy',       hex: '#2c3a5c', ring: '#6f86c4' },
+  { id: 'cream',      name: 'Cream',      hex: '#e6decc', ring: '#efe6d2' },
+];
+const Q = new URLSearchParams(location.search);
+const $ = id => document.getElementById(id);
+const fmtMB = b => (b / 1e6).toFixed(2) + ' MB';
+function glOK() { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (e) { return false; } }
+
+/* ---------- the universal dark stage (from compare.html: no tone mapping, env 0.25, softer lights) ---------- */
+const BG = 0x070609, FIX = { env: .25, li: .75, rim: .6 };
+function softSprite(inner, outer) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, inner); r.addColorStop(1, outer); g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); }
+function rgba(hex, a) { const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+
+function makeStage(canvas, ringHex) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.NoToneMapping;
+  renderer.setClearColor(BG, 1);
+  const scene = new THREE.Scene(); scene.fog = new THREE.Fog(BG, 6, 15);
+  const cam = new THREE.PerspectiveCamera(26, .75, .05, 60);
+  const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new THREE.RoomEnvironment(), .04).texture;
+
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(40, 18), new THREE.ShaderMaterial({ fog: false,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }',
+    fragmentShader: 'varying vec2 vUv; void main(){ vec2 d = (vUv - vec2(.5,.42)) * vec2(2.2,1.); float g = exp(-dot(d,d)*8.) * smoothstep(.27, .4, vUv.y); gl_FragColor = vec4(vec3(.0275,.0235,.0353) + vec3(.075,.068,.13)*g, 1.); }' }));
+  back.position.set(0, 4, -7); scene.add(back);
+
+  const floorGeo = new THREE.PlaneGeometry(40, 40); let mirror = null;
+  if (THREE.Reflector) { mirror = new THREE.Reflector(floorGeo, { textureWidth: 512, textureHeight: 512, color: 0x8a8a98, clipBias: .003 }); mirror.rotation.x = -Math.PI / 2; scene.add(mirror); }
+  const veil = new THREE.Mesh(floorGeo, new THREE.ShaderMaterial({ transparent: true, depthWrite: false, fog: false, uniforms: { uCol: { value: new THREE.Color(BG) } },
+    vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform vec3 uCol; varying vec3 vW; void main(){ float d = length(vW.xz*vec2(.8,1.1)); float a = mix(.66, 1., smoothstep(.4, 4.2, d)); vec3 pool = vec3(.16,.15,.24)*exp(-d*d*.55); gl_FragColor = vec4(uCol + pool, a); }' }));
+  veil.rotation.x = -Math.PI / 2; veil.position.y = .002; veil.renderOrder = -1; scene.add(veil);
+  const hideInMirror = [veil];
+  if (mirror) { const ob = mirror.onBeforeRender; mirror.onBeforeRender = function () { hideInMirror.forEach(o => o.visible = false); ob.apply(this, arguments); hideInMirror.forEach(o => o.visible = true); }; }
+
+  const key = new THREE.SpotLight(0xf6f3ff, 2.3 * FIX.li, 0, .5, .85, 1); key.position.set(.4, 5.6, 2.8); key.target.position.set(0, .6, 0); scene.add(key, key.target);
+  const rimL = new THREE.DirectionalLight(0x9d8cff, 1.25 * FIX.rim); rimL.position.set(-3, 2.4, -2.6); scene.add(rimL);
+  const rimR = new THREE.DirectionalLight(0xcfe3ff, .9 * FIX.rim); rimR.position.set(3.2, 2, -2.2); scene.add(rimR);
+  scene.add(new THREE.HemisphereLight(0xe8e6ff, 0x08080c, .18));
+
+  const coneH = 5.4, cone = new THREE.Mesh(new THREE.ConeGeometry(1.45, coneH, 64, 1, true), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+    vertexShader: 'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ vY = position.y/' + coneH.toFixed(1) + ' + .5; vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(abs(dot(vN, vV)), 2.2); float a = .085 * f * smoothstep(0., .55, vY) * (1. - smoothstep(.85, 1., vY)); gl_FragColor = vec4(vec3(.82,.8,1.)*a, 1.); }' }));
+  cone.position.set(.08, coneH / 2, .55); cone.rotation.z = -.03; scene.add(cone);
+
+  /* the ring at the product's foot, in this version's colour, and a soft contact shadow */
+  const ring = new THREE.Mesh(new THREE.RingGeometry(.3, .62, 96), new THREE.MeshBasicMaterial({ map: softSprite(rgba(ringHex, 1), rgba(ringHex, 0)), transparent: true, opacity: .6, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = .01; scene.add(ring);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1.1, .7), new THREE.MeshBasicMaterial({ map: softSprite('rgba(0,0,0,0.9)', 'rgba(0,0,0,0)'), transparent: true, opacity: .7, depthWrite: false, fog: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = .006; shadow.renderOrder = 2; scene.add(shadow); hideInMirror.push(shadow);
+
+  const holder = new THREE.Group(); scene.add(holder);
+  let model = null;
+  function resize() {
+    const w = canvas.clientWidth || 300, h = canvas.clientHeight || 400; renderer.setSize(w, h, false); cam.aspect = w / h;
+    const vf = THREE.MathUtils.degToRad(cam.fov / 2), hf = Math.atan(Math.tan(vf) * cam.aspect);
+    const d = Math.max(1.25 / 2 / Math.tan(hf), 1.9 / 2 / Math.tan(vf)) + .4;
+    cam.position.set(0, 1.05, d); cam.lookAt(0, .66, 0); cam.updateProjectionMatrix();
+    scene.fog.near = d + .8; scene.fog.far = d + 9;
+  }
+  function setModel(gltf) {
+    if (model) holder.remove(model);
+    const m = gltf.scene, box = new THREE.Box3().setFromObject(m), size = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
+    const s = 1.38 / (size.y || 1); m.scale.multiplyScalar(s); m.position.set(-ctr.x * s, -box.min.y * s, -ctr.z * s);
+    model = new THREE.Group(); model.add(m); holder.add(model);
+    m.traverse(o => {
+      if (!o.isMesh) return;
+      const mt = o.material; if (mt.map) { mt.map.encoding = THREE.sRGBEncoding; mt.map.anisotropy = 4; }
+      mt.envMapIntensity = FIX.env; mt.needsUpdate = true;          // the file's own PBR material, env 0.25
+    });
+  }
+  function render(deg, useMirror) { holder.rotation.y = THREE.MathUtils.degToRad(deg); if (mirror) mirror.visible = useMirror; renderer.render(scene, cam); }
+  return { resize, setModel, render };
+}
+
+/* ---------- the two rows ---------- */
+let mode = Q.get('model') === 'rodin' ? 'rodin' : 'paint', angle = +(Q.get('angle') || 0) % 360, spinning = false, useMirror = Q.get('mirror') !== '0';
+const cache = {}, stages = [];
+const loader = new THREE.GLTFLoader(); if (window.MeshoptDecoder) loader.setMeshoptDecoder(MeshoptDecoder);
+function fetchModel(url) {
+  if (!cache[url]) cache[url] = (async () => {
+    const t0 = performance.now(), r = await fetch(url); if (!r.ok) throw new Error(url + ': HTTP ' + r.status);
+    const buf = await r.arrayBuffer();
+    return { buf, bytes: buf.byteLength, ms: performance.now() - t0 };
+  })();
+  return cache[url];
+}
+function fileFor(v) { return mode === 'rodin' ? 'models/rodin.glb' : 'models/3d-' + v.id + '.glb'; }
+
+function build() {
+  for (const v of VERSIONS) {
+    const p = document.createElement('figure'); p.className = 'card photo'; p.style.margin = 0;
+    p.innerHTML = '<div class="cap"><span class="dot" style="background:' + v.hex + '"></span>' + v.name + '<small>2D · 864×1152</small></div><img alt="' + v.name + ' bottle, 2D colour version of the photo" src="../../../../media/example-bottle/' + v.id + '.png">';
+    $('photos').appendChild(p);
+    const s = document.createElement('div'); s.className = 'card'; s.dataset.version = v.id;
+    s.innerHTML = '<div class="cap"><span class="dot" style="background:' + v.hex + '"></span>' + v.name + '<small class="kind">3D</small></div><div class="stage"><canvas aria-label="' + v.name + ' bottle in 3D"></canvas><span class="tag"></span><div class="msg">Loading…</div></div><div class="stats">…</div>';
+    $('stages').appendChild(s);
+    const canvas = s.querySelector('canvas');
+    stages.push({ v, el: s, canvas, stage: glOK() ? makeStage(canvas, v.ring) : null, seq: 0 });
+  }
+}
+async function load(c) {
+  const seq = ++c.seq, msg = c.el.querySelector('.msg'), url = fileFor(c.v);
+  c.el.querySelector('.tag').textContent = mode === 'rodin' ? 'Rodin as it came' + (c.v.id === 'sage' ? '' : ' (sage only)') : 'Painted back';
+  if (!c.stage) { msg.textContent = 'This browser has no WebGL, so the model cannot be drawn.'; msg.className = 'msg bad'; return; }
+  msg.textContent = 'Loading…'; msg.className = 'msg'; msg.hidden = false;
+  try {
+    const m = await fetchModel(url); if (seq !== c.seq) return;
+    const gltf = await new Promise((res, rej) => loader.parse(m.buf.slice(0), '', res, rej)); if (seq !== c.seq) return;
+    c.stage.setModel(gltf); c.stage.resize(); c.stage.render(angle, useMirror); msg.hidden = true;
+    c.el.querySelector('.stats').innerHTML = '<b>' + url.split('/').pop() + '</b> · ' + fmtMB(m.bytes) + ' · loaded in ' + (m.ms / 1000).toFixed(2) + ' s';
+    c.el.dataset.loaded = '1';
+  } catch (e) { msg.textContent = String(e && e.message || e); msg.className = 'msg bad'; c.el.dataset.loaded = 'error'; }
+}
+function draw() { for (const c of stages) if (c.stage) c.stage.render(angle, useMirror); }
+function setMode(m) {
+  mode = m; $('mPaint').setAttribute('aria-pressed', m === 'paint'); $('mRodin').setAttribute('aria-pressed', m === 'rodin');
+  return Promise.all(stages.map(load));
+}
+window.__bottle = { ready: null, setAngle(a) { angle = a; draw(); }, setMode, canvases: () => stages.map(c => c.canvas) };
+
+if (!window.THREE || !THREE.GLTFLoader) { $('stages').innerHTML = '<p class="msg bad" style="position:static">three.js did not load (it comes from cdnjs and jsDelivr). Check the network and reload.</p>'; return; }
+build();
+$('angle').value = angle; $('angleOut').textContent = Math.round(angle) + '°'; $('mirror').checked = useMirror;
+$('angle').oninput = e => { angle = +e.target.value; $('angleOut').textContent = angle + '°'; draw(); };
+$('spin').onchange = e => { spinning = e.target.checked; };
+$('mirror').onchange = e => { useMirror = e.target.checked; draw(); };
+$('mPaint').onclick = () => setMode('paint');
+$('mRodin').onclick = () => setMode('rodin');
+let last = 0;
+function tick(now) {
+  if (spinning) { angle = (angle + (now - last) * .012) % 360; $('angle').value = Math.round(angle); $('angleOut').textContent = Math.round(angle) + '°'; draw(); }
+  last = now; requestAnimationFrame(tick);
+}
+requestAnimationFrame(t => { last = t; tick(t); });
+addEventListener('resize', () => { for (const c of stages) if (c.stage) c.stage.resize(); draw(); });
+window.__bottle.ready = setMode(mode);
+})();
+</script>
+</body>
+</html>

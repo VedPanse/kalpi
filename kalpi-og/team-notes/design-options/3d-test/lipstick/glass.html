@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass and Metal</title>
+<meta name="description" content="Rodin models split into parts and given real materials (crystal, polished and brushed metal, satin, stone, wood) on the universal dark stage. Before / after, A/B/C variants. Review page; it only reads files.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #070609; --surface: #121016; --line: #262033; --text: #F4F3F7; --text-2: #A29DAE; --text-3: #87829A; --ring: #B4AAFF; --focus: #B4AAFF; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 14px/1.5 Inter, system-ui, sans-serif; overflow-x: hidden; }
+.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; padding: 22px 0 40px; }
+h1 { font: 600 22px/1.25 Inter, sans-serif; letter-spacing: -.01em; margin: 0 0 4px; }
+.sub { color: var(--text-2); margin: 0 0 14px; max-width: 78ch; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 0 0 14px; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); flex-wrap: wrap; }
+.seg button { font: 500 13px/1 Inter, sans-serif; color: var(--text-2); background: none; border: 0; border-radius: 999px; padding: 8px 13px; cursor: pointer; }
+.seg button[aria-pressed="true"] { color: var(--text); background: #221d2b; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ring) 55%, transparent); }
+.seg button:focus-visible, .pill:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 14px; }
+@media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
+.stage { position: relative; aspect-ratio: 4 / 5; max-height: 82vh; border-radius: 14px; overflow: hidden; background: #060609; box-shadow: inset 0 0 0 1px var(--line); margin-inline: auto; width: 100%; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.msg { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; text-align: center; color: var(--text-2); pointer-events: none; }
+.pills { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); display: flex; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; font: 500 13px/1 Inter, sans-serif; color: var(--text-2); background: rgba(18,16,22,.82); border: 0; border-radius: 999px; padding: 8px 12px 8px 8px; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); backdrop-filter: blur(6px); }
+.pill i { width: 14px; height: 14px; border-radius: 50%; display: block; }
+.pill b { color: var(--text); font-weight: 600; }
+.pill[aria-pressed="true"] { color: var(--text); box-shadow: inset 0 0 0 1px var(--pc, var(--ring)), 0 0 18px -4px var(--pc, var(--ring)); }
+.tag { position: absolute; left: 14px; top: 12px; font: 500 11px/1 "JetBrains Mono", monospace; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; }
+.hint { position: absolute; right: 14px; top: 12px; font: 500 11px/1 "JetBrains Mono", monospace; color: var(--text-3); }
+aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { background: var(--surface); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); padding: 12px; }
+.card h2 { font: 600 13px/1.3 Inter, sans-serif; margin: 0 0 8px; color: var(--text); }
+.card img { display: block; width: 100%; border-radius: 8px; background: #d8d2c8; aspect-ratio: 3 / 4; object-fit: cover; }
+.card p, .card li { color: var(--text-2); font-size: 12.5px; margin: 0; }
+.card ul { margin: 0; padding-left: 16px; }
+.card code, .foot code { font: 500 11.5px "JetBrains Mono", monospace; color: var(--text); }
+.stats { font: 500 11.5px/1.7 "JetBrains Mono", monospace; color: var(--text-2); }
+.foot { color: var(--text-3); font-size: 12.5px; margin-top: 16px; max-width: 92ch; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Glass and metal, part by part</h1>
+  <p class="sub">Each Rodin model is split into its parts (cap, collar, case, bullet…) and every part gets a real material from <code>materials.js</code>: faceted crystal that refracts and tints, polished and brushed metal, satin, glossy stone, oiled bamboo. Same universal stage and ring as the landing page. Drag to turn.</p>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Product" id="prod"></div>
+    <div class="seg" role="group" aria-label="Before or after" id="mode">
+      <button type="button" data-m="before" aria-pressed="false">Before · Rodin as it came</button>
+      <button type="button" data-m="after" aria-pressed="true">After · glass + metal</button>
+    </div>
+    <div class="seg" role="group" aria-label="Quality" id="qual">
+      <button type="button" data-q="high" aria-pressed="true">High</button>
+      <button type="button" data-q="low" aria-pressed="false">Phone fallback</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="stage" id="stage">
+      <canvas aria-label="The product, turning on a dark stage"></canvas>
+      <div class="msg" id="msg">Loading…</div>
+      <span class="tag" id="tag"></span>
+      <span class="hint">drag to turn</span>
+      <div class="pills" role="group" aria-label="Versions" id="pills"></div>
+    </div>
+    <aside>
+      <div class="card"><h2>Reference photo</h2><img id="ref" alt="The photo the 3D model was made from"></div>
+      <div class="card"><h2>Parts and materials</h2><ul id="parts"></ul></div>
+      <div class="card"><h2>This view</h2><div class="stats" id="stats">…</div></div>
+    </aside>
+  </div>
+
+  <p class="foot">Files here: <code>*-parts.glb</code> (Rodin model split into named meshes; for lipstick, perfume and candle the reference photo is painted onto the front and mirrored onto the back, the rest colour-matched; WebP textures at 2048, meshopt), <code>before/</code> (Rodin's own textures, for "Before"), <code>photo-cams.json</code> (camera fitted to each photo: <code>?photocam=1</code>), <code>materials.js</code> (presets, studio lighting, transmission pass, A/B/C variants), <code>shots/</code>. "Before" is Rodin's own single material under the old viewer's light (RoomEnvironment, env 0.25), as on <code>compare.html</code>. "Phone fallback" drops the transmission pass: the glass stays glossy, tinted and faceted, but no longer shows what is behind it. The page switches to it on its own if frames get slow. Address options: <code>?product=lipstick|perfume|candle|bottle&amp;mode=after|before&amp;v=A|B|C&amp;yaw=30&amp;q=high|low&amp;spin=0</code>.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
+<script src="../../../../media/examples/materials.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const KM = window.KalpiMaterials;
+if (!window.THREE || !THREE.GLTFLoader || !KM) { $('msg').textContent = 'three.js did not load (cdnjs / jsDelivr). Check the network and reload.'; return; }
+
+const REFS = { lipstick: 'refs/lipstick.jpg', perfume: 'refs/perfume.jpg', candle: 'refs/candle.jpg', bottle: 'refs/bottle.jpg' };
+const PART_NOTES = {
+  lipstick: { cap: 'crystal · photo’s smoky plum · ior 1.9 · faceted', collar: 'polished rose gold (+ foot trim)', case: 'brushed rose gold', bullet: 'satin · photo’s plum-red' },
+  perfume: { glass: 'blush crystal · photo colour + liquid · faceted', collar: 'polished gold', cap: 'polished gold · faceted' },
+  candle: { vessel: 'polished Carrara · photo veins, no bumps', lid: 'brushed brass · spun', knob: 'polished brass' },
+  bottle: { body: 'matte powder-coat · sage', lid: 'oiled bamboo · texture kept', rim: 'polished steel', handle: 'polished steel' },
+};
+const state = { product: KM.PRODUCTS[Q.get('product')] ? Q.get('product') : 'lipstick', mode: Q.get('mode') === 'before' ? 'before' : 'after', variant: Q.get('v') || null, yaw: +(Q.get('yaw') || 0), spin: Q.get('spin') !== '0' && !matchMedia('(prefers-reduced-motion: reduce)').matches };
+
+/* ---------- the universal stage (from kalpi-look-options, theme "universal") ---------- */
+const T = { bg: '#070609', top: '#140E1D', glow: '#261C39', ring: '#B4AAFF', rimL: '#B3A3EE', rimR: '#D4E2EC', floor: '#8494A6' };
+const C = k => new THREE.Color(T[k]).convertSRGBToLinear();
+const canvas = document.querySelector('#stage canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.NoToneMapping;      // the colour fix: no tone mapping
+renderer.setClearColor(new THREE.Color(T.bg), 1);
+const scene = new THREE.Scene(); scene.fog = new THREE.Fog(new THREE.Color(T.bg), 8, 18);
+const cam = new THREE.PerspectiveCamera(26, .8, .05, 60);
+let quality = KM.detectQuality(renderer);
+const ENV = { after: KM.studioEnv(renderer), before: KM.roomEnv(renderer) };
+const pass = KM.Transmission(renderer, { scale: .5 });
+
+const VS_UV = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }';
+const back = new THREE.Mesh(new THREE.PlaneGeometry(40, 18), new THREE.ShaderMaterial({ fog: false, uniforms: { uBg: { value: new THREE.Color(T.bg) }, uTop: { value: new THREE.Color(T.top) }, uGlow: { value: new THREE.Color(T.glow) } }, vertexShader: VS_UV,
+  fragmentShader: 'uniform vec3 uBg; uniform vec3 uTop; uniform vec3 uGlow; varying vec2 vUv; void main(){ vec2 d = (vUv - vec2(.5,.42)) * vec2(2.2,1.); float g = exp(-dot(d,d)*8.) * smoothstep(.27, .4, vUv.y); vec3 base = mix(uBg, uTop, smoothstep(.28, .62, vUv.y)); gl_FragColor = vec4(mix(base, uGlow, g), 1.); }' }));
+back.position.set(0, 4, -7); scene.add(back);
+const floorGeo = new THREE.PlaneGeometry(40, 40); let mirror = null;
+if (THREE.Reflector) { mirror = new THREE.Reflector(floorGeo, { textureWidth: 512, textureHeight: 512, color: 0x8a8a98, clipBias: .003 }); mirror.rotation.x = -Math.PI / 2; mirror.material.uniforms.color.value = new THREE.Color(T.floor); scene.add(mirror); }
+const veil = new THREE.Mesh(floorGeo, new THREE.ShaderMaterial({ transparent: true, depthWrite: false, fog: false, uniforms: { uCol: { value: new THREE.Color(T.bg) }, uGlow: { value: new THREE.Color(T.glow) } },
+  vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+  fragmentShader: 'uniform vec3 uCol; uniform vec3 uGlow; varying vec3 vW; void main(){ float d = length(vW.xz*vec2(.8,1.1)); float a = mix(.66, 1., smoothstep(.4, 4.2, d)); vec3 pool = uGlow * 1.6 * exp(-d*d*.55); gl_FragColor = vec4(uCol + pool, a); }' }));
+veil.rotation.x = -Math.PI / 2; veil.position.y = .002; veil.renderOrder = -1; scene.add(veil);
+const hideInMirror = [veil];
+if (mirror) { const ob = mirror.onBeforeRender; mirror.onBeforeRender = function () { hideInMirror.forEach(o => { o.userData.v = o.visible; o.visible = false; }); ob.apply(this, arguments); hideInMirror.forEach(o => { o.visible = o.userData.v; }); }; }
+
+const key = new THREE.SpotLight(0xf7f6f8, 2.3 * .75, 0, .5, .85, 1); key.position.set(.4, 5.6, 2.8); key.target.position.set(0, .6, 0); scene.add(key, key.target);
+const rimL = new THREE.DirectionalLight(C('rimL'), 1.25 * .6); rimL.position.set(-3, 2.4, -2.6); scene.add(rimL);
+const rimR = new THREE.DirectionalLight(C('rimR'), .9 * .6); rimR.position.set(3.2, 2, -2.2); scene.add(rimR);
+const fill = new THREE.HemisphereLight(0xe9e9eb, 0x08080a, .18); scene.add(fill);
+/* "after" only: two small hard lights, for sparkle on facets and a crisp line on polished metal */
+const spark1 = new THREE.PointLight(0xffffff, 0, 0, 2); spark1.position.set(-1.6, 2.6, 2.4); scene.add(spark1);
+const spark2 = new THREE.PointLight(0xfff1ea, 0, 0, 2); spark2.position.set(1.9, 1.7, 1.8); scene.add(spark2);
+
+const coneH = 5.4; const cone = new THREE.Mesh(new THREE.ConeGeometry(1.45, coneH, 64, 1, true), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+  vertexShader: 'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ vY = position.y/' + coneH.toFixed(1) + ' + .5; vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+  fragmentShader: 'varying float vY; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(abs(dot(vN, vV)), 2.2); float a = .085 * f * smoothstep(0., .55, vY) * (1. - smoothstep(.85, 1., vY)); gl_FragColor = vec4(vec3(.82,.8,1.)*a, 1.); }' }));
+cone.position.set(.08, coneH / 2, .55); cone.rotation.z = -.03; scene.add(cone);
+
+const RING_FS = 'uniform vec3 uC; uniform float uA; uniform float uR; uniform float uW; uniform float uFill; varying vec2 vUv; void main(){ float r = length(vUv - .5) * 2.; float band = exp(-pow((r - uR) / uW, 2.)); float core = exp(-pow((r - uR) / (uW * .22), 2.)); float fill = uFill * smoothstep(uR, 0., r) * .2; vec3 c = uC * (band + fill) + vec3(1.) * core * .5; gl_FragColor = vec4(c * uA, 1.); }';
+const ringCol = new THREE.Color(T.ring);
+const ring = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.35), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+  uniforms: { uC: { value: ringCol }, uA: { value: .9 }, uR: { value: .72 }, uW: { value: .09 }, uFill: { value: 1 } }, vertexShader: VS_UV, fragmentShader: RING_FS }));
+ring.rotation.x = -Math.PI / 2; ring.position.y = .008; ring.renderOrder = 3; scene.add(ring); hideInMirror.push(ring);
+function softSprite(inner, outer) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, inner); r.addColorStop(1, outer); g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); }
+const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1.1, .7), new THREE.MeshBasicMaterial({ map: softSprite('rgba(0,0,0,0.9)', 'rgba(0,0,0,0)'), transparent: true, opacity: .75, depthWrite: false, fog: false }));
+shadow.rotation.x = -Math.PI / 2; shadow.position.y = .006; shadow.renderOrder = 2; scene.add(shadow); hideInMirror.push(shadow);
+
+const holder = new THREE.Group(); scene.add(holder);
+let model = null, fit = { hw: .62, hh: .95 }, loaded = {};
+
+/* ?photocam=1: the camera fitted to the reference photo (scratch paint.py), for like-for-like side-by-sides and dE */
+const PHOTOCAM = Q.get('photocam') === '1'; let CAMS = null;
+if (PHOTOCAM) { document.getElementById('stage').style.aspectRatio = '3 / 4'; document.querySelectorAll('.tag,.hint,.pills').forEach(e => { e.style.visibility = 'hidden'; }); }
+function photoCam(w, h) {
+  const c = CAMS && CAMS[state.product]; if (!c || !model) return false;
+  const W = c.W, H = c.H, d = c.d || 60, sv = model.s, o = model.obj.position;
+  const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch), cr = Math.cos(c.roll), sr = Math.sin(c.roll);
+  const Ry = new THREE.Matrix3().set(cy, 0, sy, 0, 1, 0, -sy, 0, cy), Rx = new THREE.Matrix3().set(1, 0, 0, 0, cp, -sp, 0, sp, cp), Rz = new THREE.Matrix3().set(cr, -sr, 0, sr, cr, 0, 0, 0, 1);
+  const Rm = Rz.clone().multiply(Rx).multiply(Ry), Rt = Rm.clone().transpose(), e = Rt.elements;      // column-major: columns = camera axes in world
+  const m4 = new THREE.Matrix4().set(e[0], e[3], e[6], 0, e[1], e[4], e[7], 0, e[2], e[5], e[8], 0, 0, 0, 0, 1);
+  cam.quaternion.setFromRotationMatrix(m4);
+  cam.position.copy(new THREE.Vector3(0, 0, d).applyMatrix3(Rt).multiplyScalar(sv).add(o));
+  cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan((H / 2) / (c.s * d))); cam.aspect = W / H;
+  cam.setViewOffset(W, H, W / 2 - c.tx, H / 2 - c.ty, W, H); cam.near = .05; cam.far = 60; cam.updateProjectionMatrix();
+  const dist = cam.position.distanceTo(o); scene.fog.near = dist + .8; scene.fog.far = dist + 9;
+  holder.rotation.y = 0; yaw = 0; return true;
+}
+function resize() {
+  const w = canvas.clientWidth || 400, h = canvas.clientHeight || 500; renderer.setSize(w, h, false); cam.aspect = w / h;
+  if (PHOTOCAM && photoCam(w, h)) { dirty = true; return; }
+  const vf = THREE.MathUtils.degToRad(cam.fov / 2), hf = Math.atan(Math.tan(vf) * cam.aspect);
+  const d = Math.max(fit.hw / Math.tan(hf), fit.hh / Math.tan(vf)) + .4;
+  cam.position.set(0, 1.05, d); cam.lookAt(0, .66, 0); cam.updateProjectionMatrix();
+  scene.fog.near = d + .8; scene.fog.far = d + 9; dirty = true;
+}
+new ResizeObserver(resize).observe(canvas);
+
+/* ---------- loading ---------- */
+const loader = new THREE.GLTFLoader(); if (window.MeshoptDecoder) loader.setMeshoptDecoder(MeshoptDecoder);
+async function load(name) {
+  if (loaded[name]) return loaded[name];
+  const t0 = performance.now(), r = await fetch('../../../../media/examples/' + KM.PRODUCTS[name].file, { cache: 'no-cache' });
+  if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + KM.PRODUCTS[name].file);
+  const buf = await r.arrayBuffer();
+  const gltf = await new Promise((res, rej) => loader.parse(buf, '', res, rej));
+  const obj = gltf.scene, box = new THREE.Box3().setFromObject(obj), size = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
+  const s = 1.38 / (size.y || 1); obj.scale.setScalar(s); obj.position.set(-ctr.x * s, -box.min.y * s, -ctr.z * s);
+  const g = new THREE.Group(); g.add(obj);
+  let tris = 0; obj.traverse(o => { if (o.isMesh) tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; });
+  const beforeMap = KM.PRODUCTS[name].before ? await KM.loadBeforeMap(KM.PRODUCTS[name].before) : null;
+  return (loaded[name] = { group: g, obj, s, beforeMap, bytes: buf.byteLength, ms: performance.now() - t0, tris, w: Math.max(size.x, size.z) * s });
+}
+
+let info = { glass: [] };
+function applyMaterials() {
+  if (!model) return;
+  const R = KM.PRODUCTS[state.product];
+  pass.clear();
+  info = KM.apply(model.group, state.product, { variant: state.variant, quality, mode: state.mode, transmission: pass, beforeMap: model.beforeMap });
+  pass.enabled = quality === 'high';
+  const after = state.mode === 'after';
+  scene.environment = after ? ENV.after : ENV.before;
+  model.group.traverse(o => { if (o.isMesh && o.material.envMapIntensity !== undefined && !after) o.material.envMapIntensity = .25; });
+  spark1.intensity = after ? .7 : 0; spark2.intensity = after ? .45 : 0;
+  ringCol.set(after ? info.ring : T.ring);
+  document.documentElement.style.setProperty('--ring', after ? info.ring : T.ring);
+  $('tag').textContent = (after ? 'after · ' + (R.variants[state.variant] ? state.variant + ' ' + info.name : '') : 'before · Rodin as it came') + (after ? ' · ' + (quality === 'high' ? 'transmission on' : 'phone fallback') : '');
+  pills(); stats(); dirty = true;
+}
+
+function stats() {
+  if (!model) return;
+  $('stats').innerHTML = 'file <b>' + (model.bytes / 1e6).toFixed(2) + ' MB</b><br>' + Math.round(model.tris).toLocaleString('en') + ' triangles<br>loaded in ' + (model.ms / 1000).toFixed(2) + ' s<br>quality <b>' + quality + '</b>' + (quality === 'high' ? ' (+1 scene pass at ½ size)' : ' (no extra pass)');
+}
+
+/* ---------- UI ---------- */
+const prodEl = $('prod');
+for (const k of Object.keys(KM.PRODUCTS)) { const b = document.createElement('button'); b.type = 'button'; b.dataset.p = k; b.textContent = KM.PRODUCTS[k].label; prodEl.appendChild(b); }
+prodEl.onclick = e => { const b = e.target.closest('button'); if (b) show(b.dataset.p); };
+$('mode').onclick = e => { const b = e.target.closest('button'); if (!b) return; state.mode = b.dataset.m; press($('mode'), 'm', state.mode); applyMaterials(); };
+$('qual').onclick = e => { const b = e.target.closest('button'); if (!b) return; quality = b.dataset.q; press($('qual'), 'q', quality); applyMaterials(); };
+function press(el, k, v) { el.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[k] === v))); }
+function pills() {
+  const R = KM.PRODUCTS[state.product], V = R.variants || {}, keys = Object.keys(V), el = $('pills');
+  el.innerHTML = '';
+  if (keys.length < 2) return;
+  for (const k of keys) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pill'; b.setAttribute('aria-pressed', String(k === state.variant));
+    b.style.setProperty('--pc', V[k].ring);
+    const sw = V[k].swatch || V[k].ring;
+    b.innerHTML = '<i style="background:radial-gradient(circle at 35% 30%,#fff8 0,' + sw + ' 45%,#000 120%)"></i><b>' + k + '</b>' + V[k].name;
+    b.onclick = () => { state.variant = k; if (state.mode !== 'after') { state.mode = 'after'; press($('mode'), 'm', 'after'); } applyMaterials(); };
+    el.appendChild(b);
+  }
+}
+
+async function show(name) {
+  state.product = name; press(prodEl, 'p', name);
+  const R = KM.PRODUCTS[name];
+  if (!R.variants[state.variant]) state.variant = R.defaultVariant;
+  $('ref').src = REFS[name];
+  $('parts').innerHTML = Object.keys(R.parts).map(p => '<li><code>' + p + '</code> ' + (PART_NOTES[name][p] || R.parts[p].preset) + '</li>').join('');
+  $('msg').style.display = ''; $('msg').textContent = 'Loading…';
+  try {
+    const m = await load(name);
+    if (state.product !== name) return;
+    if (model) holder.remove(model.group);
+    model = m; holder.add(m.group); holder.rotation.y = 0; yaw = THREE.MathUtils.degToRad(state.yaw + (R.yaw || 0));
+    if (PHOTOCAM && !CAMS) CAMS = await (await fetch('photo-cams.json')).json();
+    fit = { hw: Math.max(.62, m.w / 2 + .12), hh: .95 }; resize();
+    shadow.scale.set(Math.max(1, m.w / .55), Math.max(1, m.w / .55), 1);
+    applyMaterials(); $('msg').style.display = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => { window.__ready = name + ':' + state.mode + ':' + state.variant + ':' + quality; }));
+  } catch (e) { $('msg').textContent = String(e && e.message || e); }
+}
+
+/* drag to turn; a slow turn when idle */
+let yaw = 0, vel = 0, drag = null, dirty = true, idleSince = 0;
+canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: yaw }; canvas.setPointerCapture(e.pointerId); vel = 0; });
+canvas.addEventListener('pointermove', e => { if (!drag) return; const ny = drag.y + (e.clientX - drag.x) * .012; vel = ny - yaw; yaw = ny; dirty = true; });
+const end = () => { drag = null; idleSince = performance.now(); };
+canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+
+const dog = KM.watchdog(34, 90);
+let last = performance.now();
+function tick(now) {
+  const dt = now - last; last = now;
+  if (!drag) {
+    if (Math.abs(vel) > 1e-4) { yaw += vel; vel *= .92; dirty = true; }
+    else if (state.spin && now - idleSince > 2500) { yaw += dt * .00022; dirty = true; }
+  }
+  if (dirty && model) {
+    holder.rotation.y = yaw;
+    if (state.mode === 'after' && quality === 'high') pass.render(scene, cam, mirror ? [mirror] : []);
+    renderer.render(scene, cam); dirty = false;
+    if (quality === 'high' && !Q.get('q') && dog.tick(dt)) { quality = 'low'; press($('qual'), 'q', 'low'); applyMaterials(); }
+  }
+  requestAnimationFrame(tick);
+}
+press($('qual'), 'q', quality); press($('mode'), 'm', state.mode);
+window.__kalpi = { state, setYaw: d => { yaw = THREE.MathUtils.degToRad(d + (KM.PRODUCTS[state.product].yaw || 0)); dirty = true; }, show, apply: applyMaterials, renderer };
+show(state.product);
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

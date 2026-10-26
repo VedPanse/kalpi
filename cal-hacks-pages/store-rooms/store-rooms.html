@@ -1,0 +1,346 @@
+<title>Kalpi Store Rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --ground:#0E0F12; --panel:#17191F; --panel2:#20232B; --line:#2C3039; --ink:#EEEDF2; --ink2:#A6A8B4; --ink3:#7E818E;
+  --accent:#B4AAFF; --accentInk:#0C0B12;
+  --display:"Syne",ui-sans-serif,system-ui,sans-serif;
+  --body:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:18px}
+h1,h2,h3,p{margin:0}
+h1{font:800 clamp(26px,3.4vw,40px)/1 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.head p{color:var(--ink2);max-width:62ch;margin-top:8px}
+.eyebrow{font:500 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:999px;padding:9px 15px;font:600 14px/1 var(--body);cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.tab i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.tab:focus-visible,.btn:focus-visible,.sw:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stagewrap{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#000;height:min(72vh,720px);min-height:420px}
+#view{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#view:active{cursor:grabbing}
+.hint{position:absolute;left:14px;bottom:14px;font:500 12px/1.3 var(--mono);color:#fff;background:rgba(0,0,0,.45);padding:7px 10px;border-radius:8px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:none}
+.roomtag{position:absolute;left:14px;top:14px;background:rgba(10,10,14,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;max-width:min(320px,calc(100% - 28px))}
+.roomtag b{display:block;font:700 15px/1.2 var(--display);color:#fff}
+.roomtag span{font-size:12.5px;color:#cfd0d8}
+.panel{position:absolute;right:14px;top:14px;width:min(310px,calc(100% - 28px));background:rgba(18,19,24,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px;max-height:calc(100% - 28px);overflow:auto}
+.panel h3{font:700 18px/1.2 var(--display)}
+.price{font:500 15px var(--mono);color:var(--ink)}
+.panel p{color:var(--ink2);font-size:13.5px}
+.lbl{font:600 12px/1 var(--body);color:var(--ink3);text-transform:uppercase;letter-spacing:.08em}
+.sws{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{border-color:var(--ink)}
+.panel input[type=text]{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:9px 11px;font:inherit}
+.btns{display:grid;gap:8px}
+.btn{border:0;border-radius:999px;padding:11px 14px;font:600 14px/1 var(--body);cursor:pointer}
+.btn.main{background:var(--accent);color:var(--accentInk)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.x{position:absolute;right:10px;top:10px;background:none;border:0;color:var(--ink2);font-size:18px;cursor:pointer;line-height:1;padding:4px}
+.toast{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 14px;border-radius:10px;font-weight:600;font-size:13.5px;max-width:calc(100% - 32px);text-align:center}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:14px;display:grid;gap:6px;cursor:pointer;text-align:left;color:inherit;font:inherit}
+.card[aria-pressed="true"]{border-color:var(--accent)}
+.card b{font:700 16px/1.2 var(--display)}
+.card span{font-size:13px;color:var(--ink2)}
+.card em{font-style:normal;font:500 11.5px/1.3 var(--mono);color:var(--ink3)}
+.sw-strip{display:flex;gap:4px;margin-bottom:4px}
+.sw-strip i{height:6px;flex:1;border-radius:3px}
+.foot{color:var(--ink3);font-size:12.5px}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){
+  .stagewrap{height:auto;min-height:0;display:flex;flex-direction:column;background:var(--panel)}
+  #view{height:62vh;min-height:360px}
+  .panel{position:static;width:auto;max-height:none;border-radius:0;border-width:1px 0 0}
+  .roomtag{display:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="eyebrow">Store templates · pick one per seller</div>
+      <h1>Four rooms for a seller's shop</h1>
+      <p>Each template is a 3D room that fills itself with a seller's Shopify products. Drag to look around, scroll to zoom, and click any product to open it, change its colour or label, and start a demand test.</p>
+    </div>
+    <div class="tabs" role="group" aria-label="Choose a store template" id="tabs"></div>
+  </header>
+
+  <div class="stagewrap">
+    <canvas id="view" aria-label="3D store room with sample products. Drag to look around; click a product to open it."></canvas>
+    <div class="roomtag" id="roomtag"></div>
+    <div class="hint" id="hint">Drag to look · scroll to zoom · click a product</div>
+    <aside class="panel" id="panel" hidden aria-live="polite">
+      <button class="x" id="closeP" type="button" aria-label="Close product">×</button>
+      <div class="eyebrow" id="pCat">Candle</div>
+      <h3 id="pName">Name</h3>
+      <div class="price" id="pPrice">$0</div>
+      <p id="pDesc"></p>
+      <div class="lbl">Colour</div>
+      <div class="sws" id="pSw"></div>
+      <label class="lbl" for="pLabel">Label text</label>
+      <input type="text" id="pLabel" maxlength="22">
+      <div class="btns">
+        <button class="btn main" id="pTest" type="button">Test this version with my customers</button>
+        <button class="btn ghost" id="pBuy" type="button">Add to cart on the seller's store</button>
+      </div>
+    </aside>
+    <div class="toast" id="toast" hidden></div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+  <p class="foot">The water bottle is Kalpi's real 3D model in its four colours; click it and pick a colour to swap the model. Sample shop "Hollow Oak" and its other products, prices and labels are made up for this preview. In the app, products, photos and prices come from the seller's own Shopify store, and checkout uses their real cart.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script src="media/example-bottle/3d-sage.glb.js"></script>
+<script src="media/example-bottle/3d-terracotta.glb.js"></script>
+<script src="media/example-bottle/3d-navy.glb.js"></script>
+<script src="media/example-bottle/3d-cream.glb.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BRAND='Hollow Oak';
+
+/* ---------- the sample catalogue (stands in for a seller's products.json) ---------- */
+const CATALOG=[
+ {id:'c1',type:'candle',name:'Fig & Cedar Candle',price:'$34.00',desc:'Soy wax in a smoked glass jar. 60-hour burn.',colors:['#3E4A3D','#8A5A44','#D9CDB8','#2E3550'],label:'FIG & CEDAR'},
+ {id:'c2',type:'candle',name:'Sea Salt Candle',price:'$34.00',desc:'Coconut-soy blend with a cotton wick.',colors:['#A9C2C9','#E6DFD2','#556B7A','#C9A27A'],label:'SEA SALT'},
+ {id:'b1',type:'glb',name:'Water Bottle',price:'$32.00',desc:'Insulated steel bottle with a bamboo lid. Your Kalpi 3D model: each colour is its own scanned-and-painted version.',colors:['#8FA595','#BA6246','#2C3A5C','#E8E0CE'],glb:{'#8FA595':'sage','#BA6246':'terracotta','#2C3A5C':'navy','#E8E0CE':'cream'},label:'WATER BOTTLE'},
+ {id:'b2',type:'bottle',name:'Hand Oil',price:'$22.00',desc:'Cold-pressed oils with vetiver, 50 ml.',colors:['#7B4B3A','#C8B27E','#3A4E48','#9E9EAF'],label:'HAND OIL'},
+ {id:'x1',type:'box',name:'Gift Set',price:'$58.00',desc:'One candle, one mist and a matchbox in a rigid box.',colors:['#22262E','#C9B59A','#7D8F7A','#8E4E3E'],label:'GIFT SET'},
+ {id:'m1',type:'mug',name:'Stoneware Mug',price:'$28.00',desc:'Hand-thrown, 300 ml, speckled glaze.',colors:['#E8E2D6','#5C6B73','#A0644E','#2F3530'],label:'HOLLOW OAK'},
+ {id:'p1',type:'print',name:'Oak Leaf Print',price:'$40.00',desc:'A3 giclée print on cotton paper.',colors:['#C98B5B','#7A8F6A','#3E4C66','#D8C9A9'],label:'OAK'},
+ {id:'p2',type:'print',name:'Shoreline Print',price:'$40.00',desc:'A3 giclée print on cotton paper.',colors:['#6F94A6','#D2B48C','#45584A','#B5747A'],label:'SHORE'}
+];
+const state={}; CATALOG.forEach(p=>state[p.id]={color:p.colors[0],label:p.label});
+
+/* ---------- templates ---------- */
+const TEMPLATES=[
+ {id:'gallery',name:'Gallery',dot:'#E9E6E0',sw:['#F1EFEA','#C9B79C','#2B2B2B'],tag:'White walls, oak floor, spotlights. Products hang as prints or stand on plinths.',best:'Best for art, prints, ceramics'},
+ {id:'apothecary',name:'Apothecary',dot:'#2F4A3C',sw:['#2F4A3C','#8C6A43','#D9B56A'],tag:'Deep green walls, wooden shelves and brass lamps. A small, warm shop.',best:'Best for candles, beauty, home scents'},
+ {id:'stage',name:'Stage',dot:'#B4AAFF',sw:['#07060A','#B4AAFF','#3A2F55'],tag:'A dark stage with lit plinths and glowing rings, one product per light.',best:'Best for launches and hero products'},
+ {id:'loft',name:'Pop-up Loft',dot:'#9AA3AB',sw:['#B9BEC2','#5E6670','#F2A65A'],tag:'Concrete loft with long tables, window light and a neon sign.',best:'Best for makers, merch, markets'}
+];
+
+/* ---------- renderer ---------- */
+const cv=$('#view');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const camera=new THREE.PerspectiveCamera(50,1,.05,80);
+const controls=new THREE.OrbitControls(camera,cv);
+controls.enableDamping=true; controls.dampingFactor=.08; controls.maxPolarAngle=Math.PI*.49; controls.minDistance=1.2; controls.maxDistance=9; controls.enablePan=false;
+let scene=null, pickables=[], anim=[], current=null;
+
+function resize(){const r=cv.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/Math.max(1,r.height);camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(cv);
+
+/* ---------- canvas textures ---------- */
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;t.userData={c,draw};return t;}
+function redraw(t,draw){const c=t.userData.c,g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);draw(g,c.width,c.height);t.needsUpdate=true;}
+const labelDraw=(text,bg,ink)=>(g,w,h)=>{g.fillStyle=bg;g.fillRect(0,0,w,h);g.strokeStyle=ink;g.globalAlpha=.5;g.lineWidth=3;g.strokeRect(w*.32,h*.12,w*.36,h*.76);g.globalAlpha=1;g.fillStyle=ink;g.textAlign='center';g.font='600 '+(h*.13)+'px "DM Sans", sans-serif';g.fillText(BRAND.toUpperCase(),w/2,h*.34);g.font='800 '+(h*.2)+'px Syne, sans-serif';fitText(g,text,w/2,h*.62,w*.34);g.font='400 '+(h*.1)+'px "IBM Plex Mono", monospace';g.fillText('HANDMADE',w/2,h*.8);};
+function fitText(g,text,x,y,max){let s=parseFloat(g.font.split(' ')[1]);while(g.measureText(text).width>max&&s>8){s-=2;g.font=g.font.replace(/\d+(\.\d+)?px/,s+'px');}g.fillText(text,x,y);}
+const artDraw=(seed,col,label)=>(g,w,h)=>{g.fillStyle='#F3EFE6';g.fillRect(0,0,w,h);const r=mulberry(seed);g.fillStyle=col;for(let i=0;i<5;i++){g.globalAlpha=.25+r()*.6;g.beginPath();g.ellipse(w*(.25+r()*.5),h*(.25+r()*.5),w*(.12+r()*.22),h*(.06+r()*.2),r()*3,0,7);g.fill();}g.globalAlpha=1;g.fillStyle='#2b2b2b';g.font='600 '+(h*.05)+'px "DM Sans", sans-serif';g.textAlign='center';g.fillText(label+' · '+BRAND,w/2,h*.93);};
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gradTex(inner,outer){return canvasTex(256,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gr.addColorStop(0,inner);gr.addColorStop(.55,inner);gr.addColorStop(.72,outer);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,w,h);});}
+function woodTex(base,line){return canvasTex(512,512,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);const r=mulberry(7);for(let i=0;i<60;i++){g.strokeStyle=line;g.globalAlpha=.05+r()*.12;g.lineWidth=1+r()*3;g.beginPath();const y=r()*h;g.moveTo(0,y);g.bezierCurveTo(w*.3,y+r()*20-10,w*.6,y+r()*20-10,w,y+r()*16-8);g.stroke();}for(let i=1;i<6;i++){g.globalAlpha=.18;g.fillStyle='#000';g.fillRect(0,i*h/6,w,2);}});}
+function noiseTex(base,amt){return canvasTex(512,512,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);const r=mulberry(3);for(let i=0;i<9000;i++){g.globalAlpha=r()*amt;g.fillStyle=r()>.5?'#fff':'#000';g.fillRect(r()*w,r()*h,1+r()*2,1+r()*2);}});}
+
+/* ---------- products ---------- */
+function std(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:0},o||{}));}
+/* her Kalpi bottle: real GLB models (meshopt + WebP), one per colour, packed as base64 scripts */
+const GLBC={};
+function getGLB(name){const key='media/example-bottle/3d-'+name+'.glb';if(GLBC[key])return GLBC[key];
+  const b=window.KALPI_GLB&&window.KALPI_GLB[key];if(!b||!THREE.GLTFLoader||!window.MeshoptDecoder)return Promise.reject(new Error('model missing'));
+  const s=atob(b),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);
+  return GLBC[key]=MeshoptDecoder.ready.then(()=>new Promise((res,rej)=>{const L=new THREE.GLTFLoader();L.setMeshoptDecoder(MeshoptDecoder);L.parse(a.buffer,'',g=>res(g.scene),rej);}));}
+function makeGLBProduct(p){
+  const g=new THREE.Group();g.userData.pid=p.id;g.userData.recol=[];g.userData.type='glb';
+  const hit=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,.36,12),new THREE.MeshBasicMaterial({visible:false}));hit.position.y=.18;hit.userData.pid=p.id;g.add(hit);
+  let cur=null;
+  g.userData.setModel=name=>getGLB(name).then(sc=>{const m=sc.clone(true);const box=new THREE.Box3().setFromObject(m),size=box.getSize(new THREE.Vector3()),c=box.getCenter(new THREE.Vector3()),k=.36/size.y;
+    m.scale.setScalar(k);m.position.set(-c.x*k,-box.min.y*k,-c.z*k);
+    m.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;o.userData.pid=p.id;const mt=o.material;if(mt){if(mt.map)mt.map.encoding=THREE.sRGBEncoding;mt.roughness=.6;mt.metalness=0;mt.side=THREE.DoubleSide;}}});
+    if(cur)g.remove(cur);cur=m;g.add(m);}).catch(e=>console.warn(e));
+  g.userData.setModel(p.glb[state[p.id].color]);
+  return g;}
+function makeProduct(p){
+  if(p.type==='glb')return makeGLBProduct(p);
+  const s=state[p.id], g=new THREE.Group(); g.userData.pid=p.id; const recol=[]; let labelTex=null;
+  const lt=()=>labelTex=canvasTex(512,256,labelDraw(s.label,'#F4F0E8','#2A2A2A'));
+  if(p.type==='candle'){
+    const glass=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.26,48,1,true),new THREE.MeshPhysicalMaterial({color:'#ffffff',roughness:.08,metalness:0,transparent:true,opacity:.28,side:THREE.DoubleSide}));glass.position.y=.13;
+    const wax=new THREE.Mesh(new THREE.CylinderGeometry(.122,.122,.2,48),std(s.color,{roughness:.85}));wax.position.y=.1;recol.push(wax.material);
+    lt();const label=new THREE.Mesh(new THREE.CylinderGeometry(.1315,.1315,.11,48,1,true,-.9,1.8),std('#fff',{map:labelTex,roughness:.7}));label.position.y=.12;label.rotation.y=Math.PI;
+    const lid=new THREE.Mesh(new THREE.CylinderGeometry(.135,.135,.03,48),std('#B08D57',{metalness:.7,roughness:.35}));lid.position.y=.275;
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.01,48),std('#333'));base.position.y=.005;
+    g.add(glass,wax,label,lid,base);
+  } else if(p.type==='bottle'){
+    const pts=[[0,0],[.075,0],[.08,.01],[.08,.2],[.07,.24],[.03,.27],[.026,.3],[0,.3]].map(a=>new THREE.Vector2(a[0],a[1]));
+    const body=new THREE.Mesh(new THREE.LatheGeometry(pts,48),new THREE.MeshPhysicalMaterial({color:s.color,roughness:.15,metalness:0,clearcoat:1,clearcoatRoughness:.05}));recol.push(body.material);
+    lt();const label=new THREE.Mesh(new THREE.CylinderGeometry(.0815,.0815,.1,48,1,true,-.8,1.6),std('#fff',{map:labelTex}));label.position.y=.11;label.rotation.y=Math.PI;
+    const cap=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.07,32),std('#1E1E1E',{roughness:.4}));cap.position.y=.33;
+    g.add(body,label,cap);
+  } else if(p.type==='box'){
+    lt();const side=std(s.color,{roughness:.5});recol.push(side);const front=std('#fff',{map:labelTex});
+    const box=new THREE.Mesh(new THREE.BoxGeometry(.42,.2,.3),[side,side,side,side,front,side]);box.position.y=.1;
+    const ribbon=new THREE.Mesh(new THREE.BoxGeometry(.43,.205,.03),std('#C9A86A',{metalness:.3,roughness:.4}));ribbon.position.y=.1;
+    g.add(box,ribbon);
+  } else if(p.type==='mug'){
+    const m=std(s.color,{roughness:.45});recol.push(m);
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(.1,.09,.2,48,1,true),m);cup.position.y=.1;cup.material.side=THREE.DoubleSide;
+    const bottom=new THREE.Mesh(new THREE.CircleGeometry(.09,32),m);bottom.rotation.x=-Math.PI/2;bottom.position.y=.002;
+    const handle=new THREE.Mesh(new THREE.TorusGeometry(.055,.014,12,32,Math.PI),m);handle.position.set(.1,.1,0);handle.rotation.z=-Math.PI/2;
+    lt();const band=new THREE.Mesh(new THREE.CylinderGeometry(.0985,.0965,.07,48,1,true,-.7,1.4),std('#fff',{map:labelTex,transparent:true}));band.position.y=.1;band.rotation.y=Math.PI;
+    g.add(cup,bottom,handle,band);
+  } else if(p.type==='print'){
+    const art=canvasTex(512,700,artDraw(p.id.charCodeAt(1)*31,s.color,s.label));labelTex=art;
+    const frame=new THREE.Mesh(new THREE.BoxGeometry(.62,.82,.035),std('#2A2622',{roughness:.5}));
+    const pic=new THREE.Mesh(new THREE.PlaneGeometry(.52,.72),std('#fff',{map:art,roughness:.9}));pic.position.z=.019;
+    g.add(frame,pic);g.userData.print=true;
+  }
+  g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.userData.pid=p.id;}});
+  g.userData.recol=recol; g.userData.labelTex=labelTex; g.userData.type=p.type;
+  return g;
+}
+function refreshProduct(g){const p=CATALOG.find(x=>x.id===g.userData.pid),s=state[p.id];
+  if(p.type==='glb'){g.userData.setModel(p.glb[s.color]);return;}
+  g.userData.recol.forEach(m=>m.color.set(s.color));
+  const t=g.userData.labelTex;if(!t)return;
+  if(p.type==='print')redraw(t,artDraw(p.id.charCodeAt(1)*31,s.color,s.label));else redraw(t,labelDraw(s.label,'#F4F0E8','#2A2A2A'));}
+
+/* ---------- room helpers ---------- */
+function room(w,d,h,wallMat,floorMat,ceil){const g=new THREE.Group();
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(w,d),floorMat);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;g.add(floor);
+  const mk=(W,H,x,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(W,H),wallMat);m.position.set(x,H/2,z);m.rotation.y=ry;m.receiveShadow=true;g.add(m);};
+  mk(w,h,0,-d/2,0);mk(d,h,-w/2,0,Math.PI/2);mk(d,h,w/2,0,-Math.PI/2);
+  if(ceil){const c=new THREE.Mesh(new THREE.PlaneGeometry(w,d),ceil);c.rotation.x=Math.PI/2;c.position.y=h;g.add(c);}
+  return g;}
+function plinth(x,z,h,mat,r){const m=r?new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,48),mat):new THREE.Mesh(new THREE.BoxGeometry(.42,h,.42),mat);m.position.set(x,h/2,z);m.castShadow=m.receiveShadow=true;return m;}
+function spot(x,y,z,tx,ty,tz,col,int,ang){const s=new THREE.SpotLight(col,int,12,ang||.45,.55,1.4);s.position.set(x,y,z);s.target.position.set(tx,ty,tz);s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.bias=-.0005;return [s,s.target];}
+function place(id,x,y,z,ry){const p=CATALOG.find(c=>c.id===id);const g=makeProduct(p);g.position.set(x,y,z);g.rotation.y=ry||0;scene.add(g);pickables.push(g);return g;}
+
+/* ---------- the four templates ---------- */
+const BUILD={
+ gallery(){
+  scene.background=new THREE.Color('#E8E5DF');scene.fog=new THREE.Fog('#E8E5DF',9,18);
+  scene.add(room(8,7,3.4,std('#F1EFEA',{roughness:.95}),std('#ffffff',{map:woodTex('#C9B79C','#6b5233'),roughness:.7}),std('#F6F5F2')));
+  scene.add(new THREE.HemisphereLight('#ffffff','#b9a98f',.55));
+  const amb=new THREE.DirectionalLight('#fff7ee',.35);amb.position.set(2,5,4);scene.add(amb);
+  place('p1',-1.2,1.65,-3.47);place('p2',1.2,1.65,-3.47);
+  scene.add(...spot(-1.2,3.3,-2,-1.2,1.6,-3.5,'#fff3e2',2.2,.32),...spot(1.2,3.3,-2,1.2,1.6,-3.5,'#fff3e2',2.2,.32));
+  const pm=std('#FAFAF8',{roughness:.8});
+  [[-1.6,-1.2,'c1'],[-.55,-.6,'b1'],[.55,-.6,'m1'],[1.6,-1.2,'c2']].forEach(([x,z,id])=>{scene.add(plinth(x,z,.95,pm));place(id,x,.95,z,.4);scene.add(...spot(x,3.3,z+1.2,x,1,z,'#fff',1.3,.22));});
+  scene.add(plinth(0,-2.3,.6,pm));place('x1',0,.6,-2.3,-.3);
+  camera.position.set(0,1.6,3.2);controls.target.set(0,1,-1.2);
+ },
+ apothecary(){
+  scene.background=new THREE.Color('#162319');scene.fog=new THREE.Fog('#162319',7,14);
+  scene.add(room(6,6,3,std('#2F4A3C',{roughness:.9}),std('#fff',{map:woodTex('#5A3E26','#1d120a'),roughness:.75}),std('#1E2E24')));
+  scene.add(new THREE.HemisphereLight('#FFE2B8','#1b2a20',.35));
+  const wood=std('#fff',{map:woodTex('#8C6A43','#3b2914'),roughness:.6});
+  const shelfY=[.75,1.35,1.95];
+  shelfY.forEach(y=>{const sh=new THREE.Mesh(new THREE.BoxGeometry(4.2,.05,.38),wood);sh.position.set(0,y,-2.79);sh.castShadow=sh.receiveShadow=true;scene.add(sh);});
+  [-2.1,2.1].forEach(x=>{const up=new THREE.Mesh(new THREE.BoxGeometry(.06,2.3,.38),wood);up.position.set(x,1.15,-2.79);up.castShadow=true;scene.add(up);});
+  const rows=[['c1','c2','b1','b2','m1'],['b2','c2','x1','c1'],['m1','b1','c1','b2','c2']];
+  rows.forEach((ids,ri)=>{const n=ids.length;ids.forEach((id,i)=>{place(id,-1.6+i*3.2/(n-1),shelfY[ri]+.025,-2.75,0);});});
+  const counter=new THREE.Mesh(new THREE.BoxGeometry(1.8,.95,.6),wood);counter.position.set(1.2,.475,-.4);counter.castShadow=counter.receiveShadow=true;scene.add(counter);
+  place('x1',1.0,.95,-.4,-.4);place('c1',1.65,.95,-.35,.6);
+  [[-1.2,-1.8],[1.2,-1.8],[1.2,-.3]].forEach(([x,z])=>{
+    const cord=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,.7,6),std('#111'));cord.position.set(x,2.65,z);scene.add(cord);
+    const shade=new THREE.Mesh(new THREE.ConeGeometry(.16,.18,32,1,true),std('#D9B56A',{metalness:.85,roughness:.3,side:THREE.DoubleSide}));shade.position.set(x,2.25,z);scene.add(shade);
+    const bulb=new THREE.Mesh(new THREE.SphereGeometry(.04,16,16),new THREE.MeshBasicMaterial({color:'#FFE6B0'}));bulb.position.set(x,2.2,z);scene.add(bulb);
+    const l=new THREE.PointLight('#FFC97A',1.3,4.5,1.6);l.position.set(x,2.15,z);l.castShadow=true;l.shadow.mapSize.set(512,512);scene.add(l);});
+  camera.position.set(-.6,1.55,2.4);controls.target.set(0,1.2,-2);
+ },
+ stage(){
+  scene.background=new THREE.Color('#07060A');scene.fog=new THREE.Fog('#07060A',6,13);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(9,64),new THREE.MeshStandardMaterial({color:'#0F0D15',roughness:.35,metalness:.4}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+  const back=new THREE.Mesh(new THREE.PlaneGeometry(20,8),new THREE.MeshBasicMaterial({map:canvasTex(512,256,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h*.15,0,w/2,h*.15,w*.6);gr.addColorStop(0,'#3A2F55');gr.addColorStop(.5,'#140E1D');gr.addColorStop(1,'#07060A');g.fillStyle=gr;g.fillRect(0,0,w,h);})}));back.position.set(0,3.5,-5);scene.add(back);
+  scene.add(new THREE.HemisphereLight('#B4AAFF','#07060A',.18));
+  const ringTex=gradTex('rgba(0,0,0,0)','rgba(180,170,255,1)');
+  const items=[['b1',-2.2,-1.4],['c1',-1.1,-2],['x1',0,-2.3],['c2',1.1,-2],['m1',2.2,-1.4]];
+  const pm=new THREE.MeshStandardMaterial({color:'#18151F',roughness:.4,metalness:.3});
+  items.forEach(([id,x,z],i)=>{scene.add(plinth(x,z,.7,pm,.3));const g=place(id,x,.7,z,-x*.2);
+    const ring=new THREE.Mesh(new THREE.PlaneGeometry(1.1,1.1),new THREE.MeshBasicMaterial({map:ringTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(x,.012,z);scene.add(ring);
+    anim.push(t=>{ring.material.opacity=.65+.3*Math.sin(t*1.6+i);if(!reduce)g.rotation.y+= .003;});
+    scene.add(...spot(x*.6,4.2,z+1.6,x,.8,z,'#E9E6FF',2.4,.18));});
+  camera.position.set(0,1.5,2.8);controls.target.set(0,.9,-1.6);
+ },
+ loft(){
+  scene.background=new THREE.Color('#2A2E33');scene.fog=new THREE.Fog('#2A2E33',9,18);
+  const wall=std('#fff',{map:noiseTex('#A9AEB2',.08),roughness:.95});
+  scene.add(room(9,7,3.6,wall,std('#fff',{map:noiseTex('#7A8087',.12),roughness:.85}),std('#3A3F45')));
+  const win=new THREE.Mesh(new THREE.PlaneGeometry(3.2,2),new THREE.MeshBasicMaterial({color:'#E7F0F7'}));win.position.set(-4.49,1.8,-.5);win.rotation.y=Math.PI/2;scene.add(win);
+  for(let i=1;i<4;i++){const bar=new THREE.Mesh(new THREE.BoxGeometry(.04,2,.04),std('#1c1f22'));bar.position.set(-4.47,1.8,-.5-1.6+i*.8);scene.add(bar);}
+  const sun=new THREE.DirectionalLight('#FFF4E5',1.6);sun.position.set(-6,4,0);sun.target.position.set(0,0,-1);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-5,right:5,top:5,bottom:-5});scene.add(sun,sun.target);
+  scene.add(new THREE.HemisphereLight('#dfe6ee','#3a3f45',.55));
+  const top=std('#fff',{map:woodTex('#B08A5F','#4a331c'),roughness:.6}),leg=std('#22262A',{metalness:.6,roughness:.4});
+  [[-1.2,-1.6],[1.4,-1.0]].forEach(([x,z],ti)=>{const t=new THREE.Mesh(new THREE.BoxGeometry(2.2,.06,.8),top);t.position.set(x,.88,z);t.castShadow=t.receiveShadow=true;scene.add(t);
+    [[-1,-.33],[1,-.33],[-1,.33],[1,.33]].forEach(([a,b])=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.05,.85,.05),leg);l.position.set(x+a,.425,z+b);l.castShadow=true;scene.add(l);});
+    const ids=ti?['m1','c2','b2','m1']:['c1','b1','x1','b2'];ids.forEach((id,i)=>place(id,x-.75+i*.5,.91,z,(i-1.5)*.3));});
+  const neon=new THREE.Mesh(new THREE.PlaneGeometry(2.4,.6),new THREE.MeshBasicMaterial({map:canvasTex(1024,256,(g,w,h)=>{g.fillStyle='rgba(0,0,0,0)';g.fillRect(0,0,w,h);g.font='700 150px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='#F2A65A';g.shadowBlur=40;g.fillStyle='#FFD3A3';g.fillText(BRAND.toLowerCase(),w/2,h/2);g.shadowBlur=12;g.fillText(BRAND.toLowerCase(),w/2,h/2);}),transparent:true}));neon.position.set(.4,2.5,-3.48);scene.add(neon);
+  const glow=new THREE.PointLight('#F2A65A',.7,4);glow.position.set(.4,2.5,-3);scene.add(glow);
+  place('p1',2.6,1.7,-3.47);
+  camera.position.set(.2,1.6,2.8);controls.target.set(0,1,-1.4);
+ }
+};
+
+function dispose(o){o.traverse(n=>{if(n.geometry)n.geometry.dispose();if(n.material){(Array.isArray(n.material)?n.material:[n.material]).forEach(m=>{if(m.map)m.map.dispose();m.dispose();});}});}
+function load(id){
+  if(scene)dispose(scene);
+  scene=new THREE.Scene();pickables=[];anim=[];current=id;
+  BUILD[id]();controls.update();resize();
+  const T=TEMPLATES.find(t=>t.id===id);$('#roomtag').innerHTML='<b>'+T.name+'</b><span>'+T.tag+'</span>';
+  document.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===id));
+  closePanel();
+}
+
+/* ---------- picking + panel ---------- */
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let down=null,sel=null;
+cv.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+cv.addEventListener('pointerup',e=>{if(!down)return;const moved=Math.hypot(e.clientX-down[0],e.clientY-down[1]);down=null;if(moved>6)return;
+  const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);
+  const hit=ray.intersectObjects(pickables,true)[0];if(hit)openPanel(hit.object.userData.pid);});
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);cv.style.cursor=ray.intersectObjects(pickables,true).length?'pointer':'';});
+function openPanel(pid){const p=CATALOG.find(c=>c.id===pid),s=state[pid];sel=pid;
+  $('#pCat').textContent=p.type==='box'?'Gift box':p.type[0].toUpperCase()+p.type.slice(1);$('#pName').textContent=p.name;$('#pPrice').textContent=p.price;$('#pDesc').textContent=p.desc;
+  $('#pSw').innerHTML=p.colors.map(c=>'<button class="sw" type="button" data-c="'+c+'" style="background:'+c+'" aria-label="Colour '+c+'" aria-pressed="'+(c===s.color)+'"></button>').join('');
+  $('#pLabel').value=s.label;const isG=p.type==='glb';$('#pLabel').disabled=isG;$('#pLabel').title=isG?'This model has its own printed label':'';$('#pCat').textContent=isG?'Your Kalpi 3D model':$('#pCat').textContent;
+  $('#panel').hidden=false;$('#hint').hidden=true;}
+function closePanel(){$('#panel').hidden=true;$('#hint').hidden=false;sel=null;}
+function update(){pickables.filter(g=>g.userData.pid===sel).forEach(refreshProduct);}
+$('#pSw').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;state[sel].color=b.dataset.c;$('#pSw').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',x===b));update();});
+$('#pLabel').addEventListener('input',e=>{state[sel].label=(e.target.value||'').toUpperCase().slice(0,22)||' ';update();});
+$('#closeP').addEventListener('click',closePanel);
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3600);}
+$('#pTest').addEventListener('click',()=>{const p=CATALOG.find(c=>c.id===sel);toast('In the app, this makes an ad and a vote page for "'+state[sel].label+'" in this colour, with a QR code for the seller’s customers.');});
+$('#pBuy').addEventListener('click',()=>toast('In the app, this opens the seller’s real Shopify cart with this item added.'));
+
+/* ---------- tabs + cards ---------- */
+$('#tabs').innerHTML=TEMPLATES.map(t=>'<button class="tab" type="button" data-t="'+t.id+'" aria-pressed="false"><i style="background:'+t.dot+'"></i>'+t.name+'</button>').join('');
+$('#cards').innerHTML=TEMPLATES.map(t=>'<button class="card" type="button" data-t="'+t.id+'" aria-pressed="false"><div class="sw-strip">'+t.sw.map(c=>'<i style="background:'+c+'"></i>').join('')+'</div><b>'+t.name+'</b><span>'+t.tag+'</span><em>'+t.best+'</em></button>').join('');
+document.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)load(b.dataset.t);});
+
+/* ---------- loop ---------- */
+const clock=new THREE.Clock();
+function frame(){requestAnimationFrame(frame);const t=clock.getElapsedTime();anim.forEach(f=>f(t));controls.update();if(scene)renderer.render(scene,camera);}
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{load('apothecary');frame();});
+})();
+</script>

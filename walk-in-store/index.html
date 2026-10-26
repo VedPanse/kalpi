@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Walk-in Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <canvas id="view" aria-label="Walk-in 3D store. Move the mouse or drag to look, use arrow keys or WASD to walk, click a product."></canvas>
+  <div class="cross" aria-hidden="true"></div>
+
+  <div class="bar">
+    <div class="brand" id="brand">Walk-in Store</div>
+    <form id="storeForm">
+      <input id="storeInput" value="homesick.com" aria-label="Shopify store address" spellcheck="false" autocomplete="off">
+      <button class="btn main" type="submit">Build store</button>
+    </form>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="status" id="status">Type a Shopify store and press <b>Build store</b>.</div>
+
+  <aside class="panel" id="panel" hidden>
+    <button class="x" id="closePanel" type="button" aria-label="Close">×</button>
+    <img id="pImg" alt="">
+    <div class="meta" id="pMeta"></div>
+    <h3 id="pTitle"></h3>
+    <div class="price" id="pPrice"></div>
+    <div class="btns">
+      <button class="btn main" id="pFetch" type="button">🤖 Fetch it for me</button>
+      <button class="btn ghost" id="pTest" type="button">Test a new version of this (Kalpi)</button>
+      <a class="btn ghost" id="pCart" target="_blank" rel="noopener">Add to cart on their store ↗</a>
+      <a class="btn ghost" id="pPage" target="_blank" rel="noopener">View product page ↗</a>
+    </div>
+  </aside>
+
+  <div class="keys" aria-label="Walk controls">
+    <span class="sp"></span><button data-k="forward" aria-label="Walk forward">↑</button><span class="sp"></span>
+    <button data-k="left" aria-label="Turn left">↺</button><button data-k="back" aria-label="Walk back">↓</button><button data-k="right" aria-label="Turn right">↻</button>
+  </div>
+
+  <div class="basket" id="basket" hidden>
+    <span id="basketText">0 items</span>
+    <button class="btn main" id="checkoutBtn" type="button">Checkout with the robot</button>
+    <a class="btn ghost" id="payLink" target="_blank" rel="noopener" hidden>Pay on their store ↗</a>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <div class="enter" id="enter">
+    <div>
+      <h2>Walk into the store</h2>
+      <p>Mouse looks around · <b>W A S D</b> or arrow keys walk · <b>Shift</b> walks faster · click a product to open it · <b>Esc</b> gives your mouse back.<br>Or click the floor to walk there.</p>
+      <button class="btn main" id="enterBtn" type="button">Enter the store</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

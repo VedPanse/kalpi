@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Viewer</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Tell the browser where "three" and "three/addons/" come from -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- The renderer adds its <canvas> inside this div -->
+  <div id="container3D"></div>
+
+  <!-- Buttons to switch which product is on screen -->
+  <nav id="picker">
+    <button data-model="lipstick-crystal-red" class="on">Red lipstick</button>
+    <button data-model="bottle-sage">Sage bottle</button>
+    <button data-model="bottle-terracotta">Terracotta</button>
+    <button data-model="bottle-navy">Navy</button>
+    <button data-model="bottle-cream">Cream</button>
+    <button data-model="perfume-parts">Perfume</button>
+    <button data-model="candle-marble">Candle</button>
+  </nav>
+
+  <p id="hint">Drag to rotate · scroll to zoom · right-drag to move</p>
+  <p id="status">Loading…</p>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

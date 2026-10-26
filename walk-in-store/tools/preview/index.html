@@ -1,0 +1,24 @@
+<!doctype html><meta charset=utf-8><title>3D catalogue preview</title>
+<style>html,body{margin:0;height:100%;background:#efece6}</style>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { buildModel } from "../../src/model3d.ts";
+const STORE = new URLSearchParams(location.search).get("store") || "graza.co";
+const dir = "/models/" + STORE + "/";
+const cat = await (await fetch("/api/models?store=" + STORE)).json();
+const r = new THREE.WebGLRenderer({ antialias: true }); r.setPixelRatio(2); r.setSize(innerWidth, innerHeight);
+r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color("#efece6");
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.6;
+const key = new THREE.DirectionalLight(0xffffff, 2); key.position.set(2, 4, 3); scene.add(key);
+const only = new URLSearchParams(location.search).get("only"); const ids = only ? only.split(",") : Object.keys(cat.bases); let x = 0;
+for (const id of ids) { const m = buildModel(cat.bases[id], dir); m.position.x = x; x += cat.bases[id].widthMM / 1000 + 0.06; m.rotation.y = 0.35; scene.add(m); }
+const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.01, 50); cam.position.set(x / 2, 0.35, 2.4);
+const c = new OrbitControls(cam, r.domElement); c.target.set(x / 2, 0.14, 0); c.update();
+window.__dbg = ids.map(id => { const b = cat.bases[id]; return id + " w" + b.widthMM + " pts" + b.profile?.length; }); console.log(JSON.stringify(window.__dbg));
+const spin = scene.children.filter((o) => o.userData.base);
+let last = performance.now();
+r.setAnimationLoop((t) => { const dt = (t - last) / 1000; last = t; spin.forEach((o) => (o.rotation.y += dt * 0.6)); c.update(); r.render(scene, cam); });
+</script>

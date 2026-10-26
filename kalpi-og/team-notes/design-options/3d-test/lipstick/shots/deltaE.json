@@ -1,0 +1,142 @@
+[
+ {
+  "product": "lipstick",
+  "part": "cap",
+  "albedo_dE00_rodin": 19.48,
+  "albedo_dE00_painted": 3.11,
+  "lit_before_pixel_mean": [
+   16.2,
+   5.9
+  ],
+  "lit_after_pixel_mean": [
+   7.3,
+   4.1
+  ]
+ },
+ {
+  "product": "lipstick",
+  "part": "collar",
+  "albedo_dE00_rodin": 32.33,
+  "albedo_dE00_painted": 4.35,
+  "lit_before_pixel_mean": [
+   33.3,
+   3.8
+  ],
+  "lit_after_pixel_mean": [
+   20.3,
+   7.1
+  ]
+ },
+ {
+  "product": "lipstick",
+  "part": "case",
+  "albedo_dE00_rodin": 21.16,
+  "albedo_dE00_painted": 2.37,
+  "lit_before_pixel_mean": [
+   27.2,
+   16.4
+  ],
+  "lit_after_pixel_mean": [
+   11.6,
+   3.7
+  ]
+ },
+ {
+  "product": "lipstick",
+  "part": "bullet",
+  "albedo_dE00_rodin": 16.1,
+  "albedo_dE00_painted": 1.88,
+  "lit_before_pixel_mean": [
+   14.9,
+   5.9
+  ],
+  "lit_after_pixel_mean": [
+   7.0,
+   4.1
+  ]
+ },
+ {
+  "product": "perfume",
+  "part": "glass",
+  "albedo_dE00_rodin": 15.67,
+  "albedo_dE00_painted": 2.16,
+  "lit_before_pixel_mean": [
+   25.6,
+   20.6
+  ],
+  "lit_after_pixel_mean": [
+   12.3,
+   6.6
+  ]
+ },
+ {
+  "product": "perfume",
+  "part": "collar",
+  "albedo_dE00_rodin": 25.36,
+  "albedo_dE00_painted": 2.36,
+  "lit_before_pixel_mean": [
+   26.8,
+   21.3
+  ],
+  "lit_after_pixel_mean": [
+   20.9,
+   5.0
+  ]
+ },
+ {
+  "product": "perfume",
+  "part": "cap",
+  "albedo_dE00_rodin": 32.25,
+  "albedo_dE00_painted": 2.89,
+  "lit_before_pixel_mean": [
+   24.7,
+   8.3
+  ],
+  "lit_after_pixel_mean": [
+   19.0,
+   3.4
+  ]
+ },
+ {
+  "product": "candle",
+  "part": "vessel",
+  "albedo_dE00_rodin": 10.47,
+  "albedo_dE00_painted": 4.61,
+  "lit_before_pixel_mean": [
+   11.3,
+   8.5
+  ],
+  "lit_after_pixel_mean": [
+   9.5,
+   7.1
+  ]
+ },
+ {
+  "product": "candle",
+  "part": "lid",
+  "albedo_dE00_rodin": 23.51,
+  "albedo_dE00_painted": 12.65,
+  "lit_before_pixel_mean": [
+   22.6,
+   7.2
+  ],
+  "lit_after_pixel_mean": [
+   22.5,
+   5.9
+  ]
+ },
+ {
+  "product": "candle",
+  "part": "knob",
+  "albedo_dE00_rodin": 20.12,
+  "albedo_dE00_painted": 4.59,
+  "lit_before_pixel_mean": [
+   26.6,
+   25.3
+  ],
+  "lit_after_pixel_mean": [
+   27.0,
+   26.1
+  ]
+ }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "Kalpi",
+  "id": "label-to-shelf-dev",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://cdnjs.cloudflare.com",
+      "https://cdn.jsdelivr.net"
+    ],
+    "devAllowedDomains": [
+      "http://localhost:8795"
+    ],
+    "reasoning": "Talks to a local helper on this computer that calls fal.ai to generate images; the API key stays in the helper."
+  }
+}
