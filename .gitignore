@@ -5,3 +5,12 @@ data/uploads/*
 !data/uploads/sample.glb
 .env
 .DS_Store
+.env.*
+!.env.example
+public/dist/
+spacetimedb/dist/
+spacetimedb/node_modules/
+playwright-report/
+test-results/
+.local/
+.vercel

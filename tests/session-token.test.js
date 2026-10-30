@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {currentHttpToken} from '../src/session-token.js';
+test('HTTP uses renewed OIDC token instead of stale socket token',async()=>{assert.equal(await currentHttpToken({manager:{getUser:async()=>({id_token:'new',expired:false,expires_in:900})},fallback:'old'}),'new');});
+test('expired token silently renews before upload',async()=>{let calls=0;assert.equal(await currentHttpToken({manager:{getUser:async()=>({expired:true})},refresh:async()=>{calls++;return{id_token:'renewed',expired:false};}}),'renewed');assert.equal(calls,1);});
+test('failed renewal gives recovery instructions instead of sending expired credential',async()=>{await assert.rejects(currentHttpToken({manager:{getUser:async()=>({expired:true})},refresh:async()=>{throw Error('login needed');}}),/model is already saved/);});
+test('non-OIDC plugin/test credentials remain usable',async()=>{assert.equal(await currentHttpToken({fallback:'plugin-token'}),'plugin-token');});

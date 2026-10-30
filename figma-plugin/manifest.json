@@ -1,1 +1,31 @@
-{"name":"Kalpi — Label to customer shelf","id":"kalpi-local-development","api":"1.0.0","main":"code.js","ui":"ui.html","editorType":["figma"],"documentAccess":"dynamic-page","networkAccess":{"allowedDomains":["none"],"devAllowedDomains":["http://localhost:3000"],"reasoning":"Connects only to your running local Kalpi workspace for the 3D label preview and real feedback."}}
+{
+  "name": "Kalpi \u2014 Figma to shared 3D store",
+  "id": "kalpi-local-development",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "relaunchButtons": [
+    {
+      "command": "edit",
+      "name": "Edit in Kalpi"
+    }
+  ],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://kalpi-roan.vercel.app",
+      "https://kalpi-staging-eight.vercel.app",
+      "wss://maincloud.spacetimedb.com",
+      "https://maincloud.spacetimedb.com",
+      "https://*.blob.vercel-storage.com"
+    ],
+    "devAllowedDomains": [
+      "http://localhost:3000",
+      "http://localhost:3002"
+    ],
+    "reasoning": "Connects the project-scoped Kalpi panel to its hosted studio, realtime state and artwork storage."
+  }
+}

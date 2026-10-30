@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1540" viewBox="0 0 1800 1540">
+<rect x="0" y="0" width="1800" height="1540" fill="#F1EFE5"/>
+<text x="64" y="54.0" fill="#182C31" font-family="Arial" font-size="14">FIELDWORK / OBJECTS FOR SLOWER LIVING</text>
+<text x="64" y="144.0" fill="#182C31" font-family="Georgia" font-size="72">A garden for the night.</text>
+<text x="64" y="193.0" fill="#182C31" font-family="Arial" font-size="16">MOON GARDEN — SEED KIT PACKAGING</text>
+<text x="1400" y="75.0" fill="#182C31" font-family="Arial" font-size="13">CONCEPT 01</text>
+<text x="1400" y="91.25" fill="#182C31" font-family="Arial" font-size="13">FLAT ARTWORK + CARTON STUDY</text>
+<path d="M64 226h1672" fill="none" stroke="#182C31" stroke-width="1.2"/>
+<text x="64" y="280.0" fill="#182C31" font-family="Arial" font-size="13">01 / THE FRONT</text>
+<text x="620" y="280.0" fill="#182C31" font-family="Arial" font-size="13">02 / UNFOLDED CARTON</text>
+<g id="front-artwork" transform="translate(64 320) scale(1.3333)">
+<rect x="0" y="0" width="270" height="420" fill="#182C31"/>
+<text x="24" y="32.0" fill="#DBEA92" font-family="Arial" font-size="10">F I E L D W O R K</text>
+<text x="22" y="93.0" fill="#F1EFE5" font-family="Georgia" font-size="49">Moon</text>
+<text x="22" y="154.25" fill="#F1EFE5" font-family="Georgia" font-size="49">Garden</text>
+<text x="24" y="181.0" fill="#DBEA92" font-family="Arial" font-size="8.5">SOW A LITTLE NIGHT MAGIC.</text>
+<g transform="translate(9 188) scale(0.74)">
+<path d="M145 240C128 192 155 162 150 120M151 177C101 187 70 162 55 123M147 213C203 206 236 172 240 131" fill="none" stroke="#DBEA92" stroke-width="1.2"/>
+<path d="M114 185Q66 197 60 163Q93 157 114 185Z" fill="#DBEA92"/>
+<path d="M161 203Q170 168 203 175Q200 203 161 203Z" fill="#DBEA92"/>
+<g transform="translate(150 105)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<g transform="translate(55 115)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<g transform="translate(240 130)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<path d="M226 24a26 26 0 1 0 29 35 22 22 0 0 1-29-35Z" fill="#DBEA92"/>
+<circle cx="56" cy="40" r="2" fill="#DBEA92"/>
+<circle cx="116" cy="26" r="2" fill="#DBEA92"/>
+<circle cx="279" cy="62" r="2" fill="#DBEA92"/>
+</g>
+<text x="24" y="380.0" fill="#F1EFE5" font-family="Arial" font-size="8.5">THREE SEED VARIETIES</text>
+<text x="24" y="390.625" fill="#F1EFE5" font-family="Arial" font-size="8.5">FOR A PALE EVENING GARDEN</text>
+</g>
+<text x="64" y="929.0" fill="#182C31" font-family="Georgia" font-size="24">Small seeds. A new evening ritual.</text>
+<text x="64" y="967.0" fill="#6A7775" font-family="Arial" font-size="15">A book-sized carton with three illustrated</text>
+<text x="64" y="985.75" fill="#6A7775" font-family="Arial" font-size="15">seed sachets and a growing guide.</text>
+<g id="carton-net" transform="translate(620 320)">
+<rect x="40" y="180" width="45" height="420" fill="#E0E3D9"/>
+<text x="57" y="353.0" fill="#6A7775" font-family="Arial" font-size="11">G</text>
+<text x="57" y="366.75" fill="#6A7775" font-family="Arial" font-size="11">L</text>
+<text x="57" y="380.5" fill="#6A7775" font-family="Arial" font-size="11">U</text>
+<text x="57" y="394.25" fill="#6A7775" font-family="Arial" font-size="11">E</text>
+<g id="front-artwork" transform="translate(85 180) scale(1)">
+<rect x="0" y="0" width="270" height="420" fill="#182C31"/>
+<text x="24" y="32.0" fill="#DBEA92" font-family="Arial" font-size="10">F I E L D W O R K</text>
+<text x="22" y="93.0" fill="#F1EFE5" font-family="Georgia" font-size="49">Moon</text>
+<text x="22" y="154.25" fill="#F1EFE5" font-family="Georgia" font-size="49">Garden</text>
+<text x="24" y="181.0" fill="#DBEA92" font-family="Arial" font-size="8.5">SOW A LITTLE NIGHT MAGIC.</text>
+<g transform="translate(9 188) scale(0.74)">
+<path d="M145 240C128 192 155 162 150 120M151 177C101 187 70 162 55 123M147 213C203 206 236 172 240 131" fill="none" stroke="#DBEA92" stroke-width="1.2"/>
+<path d="M114 185Q66 197 60 163Q93 157 114 185Z" fill="#DBEA92"/>
+<path d="M161 203Q170 168 203 175Q200 203 161 203Z" fill="#DBEA92"/>
+<g transform="translate(150 105)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<g transform="translate(55 115)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<g transform="translate(240 130)">
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(0)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(72)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(144)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(216)"/>
+<ellipse cx="0" cy="-14" rx="12" ry="21" fill="#F1EFE5" transform="rotate(288)"/>
+<circle r="6" fill="#DBEA92"/></g>
+<path d="M226 24a26 26 0 1 0 29 35 22 22 0 0 1-29-35Z" fill="#DBEA92"/>
+<circle cx="56" cy="40" r="2" fill="#DBEA92"/>
+<circle cx="116" cy="26" r="2" fill="#DBEA92"/>
+<circle cx="279" cy="62" r="2" fill="#DBEA92"/>
+</g>
+<text x="24" y="380.0" fill="#F1EFE5" font-family="Arial" font-size="8.5">THREE SEED VARIETIES</text>
+<text x="24" y="390.625" fill="#F1EFE5" font-family="Arial" font-size="8.5">FOR A PALE EVENING GARDEN</text>
+</g>
+<rect x="355" y="180" width="105" height="420" fill="#DBEA92"/>
+<text x="369" y="218.0" fill="#182C31" font-family="Arial" font-size="13">GROW</text>
+<text x="369" y="234.25" fill="#182C31" font-family="Arial" font-size="13">SOMETHING</text>
+<text x="369" y="250.5" fill="#182C31" font-family="Arial" font-size="13">WONDERFUL</text>
+<text x="369" y="266.75" fill="#182C31" font-family="Arial" font-size="13">AFTER</text>
+<text x="369" y="283.0" fill="#182C31" font-family="Arial" font-size="13">HOURS.</text>
+<text x="369" y="521.0" fill="#182C31" font-family="Arial" font-size="11">03</text>
+<text x="369" y="534.75" fill="#182C31" font-family="Arial" font-size="11">SEED</text>
+<text x="369" y="548.5" fill="#182C31" font-family="Arial" font-size="11">VARIETIES</text>
+<rect x="460" y="180" width="270" height="420" fill="#182C31"/>
+<text x="483" y="224.0" fill="#F1EFE5" font-family="Georgia" font-size="28">THE NIGHT</text>
+<text x="483" y="259.0" fill="#F1EFE5" font-family="Georgia" font-size="28">IS IN BLOOM.</text>
+<text x="483" y="299.0" fill="#F1EFE5" font-family="Arial" font-size="12">Make a little room for dusk.</text>
+<text x="483" y="314.0" fill="#F1EFE5" font-family="Arial" font-size="12">A collection of pale flowers</text>
+<text x="483" y="329.0" fill="#F1EFE5" font-family="Arial" font-size="12">for a garden that glows as</text>
+<text x="483" y="344.0" fill="#F1EFE5" font-family="Arial" font-size="12">the day slows down.</text>
+<path d="M483 392h224" fill="none" stroke="#6A7775" stroke-width="1.2"/>
+<text x="483" y="420.0" fill="#DBEA92" font-family="Arial" font-size="9">INSIDE YOUR KIT</text>
+<text x="483" y="451.0" fill="#F1EFE5" font-family="Arial" font-size="11">01   White cosmos</text>
+<text x="483" y="464.75" fill="#F1EFE5" font-family="Arial" font-size="11">02   White sweet alyssum</text>
+<text x="483" y="478.5" fill="#F1EFE5" font-family="Arial" font-size="11">03   Evening primrose</text>
+<text x="483" y="492.25" fill="#F1EFE5" font-family="Arial" font-size="11">       + A field guide to growing</text>
+<text x="483" y="551.0" fill="#F1EFE5" font-family="Arial" font-size="8">Seeds for sowing. Not for consumption.</text>
+<text x="483" y="561.0" fill="#F1EFE5" font-family="Arial" font-size="8">Store in a cool, dry place.</text>
+<text x="483" y="571.0" fill="#F1EFE5" font-family="Arial" font-size="8">FIELDWORK / MOON GARDEN / No. 001</text>
+<rect x="730" y="180" width="105" height="420" fill="#DBEA92"/>
+<text x="743" y="218.0" fill="#182C31" font-family="Arial" font-size="14">A SMALL</text>
+<text x="743" y="235.5" fill="#182C31" font-family="Arial" font-size="14">EVENING</text>
+<text x="743" y="253.0" fill="#182C31" font-family="Arial" font-size="14">RITUAL</text>
+<text x="743" y="324.0" fill="#182C31" font-family="Arial" font-size="10">01 / SOW</text>
+<text x="743" y="336.5" fill="#182C31" font-family="Arial" font-size="10">Follow the</text>
+<text x="743" y="349.0" fill="#182C31" font-family="Arial" font-size="10">seed guide.</text>
+<text x="743" y="361.5" fill="#182C31" font-family="Arial" font-size="10"></text>
+<text x="743" y="374.0" fill="#182C31" font-family="Arial" font-size="10">02 / TEND</text>
+<text x="743" y="386.5" fill="#182C31" font-family="Arial" font-size="10">Water with</text>
+<text x="743" y="399.0" fill="#182C31" font-family="Arial" font-size="10">care.</text>
+<text x="743" y="411.5" fill="#182C31" font-family="Arial" font-size="10"></text>
+<text x="743" y="424.0" fill="#182C31" font-family="Arial" font-size="10">03 / PAUSE</text>
+<text x="743" y="436.5" fill="#182C31" font-family="Arial" font-size="10">Watch the</text>
+<text x="743" y="449.0" fill="#182C31" font-family="Arial" font-size="10">evening bloom.</text>
+<path d="M85 180V75L99 30H341L355 75V180Z" fill="#182C31" stroke="#D47186" stroke-width="1.2"/>
+<path d="M460 600V705L474 750H716L730 705V600Z" fill="#182C31" stroke="#D47186" stroke-width="1.2"/>
+<path d="M460 180L470 111H720L730 180Z" fill="#182C31" stroke="#D47186" stroke-width="1.2"/>
+<path d="M85 600L95 669H345L355 600Z" fill="#182C31" stroke="#D47186" stroke-width="1.2"/>
+<path d="M355 180L365 100H450L460 180Z" fill="#DBEA92" stroke="#D47186" stroke-width="1.2"/>
+<path d="M355 600L365 680H450L460 600Z" fill="#DBEA92" stroke="#D47186" stroke-width="1.2"/>
+<path d="M730 180L740 100H825L835 180Z" fill="#DBEA92" stroke="#D47186" stroke-width="1.2"/>
+<path d="M730 600L740 680H825L835 600Z" fill="#DBEA92" stroke="#D47186" stroke-width="1.2"/>
+<text x="110" y="125.0" fill="#DBEA92" font-family="Arial" font-size="12">LET THE EVENING GROW.</text>
+<text x="492" y="662.0" fill="#DBEA92" font-family="Arial" font-size="11">FIELDWORK / No. 001</text>
+<g id="fold-and-cut-guides">
+<path d="M85 180V600" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M355 180V600" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M460 180V600" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M730 180V600" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M85 180h750" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M85 600h750" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M85 75h270" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M460 705h270" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<path d="M85 180H40V600H85M835 180V600" fill="none" stroke="#D47186" stroke-width="1.2"/>
+</g>
+<text x="177" y="8.0" fill="#6A7775" font-family="Arial" font-size="12">90 mm</text>
+<text x="367" y="8.0" fill="#6A7775" font-family="Arial" font-size="12">35 mm</text>
+<text x="550" y="8.0" fill="#6A7775" font-family="Arial" font-size="12">90 mm</text>
+<text x="742" y="8.0" fill="#6A7775" font-family="Arial" font-size="12">35 mm</text>
+<text x="872" y="343.0" fill="#6A7775" font-family="Arial" font-size="12">140 mm</text>
+<text x="872" y="358.0" fill="#6A7775" font-family="Arial" font-size="12">BODY</text>
+<text x="872" y="373.0" fill="#6A7775" font-family="Arial" font-size="12">HEIGHT</text>
+</g>
+<path d="M1430 1060h30" fill="none" stroke="#D47186" stroke-width="1.2"/>
+<text x="1473" y="1064.0" fill="#6A7775" font-family="Arial" font-size="11">CUT</text>
+<path d="M1555 1060h30" fill="none" stroke="#628CA0" stroke-width="1.2" stroke-dasharray="5 5"/>
+<text x="1600" y="1064.0" fill="#6A7775" font-family="Arial" font-size="11">FOLD</text>
+<text x="620" y="1118.0" fill="#6A7775" font-family="Arial" font-size="13">Nominal carton: 90 × 35 × 140 mm / Drawing scale: 3 px = 1 mm</text>
+<path d="M64 1150h1672" fill="none" stroke="#182C31" stroke-width="1.2"/>
+<text x="64" y="1197.0" fill="#182C31" font-family="Arial" font-size="13">03 / WHAT GOES INSIDE</text>
+<text x="620" y="1197.0" fill="#182C31" font-family="Arial" font-size="13">04 / FROM FIGMA TO A REAL BOX</text>
+<rect x="64" y="1225" width="140" height="220" fill="#DBEA92"/>
+<text x="76" y="1248.0" fill="#182C31" font-family="Arial" font-size="9">FIELDWORK</text>
+<text x="76" y="1301.0" fill="#182C31" font-family="Georgia" font-size="40">01</text>
+<circle cx="134" cy="1357" r="30" fill="#182C31"/>
+<text x="117" y="1367.0" fill="#DBEA92" font-family="Arial" font-size="30">✦</text>
+<text x="76" y="1416.0" fill="#182C31" font-family="Arial" font-size="11">COSMOS</text>
+<text x="76" y="1437.0" fill="#182C31" font-family="Arial" font-size="7">MOON GARDEN</text>
+<rect x="219" y="1225" width="140" height="220" fill="#E0DAD8"/>
+<text x="231" y="1248.0" fill="#182C31" font-family="Arial" font-size="9">FIELDWORK</text>
+<text x="231" y="1301.0" fill="#182C31" font-family="Georgia" font-size="40">02</text>
+<circle cx="289" cy="1357" r="30" fill="#182C31"/>
+<text x="272" y="1367.0" fill="#DBEA92" font-family="Arial" font-size="30">✦</text>
+<text x="231" y="1416.0" fill="#182C31" font-family="Arial" font-size="11">ALYSSUM</text>
+<text x="231" y="1437.0" fill="#182C31" font-family="Arial" font-size="7">MOON GARDEN</text>
+<rect x="374" y="1225" width="140" height="220" fill="#D3DEDC"/>
+<text x="386" y="1248.0" fill="#182C31" font-family="Arial" font-size="9">FIELDWORK</text>
+<text x="386" y="1301.0" fill="#182C31" font-family="Georgia" font-size="40">03</text>
+<circle cx="444" cy="1357" r="30" fill="#182C31"/>
+<text x="427" y="1367.0" fill="#DBEA92" font-family="Arial" font-size="30">✦</text>
+<text x="386" y="1416.0" fill="#182C31" font-family="Arial" font-size="11">PRIMROSE</text>
+<text x="386" y="1437.0" fill="#182C31" font-family="Arial" font-size="7">MOON GARDEN</text>
+<text x="620" y="1250.0" fill="#182C31" font-family="Arial" font-size="14">1. EDIT THE ART</text>
+<text x="620" y="1287.0" fill="#6A7775" font-family="Arial" font-size="14">Edit the text, colours and vectors.</text>
+<text x="620" y="1304.5" fill="#6A7775" font-family="Arial" font-size="14">Keep artwork and fold guides in</text>
+<text x="620" y="1322.0" fill="#6A7775" font-family="Arial" font-size="14">separate layers in Figma.</text>
+<text x="985" y="1250.0" fill="#182C31" font-family="Arial" font-size="14">2. MAKE A DUMMY</text>
+<text x="985" y="1287.0" fill="#6A7775" font-family="Arial" font-size="14">Print at the intended dimensions.</text>
+<text x="985" y="1304.5" fill="#6A7775" font-family="Arial" font-size="14">Cut, score and fold, then test the fit</text>
+<text x="985" y="1322.0" fill="#6A7775" font-family="Arial" font-size="14">with the sachets and growing guide.</text>
+<text x="1350" y="1250.0" fill="#182C31" font-family="Arial" font-size="14">3. PREPARE FOR PRINT</text>
+<text x="1350" y="1287.0" fill="#6A7775" font-family="Arial" font-size="14">Ask your printer to verify the net,</text>
+<text x="1350" y="1304.5" fill="#6A7775" font-family="Arial" font-size="14">add 3 mm bleed and 4 mm safe areas,</text>
+<text x="1350" y="1322.0" fill="#6A7775" font-family="Arial" font-size="14">and confirm board stock and colour.</text>
+<text x="620" y="1455.0" fill="#6A7775" font-family="Arial" font-size="10">DESIGN STUDY / NOT A PRODUCTION-APPROVED DIELINE</text>
+</svg>

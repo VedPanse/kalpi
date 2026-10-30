@@ -1,31 +1,13 @@
-# Integration capability verification
+# Integration references
 
-Official documentation checked during this build on October 23, 2026 (America/Los_Angeles). Documentation capability does not establish credential access or a successful live integration.
+Checked against official documentation during the October 2026 pilot implementation. Documented capability and successful account integration are separate claims.
 
-## Figma
+- **Figma:** [Plugin API](https://developers.figma.com/docs/plugins/), [dynamic loading and page-scoped changes](https://developers.figma.com/docs/plugins/migrating-to-dynamic-loading/), [manifest](https://developers.figma.com/docs/plugins/manifest/). Kalpi writes native vectors, frames, text and dimension annotations. The panel pairs an independent identity with an expiring, project-scoped code. Plugins require user initiation and must stay open for synchronization. Native node round trips were tested through Figma; the installed desktop panel still needs a hands-on end-to-end check.
+- **SpacetimeDB 2.13:** [subscriptions](https://spacetimedb.com/docs/clients/subscriptions/) provide immediate browser/plugin updates. Private tables are exposed through sender-filtered views. Reducers validate revisions and transactional ownership. Maincloud staging is published and legacy data migrated. Creator authentication uses SpacetimeAuth; shoppers retain anonymous browser identities.
+- **OpenAI:** [Responses function calling](https://developers.openai.com/api/docs/guides/function-calling), [GPT-5 mini](https://developers.openai.com/api/docs/models/gpt-5-mini). Strict editing tools return field names and JSON-encoded values, then canonical product validation runs before any change. A live faceted-glass edit succeeded. Calls use `store:false`; application conversation history remains private in Spacetime.
+- **Claude, optional:** [Messages API](https://platform.claude.com/docs/en/api/messages). Select `AI_PROVIDER=anthropic` after configuring the server credential. No Claude inference call has been verified.
+- **Vercel:** [Express hosting](https://vercel.com/docs/frameworks/backend/express), [private Blob](https://vercel.com/docs/vercel-blob/private-storage), [client uploads](https://vercel.com/docs/vercel-blob/client-upload). Blob uses deployment OIDC. Uploaded bytes are validated before immutable asset registration. Public access is streamed only while a matching publication remains active.
+- **AR:** [model-viewer AR](https://modelviewer.dev/examples/augmentedreality/), Three.js GLTFExporter and USDZExporter. Exports come from the saved parameter model in meters. Confirmed dimensions enable fixed-scale AR. Export validation is automated; iOS Quick Look and Android physical placement require device testing.
+- **Research:** [Stream3D-VLM](https://arxiv.org/abs/2606.06891) informs future camera-based spatial interaction; [PhysX-Omni](https://arxiv.org/abs/2605.21572) informs physical metadata. No inference service from either paper is required or claimed.
 
-- [Plugin API overview](https://developers.figma.com/docs/plugins/): plugins can read/write editor content.
-- [Plugin typings maintained by Figma](https://github.com/figma/plugin-typings/blob/master/plugin-api.d.ts): `currentPage.selection`, `selectionchange`, `exportAsync`, frame/text APIs and document-change constraints.
-- [Async tasks](https://developers.figma.com/docs/plugins/async-tasks/): artwork export through `exportAsync` as PNG.
-- [DocumentChange](https://developers.figma.com/docs/plugins/api/DocumentChange/): relevant change events exist; dynamic-page/documentchange subscriptions require care. This implementation deliberately uses explicit refresh instead of high-frequency exports or document-wide listeners.
-- [Plugin UI messaging](https://developers.figma.com/docs/plugins/api/figma-ui/): UI and main-context communication.
-- [Manifest](https://developers.figma.com/docs/plugins/manifest/): development network domains and plugin entrypoints.
-
-Implemented source exports one selected FRAME, shows it in a Three.js iframe panel and sends a saved label version to Kalpi. Results insertion writes text in a new frame with actual data and timestamp. Source/origin checks scope the localhost bridge. No live Figma file was accessed, and no native 3D canvas layer is claimed. No proprietary Figma 3D format or Weave generation API is assumed.
-
-## 3D generation
-
-[Meshy image-to-3D API](https://docs.meshy.ai/en/api/image-to-3d) documents authenticated asynchronous tasks and textured model exports including GLB. [Meshy overview](https://docs.meshy.ai/en) lists export formats. No Meshy credentials were found among relevant environment variable names. No task or charge was created. GLB import is the implemented source interface. Other providers were not live-tested.
-
-## Shopify
-
-- [productCreate](https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate): `write_products` scope; creation starts with one variant. Additional sellable variants require the dedicated bulk variant mutation.
-- [Product status](https://shopify.dev/docs/api/admin-graphql/latest/objects/product): ACTIVE versus DRAFT matters for storefront availability.
-- [stagedUploadsCreate](https://shopify.dev/docs/api/admin-graphql/2026-07/mutations/stagedUploadsCreate): staged uploads include MODEL_3D; file size is required for that resource.
-- [Manage media](https://shopify.dev/docs/apps/build/product-merchandising/products-and-collections/manage-media): Shopify-hosted files process asynchronously; handle status and errors before claiming readiness.
-
-There was no Shopify integration in the empty repository and no store credentials in relevant environment variable names. The integration is unavailable; no draft, uploaded media, remote Shopify IDs, sandbox checkout, retry test, or storefront preview is claimed. Preparing confirmed facts and a local concept export works. A live development store is the concrete blocker for implementing and verifying the final draft step. A draft admin view does not imply public publication. Visa eligibility is separately unconfirmed.
-
-## Claude
-
-[Claude Sonnet 4.6](https://platform.claude.com/docs/id/models/sonnet-4-6/overview) confirms the model family. The adapter uses the server-side Messages endpoint and can be configured with ANTHROPIC_MODEL. No key was present and no paid call was made. Provider output is untested; the disabled UI is intentional.
+Prior local-only integration notes are retained in `history/local-pilot-integrations.md`.
