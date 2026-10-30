@@ -4,10 +4,11 @@ import {spawn} from 'node:child_process';
 import {mkdtemp,rm,readFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-let child,tmp;const base='http://127.0.0.1:3097',token='test-seller-secret';
+import {testDatabase} from './helpers/database.js';
+let child,tmp,testDb;const base='http://127.0.0.1:3097',token='test-seller-secret';
 async function req(p,body,auth=true,method){let r=await fetch(base+'/api/'+p,{method:method||(body?'POST':'GET'),headers:{...(auth?{Authorization:'Bearer '+token}:{}),...(!(body instanceof FormData)?{'Content-Type':'application/json'}:{})},body:body instanceof FormData?body:body?JSON.stringify(body):undefined});return {status:r.status,data:await r.json()}}
-before(async()=>{tmp=await mkdtemp(path.join(os.tmpdir(),'kalpi-test-'));child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3097',SELLER_TOKEN:token,DB_PATH:path.join(tmp,'test.sqlite')},stdio:'pipe'});await new Promise((resolve,reject)=>{child.stdout.on('data',d=>{if(String(d).includes('Kalpi:'))resolve()});child.on('error',reject);child.on('exit',c=>reject(Error('Server exited '+c)))})});
-after(async()=>{child.kill();await rm(tmp,{recursive:true,force:true})});
+before(async()=>{testDb=await testDatabase();tmp=await mkdtemp(path.join(os.tmpdir(),'kalpi-test-'));child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3097',SELLER_TOKEN:token,DB_PATH:path.join(tmp,'test.sqlite')},stdio:'pipe'});await new Promise((resolve,reject)=>{child.stdout.on('data',d=>{if(String(d).includes('Kalpi:'))resolve()});child.stderr.on('data',d=>{if(String(d).includes('Error'))console.error(String(d))});child.on('error',reject);child.on('exit',c=>reject(Error('Server exited '+c)))})});
+after(async()=>{child.kill();await testDb.close();await rm(tmp,{recursive:true,force:true})});
 test('complete import → versions → immutable shelf → real response → seller results',async()=>{
 assert.equal((await req('seller/state',null,false)).status,401);assert.equal((await req('local-session',null,false)).status,403);
 let p=(await req('seller/projects',{name:'Test perfume'})).data;
@@ -32,3 +33,22 @@ await req('seller/shelves/'+s.id+'/unpublish',{});assert.equal((await req('shelv
 });
 test('reject invalid models',async()=>{let f=new FormData();f.append('file',new Blob(['not a model']),'bad.glb');assert.equal((await req('seller/assets',f)).status,400)});
 test('database records survive reopen',async()=>{const {createStore}=await import('../store.js');let file=path.join(tmp,'persistence.sqlite');let s=createStore(file);s.put('project',{id:'durable',name:'Saved project'});s.db.close();s=createStore(file);assert.equal(s.get('durable').name,'Saved project');s.db.close()});
+test('Figma directions keep source evidence, exact finishes and safe save/publish retries',async()=>{
+  const p=(await req('seller/projects',{name:'Figma test'})).data;
+  const sourceReference={provider:'figma',fileKey:'test-file',nodeId:'7:21',nodeName:'Development label fixture',exportedAt:'2026-10-24T01:00:00Z'};
+  const body={projectId:p.id,source:'sample',name:'Fixture direction',color:'#b07b59',roughness:0,metalness:0,sourceReference,idempotencyKey:'figma-version-test'};
+  const v=(await req('seller/versions',body)).data;
+  const retried=(await req('seller/versions',body)).data;
+  assert.equal(v.id,retried.id);assert.equal(v.roughness,0);assert.deepEqual(v.sourceReference,sourceReference);
+  assert.equal((await req('seller/versions',{...body,color:'#ffffff'})).status,409);
+  const publish={projectId:p.id,versionIds:[v.id],idempotencyKey:'figma-publish-test'};
+  const shelf=(await req('seller/shelves',publish)).data;
+  assert.equal((await req('seller/shelves',publish)).data.id,shelf.id);
+  const publicData=(await req('shelves/'+shelf.id,null,false)).data;
+  assert.equal(publicData.versions[0].sourceReference,undefined);assert.equal(publicData.versions[0].designOrigin,'figma');assert.ok(!JSON.stringify(publicData).includes('test-file'));
+  const state=(await req('seller/state')).data;
+  assert.equal(state.versions.filter(v=>v.projectId===p.id).length,1);
+  assert.equal(state.shelves.filter(s=>s.projectId===p.id).length,1);
+  await req('seller/shelves/'+shelf.id+'/unpublish',{});
+  assert.equal((await req('seller/shelves',publish)).status,409);
+});

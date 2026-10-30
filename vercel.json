@@ -1,0 +1,45 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "functions": {
+    "server.js": {
+      "maxDuration": 180,
+      "includeFiles": "{.local/bindings.mjs,assets/reference/*.glb,data/uploads/sample.glb,public/*.html}"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(studio|studio.html|studio.css|dist/.*|store/.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/models/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}

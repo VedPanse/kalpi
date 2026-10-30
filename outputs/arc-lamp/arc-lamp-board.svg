@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1400" viewBox="0 0 1800 1400">
+<title>ARC / 03 — sculptural table lamp</title>
+<defs>
+ <linearGradient id="shade" x1="0" y1="0" x2="1" y2=".4"><stop stop-color="#163f43"/><stop offset=".32" stop-color="#527d79"/><stop offset=".6" stop-color="#305e60"/><stop offset="1" stop-color="#123b40"/></linearGradient>
+ <linearGradient id="brass"><stop stop-color="#6e5935"/><stop offset=".22" stop-color="#bdab7c"/><stop offset=".44" stop-color="#e5d4a2"/><stop offset=".65" stop-color="#bca371"/><stop offset="1" stop-color="#715d39"/></linearGradient>
+ <linearGradient id="base" x1="0" x2="1"><stop stop-color="#9f4f37"/><stop offset=".28" stop-color="#cc7c58"/><stop offset=".55" stop-color="#d68b65"/><stop offset="1" stop-color="#985038"/></linearGradient>
+ <radialGradient id="interior"><stop stop-color="#fff8df"/><stop offset=".65" stop-color="#e3d2a5"/><stop offset="1" stop-color="#a69570"/></radialGradient>
+</defs>
+<rect id="Board-background" width="1800" height="1400" fill="#f6f4ed"/>
+<g font-family="Helvetica,Arial,sans-serif" fill="#203c3e">
+ <text x="90" y="90" font-size="16" letter-spacing="3">KALPI / OBJECT STUDIES</text>
+ <text x="90" y="170" font-size="64" font-weight="700" letter-spacing="-3">ARC / 03</text>
+ <text x="1405" y="100" font-size="18">A small pool of warmth.</text>
+ <text x="1405" y="130" font-size="18">A quiet sculptural presence.</text>
+ <path d="M90 210H1710" stroke="#c7ccc3"/>
+</g>
+<rect x="90" y="250" width="1190" height="1010" rx="2" fill="#e8ece5"/>
+<g id="ARC-lamp-product" >
+ <g id="Terracotta-base">
+  <path d="M553 1020 Q550 1000 568 971 L603 875 Q610 854 638 850 L732 850 Q760 854 768 875 L803 971 Q821 1000 818 1020 L818 1040 Q818 1070 685 1078 Q553 1070 553 1040Z" fill="url(#base)"/>
+  <ellipse cx="685" cy="1020" rx="132" ry="43" fill="#c67a56"/>
+  <path d="M556 1038 Q685 1086 815 1038" fill="none" stroke="#a45b3d" stroke-width="3"/>
+ </g>
+ <g id="Brushed-brass-stem"><path d="M666 565 L704 565 L704 989 Q685 1002 666 989Z" fill="url(#brass)"/><ellipse cx="685" cy="989" rx="19" ry="7" fill="#cbb787"/></g>
+ <g id="Deep-petrol-aluminium-dome">
+  <path d="M353 611 C370 398 514 306 685 306 C856 306 1000 398 1017 611 Q1017 657 685 672 Q353 657 353 611Z" fill="url(#shade)"/>
+  <ellipse cx="685" cy="615" rx="331" ry="60" fill="#163f43"/>
+  <ellipse cx="685" cy="618" rx="312" ry="44" fill="url(#interior)"/>
+  <path d="M354 613 Q684 731 1016 613" fill="none" stroke="#416967" stroke-width="8"/>
+  <path d="M407 490 C440 405 520 354 602 340" fill="none" stroke="#72928a" stroke-width="5" opacity=".45"/>
+ </g>
+ <g id="Ivory-diffuser"><ellipse cx="685" cy="618" rx="83" ry="20" fill="#fff6d9"/><path d="M608 618 Q685 650 762 618" fill="none" stroke="#e8d6ac" stroke-width="2"/></g>
+ <g id="Brass-dimmer"><ellipse cx="784" cy="988" rx="13" ry="7" fill="#705638"/><path d="M772 986V969Q784 959 796 969V986Q784 995 772 986Z" fill="url(#brass)"/><ellipse cx="784" cy="969" rx="12" ry="5" fill="#d4bf8c"/></g>
+</g>
+<g font-family="Helvetica,Arial,sans-serif" fill="#203c3e">
+ <text x="125" y="295" font-size="13" letter-spacing="2">01 / PRODUCT VIEW</text>
+ <text x="125" y="1193" font-size="26">Warm light. Cool silhouette.</text>
+ <text x="125" y="1225" font-size="16" fill="#63736b">Spun aluminium · brushed brass · terracotta ceramic</text>
+ <text x="1340" y="293" font-size="13" letter-spacing="2">02 / DESIGN INTENT</text>
+ <text x="1340" y="350" font-size="32" font-weight="700">Light, grounded.</text>
+ <text x="1340" y="398" font-size="19">A broad, low dome floats</text>
+ <text x="1340" y="429" font-size="19">above a tapered ceramic</text>
+ <text x="1340" y="460" font-size="19">base on a fine brass stem.</text>
+ <path d="M1340 510H1710" stroke="#c7ccc3"/>
+ <text x="1340" y="554" font-size="13" letter-spacing="2">PROPOSED DIMENSIONS</text>
+ <text x="1340" y="603" font-size="22">Width</text><text x="1710" y="603" text-anchor="end" font-size="22" font-weight="700">320 mm</text>
+ <text x="1340" y="646" font-size="22">Depth</text><text x="1710" y="646" text-anchor="end" font-size="22" font-weight="700">320 mm</text>
+ <text x="1340" y="689" font-size="22">Height</text><text x="1710" y="689" text-anchor="end" font-size="22" font-weight="700">420 mm</text>
+ <text x="1340" y="735" font-size="15" fill="#63736b">Concept dimensions, not measured.</text>
+ <path d="M1340 780H1710" stroke="#c7ccc3"/>
+ <text x="1340" y="825" font-size="13" letter-spacing="2">MATERIAL &amp; FINISH</text>
+ <rect x="1340" y="854" width="54" height="54" rx="27" fill="#305e60"/>
+ <text x="1415" y="878" font-size="18" font-weight="700">Petrol aluminium</text><text x="1415" y="902" font-size="15">Matte powder coat</text>
+ <rect x="1340" y="935" width="54" height="54" rx="27" fill="#bdab7c"/>
+ <text x="1415" y="959" font-size="18" font-weight="700">Brushed brass</text><text x="1415" y="983" font-size="15">Stem &amp; rotary dimmer</text>
+ <rect x="1340" y="1016" width="54" height="54" rx="27" fill="#c67a56"/>
+ <text x="1415" y="1040" font-size="18" font-weight="700">Terracotta ceramic</text><text x="1415" y="1064" font-size="15">Unglazed, fine texture</text>
+ <text x="1340" y="1160" font-size="16">Single product. One clear view.</text>
+ <text x="1340" y="1190" font-size="16">Designed for image-to-3D testing.</text>
+ <path d="M90 1300H1710" stroke="#c7ccc3"/>
+ <text x="90" y="1345" font-size="14" fill="#63736b">ARC / 03 — Table lamp concept · Editable vector artwork · No 3D generation included</text>
+ <text x="1710" y="1345" text-anchor="end" font-size="14" fill="#63736b">OBJECT STUDY 03 / 2026</text>
+</g>
+</svg>

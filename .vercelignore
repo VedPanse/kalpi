@@ -1,0 +1,17 @@
+.git
+.local
+node_modules
+spacetimedb/node_modules
+spacetimedb/dist
+tests
+test-results
+playwright-report
+docs
+.env*
+data/*
+!data/uploads
+!data/uploads/sample.glb
+public/qa
+public/figma-panel.html
+public/figma-panel.js
+public/figma-panel.css
